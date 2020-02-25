@@ -1,0 +1,6 @@
+[submodule "ext/libriscv"]
+	path = ext/libriscv
+	url = git@github.com:fwsGonzo/libriscv.git
+[submodule "ext/LuaBridge"]
+	path = ext/LuaBridge
+	url = git@github.com:fwsGonzo/LuaBridge.git
