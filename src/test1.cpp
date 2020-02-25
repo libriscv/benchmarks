@@ -8,12 +8,12 @@ static State<RISCV32> state;
 
 static Script* luascript = nullptr;
 
-void test_1_setup()
+void test_setup()
 {
 	riscv::verbose_machine = false;
 	static auto rvbinary = load_file("../rvprogram/build/rvbinary");
 	delete machine;
-	machine = new Machine<RISCV32> {rvbinary};
+	machine = new Machine<RISCV32> {rvbinary, 64*1024*1024};
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_newlib_syscalls(state, *machine);
@@ -23,14 +23,24 @@ void test_1_setup()
 	machine->simulate();
 	assert(state.exit_code == 666);
 
+	delete luascript;
 	luascript = new Script("../luaprogram/script.lua");
 }
+
 void test_1_riscv()
 {
-	static std::vector<uint32_t> args = {555};
-	machine->vmcall("test", args, false);
+	machine->vmcall("test", {555});
 }
 void test_1_lua()
 {
-	luascript->call("test");
+	luascript->call("test", 555);
+}
+
+void test_2_riscv()
+{
+	machine->vmcall("test", {111, 222, 333, 444, 555, 666, 777, 888});
+}
+void test_2_lua()
+{
+	luascript->call("test", 111, 222, 333, 444, 555, 666, 777, 888);
 }

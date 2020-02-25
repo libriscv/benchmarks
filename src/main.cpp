@@ -6,11 +6,10 @@ static long
 run_test(const char* name, int samples, test_func setup, test_func execone)
 {
 	std::vector<test_result> results;
-	setup();
 	for (int i = 0; i < samples; i++)
 	{
-		auto result = perform_test(execone);
-		results.push_back(result);
+		setup();
+		results.push_back( perform_test<2000>(execone) );
 	}
 	std::sort(results.begin(), results.end());
 	long median = results[results.size() / 2];
@@ -23,14 +22,18 @@ run_test(const char* name, int samples, test_func setup, test_func execone)
 }
 
 /* TESTS */
-extern void test_1_setup();
+extern void test_setup();
 extern void test_1_riscv();
 extern void test_1_lua();
+extern void test_2_riscv();
+extern void test_2_lua();
 
 int main()
 {
-	const int S = 2000;
-	run_test("libriscv: vector append", S, test_1_setup, test_1_riscv);
-	run_test("lua5.3: table append", S, test_1_setup, test_1_lua);
+	const int S = 200;
+	run_test("libriscv: vector append", S, test_setup, test_1_riscv);
+	run_test("lua5.3: table append", S, test_setup, test_1_lua);
+	run_test("libriscv: many arguments", S, test_setup, test_2_riscv);
+	run_test("lua5.3: many arguments", S, test_setup, test_2_lua);
 	return 0;
 }
