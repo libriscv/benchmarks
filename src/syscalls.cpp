@@ -5,8 +5,10 @@
 using namespace riscv;
 static constexpr uint32_t G_SHMEM_BASE = 0x70000000;
 static const uint32_t sbrk_start = 0x40000000;
+static       uint32_t sbrk_end = sbrk_start;
 static const uint32_t sbrk_max   = sbrk_start + 0x1000000;
 static const uint32_t heap_start = sbrk_max;
+static       uint32_t heap_nextfree = heap_start;
 static const uint32_t heap_max   = 0xF0000000;
 
 struct iovec32 {
@@ -121,7 +123,6 @@ long syscall_gettimeofday(Machine<W>& machine)
 template <int W>
 long syscall_brk(Machine<W>& machine)
 {
-	static uint32_t sbrk_end = sbrk_start;
 	const uint32_t new_end = machine.template sysarg<uint32_t>(0);
 	if constexpr (verbose_syscalls) {
 		printf("SYSCALL brk called, current = 0x%X new = 0x%X\n", sbrk_end, new_end);
@@ -217,14 +218,13 @@ inline void add_mman_syscalls(Machine<W>& machine)
 	            addr_g, length, prot, flags);
 	    if (addr_g == 0 && (length % Page::size()) == 0)
 	    {
-	        static uint32_t nextfree = heap_start;
-	        const uint32_t addr = nextfree;
+	        const uint32_t addr = heap_nextfree;
 			// anon pages need to be zeroed
 			if (flags & MAP_ANONYMOUS) {
 				// ... but they are already CoW
 				//machine.memory.memset(addr, 0, length);
 			}
-	        nextfree += length;
+	        heap_nextfree += length;
 	        return addr;
 	    }
 		return UINT32_MAX; // = MAP_FAILED;
@@ -272,6 +272,10 @@ inline void add_mman_syscalls(Machine<W>& machine)
 template <int W>
 inline void setup_newlib_syscalls(State<W>& state, Machine<W>& machine)
 {
+	// reset these
+	sbrk_end = sbrk_start;
+	heap_nextfree = heap_start;
+
 	machine.install_syscall_handler(SYSCALL_EBREAK, syscall_ebreak<W>);
 	machine.install_syscall_handler(64, {&state, &State<W>::syscall_write});
 	machine.install_syscall_handler(93, {&state, &State<W>::syscall_exit});

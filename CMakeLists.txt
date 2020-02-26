@@ -5,7 +5,7 @@ option(MINIMAL     "Minimal build" ON)
 option(DEBUGGING   "Debugging build" OFF)
 
 set(MARCH     "-march=native")
-set(COMMON    "-O2 -Wall -Wextra")
+set(COMMON    "-Ofast -Wall -Wextra")
 set(CMAKE_CXX_FLAGS "${COMMON} ${MARCH} -std=c++17")
 
 if (DEBUGGING)

@@ -27,6 +27,8 @@ extern void test_1_riscv();
 extern void test_1_lua();
 extern void test_2_riscv();
 extern void test_2_lua();
+extern void test_3_riscv();
+extern void test_3_lua();
 
 int main()
 {
@@ -35,5 +37,7 @@ int main()
 	run_test("lua5.3: table append", S, test_setup, test_1_lua);
 	run_test("libriscv: many arguments", S, test_setup, test_2_riscv);
 	run_test("lua5.3: many arguments", S, test_setup, test_2_lua);
+	run_test("libriscv: integer math", S, test_setup, test_3_riscv);
+	run_test("lua5.3: integer math", S, test_setup, test_3_lua);
 	return 0;
 }
