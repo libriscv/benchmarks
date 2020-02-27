@@ -19,6 +19,7 @@ perform_test(test_func func)
 	for (int i = 0; i < ROUNDS; i++) {
 		func();
 	}
+	asm("" : : : "memory");
 	auto t1 = time_now();
 	asm("" : : : "memory");
 	return nanodiff(t0, t1);

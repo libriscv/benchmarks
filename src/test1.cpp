@@ -14,7 +14,8 @@ void test_setup()
 	riscv::verbose_machine = false;
 	rvbinary = load_file("../rvprogram/build/rvbinary");
 	delete machine;
-	machine = new Machine<RISCV32> {rvbinary, 4*1024*1024};
+	machine = new Machine<RISCV32> {rvbinary, 2*1024*1024};
+	machine->memory.set_exit_address(machine->address_of("fastexit"));
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_newlib_syscalls(state, *machine);

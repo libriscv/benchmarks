@@ -276,7 +276,7 @@ inline void setup_newlib_syscalls(State<W>& state, Machine<W>& machine)
 	sbrk_end = sbrk_start;
 	heap_nextfree = heap_start;
 
-	machine.install_syscall_handler(SYSCALL_EBREAK, syscall_ebreak<W>);
+	machine.install_syscall_handler(SYSCALL_EBREAK, {&state, &State<W>::syscall_exit});
 	machine.install_syscall_handler(64, {&state, &State<W>::syscall_write});
 	machine.install_syscall_handler(93, {&state, &State<W>::syscall_exit});
 	machine.install_syscall_handler(214, syscall_brk<W>);
