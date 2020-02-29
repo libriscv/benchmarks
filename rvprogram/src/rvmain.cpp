@@ -1,15 +1,13 @@
+#include <cassert>
+#include <cstdio>
 #include <vector>
 extern "C" void _exit(int);
-extern "C" void fastexit(int) __attribute__((noreturn));
-
-asm(".global fastexit\n"
-	"fastexit:\n"
-	"ebreak\n");
+#define PUBLIC_API extern "C" __attribute__((used))
 
 std::vector<int> vec;
 int main()
 {
-	vec.reserve(2000 * 9);
+	vec.reserve(9 * 2000);
 	_exit(666);
 }
 
@@ -20,8 +18,7 @@ std::array<int, 2000*8> array;
 static int* setter = array.data();
 #endif
 
-extern "C"
-void test(int arg1)
+PUBLIC_API void test(int arg1)
 {
 #ifdef USE_ARRAY
 	//array[counter++] = arg1;
@@ -31,8 +28,8 @@ void test(int arg1)
 #endif
 }
 
-extern "C"
-void test_args(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8)
+PUBLIC_API void
+test_args(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8)
 {
 #ifdef USE_ARRAY
 	*setter++ = a1;
@@ -55,12 +52,21 @@ void test_args(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8)
 #endif
 }
 
-extern "C"
-long test_maffs(int a1, int a2)
+PUBLIC_API long test_maffs(int a1, int a2)
 {
 	int a = a1 + a2;
 	int b = a1 - a2;
 	int c = a1 * a2;
 	int d = a1 / a2;
 	return a + b + c + d;
+}
+
+PUBLIC_API long selftest(int i, float f)
+{
+	static int bss = 0;
+	printf("i: %d   f: %d   bss: %d\n", i, (int) f, bss);
+	assert(i == 1234);
+	assert(f == 5678.0);
+	assert(bss == 0);
+	return 200;
 }

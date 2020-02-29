@@ -19,11 +19,14 @@ add_subdirectory(ext/libriscv/lib libriscv)
 set(SOURCES
 	src/main.cpp
 	src/luascript.cpp
+	src/selftest.cpp
 	src/syscalls.cpp
 	src/test1.cpp
+	ext/libriscv/emulator/src/native_libc.cpp
 )
 
 add_executable(bench ${SOURCES})
 target_link_libraries(bench riscv lua5.3)
 target_include_directories(bench PRIVATE ext/LuaBridge/Source/LuaBridge)
-set_target_properties(bench PROPERTIES CXX_STANDARD 17)
+# for some reason this causes -std=gnu++1z
+#set_target_properties(bench PROPERTIES CXX_STANDARD 17)

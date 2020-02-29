@@ -4,11 +4,11 @@ project(rvbinary C CXX)
 option(MINIMAL     "Minimal build" OFF)
 option(DEBUGGING   "Debugging build" OFF)
 option(GCSECTIONS  "Garbage collect empty sections" ON)
-set(PUBLIC_API "test;test_args;test_maffs" CACHE STRING "Symbols to keep during GC")
+set(PUBLIC_API "test" CACHE STRING "Symbols to keep during GC")
 
-set(RISCV_ABI "-march=rv32g -mabi=ilp32d")
+set(RISCV_ABI "-march=rv32imfd -mabi=ilp32d")
 set(WARNINGS  "-Wall -Wextra")
-set(COMMON    "-O2 -fstack-protector")
+set(COMMON    "-O3 -fstack-protector -nostdlib -nostdinc -fno-builtin")
 set(CMAKE_C_FLAGS "${WARNINGS} ${RISCV_ABI} -std=c11 ${COMMON}")
 set(CMAKE_CXX_FLAGS "${WARNINGS} ${RISCV_ABI} -std=c++2a ${COMMON}")
 
@@ -34,11 +34,14 @@ set(SOURCES
 	src/rvmain.cpp
 )
 
+add_subdirectory(ext)
+add_subdirectory(libc)
+
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "") # remove -rdynamic
 
 add_executable(rvbinary ${SOURCES})
-target_link_libraries(rvbinary -static)
+target_link_libraries(rvbinary -static libc)
 # place ELF into the top binary folder
 set_target_properties(rvbinary
 	PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"

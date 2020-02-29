@@ -22,6 +22,7 @@ run_test(const char* name, int samples, test_func setup, test_func execone)
 }
 
 /* TESTS */
+extern void run_selftest();
 extern void test_setup();
 extern void test_1_riscv();
 extern void test_1_lua();
@@ -32,6 +33,8 @@ extern void test_3_lua();
 
 int main()
 {
+	run_selftest();
+	printf("RISC-V self-test OK\n");
 	const int S = 200;
 	run_test("libriscv: vector append", S, test_setup, test_1_riscv);
 	run_test("lua5.3: table append", S, test_setup, test_1_lua);

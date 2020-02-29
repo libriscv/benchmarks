@@ -1,13 +1,12 @@
 #!/bin/bash
 set -e
 
-RISCV_TC=$HOME/riscv
-export PATH=$PATH:$RISCV_TC/bin
-export CC=$RISCV_TC/bin/riscv32-unknown-elf-gcc
-export CXX=$RISCV_TC/bin/riscv32-unknown-elf-g++
+export PATH=$PATH:$HOME/opt/xPacks/@xpack-dev-tools/riscv-none-embed-gcc/8.3.0-1.1.1/.content/bin
+export CC=$HOME/opt/xPacks/@xpack-dev-tools/riscv-none-embed-gcc/8.3.0-1.1.1/.content/bin/riscv-none-embed-gcc
+export CXX=$HOME/opt/xPacks/@xpack-dev-tools/riscv-none-embed-gcc/8.3.0-1.1.1/.content/bin/riscv-none-embed-g++
 
 mkdir -p build
 pushd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake -DPUBLIC_API="test"
+cmake .. -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake
 make -j4
 popd
