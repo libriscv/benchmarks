@@ -61,6 +61,19 @@ PUBLIC_API long test_maffs(int a1, int a2)
 	return a + b + c + d;
 }
 
+#include <include/syscall.hpp>
+extern "C"
+long sys_print(const void* data, size_t len)
+{
+	return syscall(50, (long) data, len);
+}
+
+PUBLIC_API void test_print()
+{
+	const char text[] = "This is a string";
+	sys_print(text, sizeof(text)-1);
+}
+
 PUBLIC_API long selftest(int i, float f)
 {
 	static int bss = 0;

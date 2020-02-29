@@ -9,6 +9,23 @@ static State<RISCV32> state;
 
 static Script* luascript = nullptr;
 
+template <int W>
+long syscall_print(Machine<W>& machine)
+{
+	using namespace riscv;
+	const auto address = machine.template sysarg<address_type<W>>(0);
+	const size_t len   = std::min(machine.template sysarg<address_type<W>>(1),
+						 2048u);
+	// TODO: support memview function w/callback
+	machine.memory.memview(address, len,
+		[] (const uint8_t* buffer, size_t len) {
+			if (std::string((char*) buffer, len) != "This is a string") {
+				abort();
+			}
+		});
+	return len;
+}
+
 void test_setup()
 {
 	riscv::verbose_machine = false;
@@ -23,6 +40,7 @@ void test_setup()
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, *machine);
 	setup_native_heap_syscalls(state, *machine);
+	machine->install_syscall_handler(50, syscall_print<RISCV32>);
 	machine->setup_argv({"rvprogram"});
 
 	try {
@@ -100,4 +118,13 @@ void test_3_riscv()
 void test_3_lua()
 {
 	luascript->call("test_maffs", 111, 222);
+}
+
+void test_4_riscv()
+{
+	machine->vmcall("test_print", {});
+}
+void test_4_lua()
+{
+	luascript->call("test_print");
 }

@@ -3,6 +3,13 @@
 
 using namespace luabridge;
 
+static void print(const std::string& text)
+{
+	if (text != "This is a string") {
+		abort();
+	}
+}
+
 Script::Script(const std::string& file)
 {
     this->state = luaL_newstate();
@@ -12,6 +19,10 @@ Script::Script(const std::string& file)
     {
 		throw std::runtime_error("Missing script file");
 	}
+	auto gns = getGlobalNamespace(this->state);
+    gns.beginNamespace("script")
+	.addFunction("print", print)
+	.endNamespace();
 }
 Script::~Script()
 {

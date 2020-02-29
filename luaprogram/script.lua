@@ -22,3 +22,7 @@ function test_maffs(arg1, arg2)
 	d = arg1 / arg2
 	return a + b + c + d
 end
+
+function test_print()
+	script.print("This is a string")
+end
