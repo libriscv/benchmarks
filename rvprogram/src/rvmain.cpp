@@ -14,7 +14,7 @@ int main()
 #define USE_ARRAY
 #ifdef USE_ARRAY
 #include <array>
-std::array<int, 2000*8> array;
+std::array<int, 2000*9> array;
 static int* setter = array.data();
 #endif
 

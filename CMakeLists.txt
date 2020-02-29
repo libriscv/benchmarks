@@ -4,9 +4,9 @@ project(script_bench CXX)
 option(MINIMAL     "Minimal build" ON)
 option(DEBUGGING   "Debugging build" OFF)
 
-set(MARCH     "-march=native")
-set(COMMON    "-Ofast -Wall -Wextra")
-set(CMAKE_CXX_FLAGS "${COMMON} ${MARCH} -std=c++17")
+set(OPTIMIZE  "-Ofast -march=native")
+set(COMMON    "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${COMMON} ${OPTIMIZE} -std=c++17")
 
 if (DEBUGGING)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")

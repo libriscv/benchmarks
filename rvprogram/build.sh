@@ -7,6 +7,6 @@ export CXX=$HOME/opt/xPacks/@xpack-dev-tools/riscv-none-embed-gcc/8.3.0-1.1.1/.c
 
 mkdir -p build
 pushd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake
+cmake .. -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake -DPUBLIC_API="test;test_args;test_maffs;fastexit"
 make -j4
 popd

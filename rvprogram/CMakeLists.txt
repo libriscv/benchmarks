@@ -8,7 +8,7 @@ set(PUBLIC_API "test" CACHE STRING "Symbols to keep during GC")
 
 set(RISCV_ABI "-march=rv32imfd -mabi=ilp32d")
 set(WARNINGS  "-Wall -Wextra")
-set(COMMON    "-O3 -fstack-protector -nostdlib -nostdinc -fno-builtin")
+set(COMMON    "-O2 -fstack-protector -nostdlib -nostdinc -fno-builtin")
 set(CMAKE_C_FLAGS "${WARNINGS} ${RISCV_ABI} -std=c11 ${COMMON}")
 set(CMAKE_CXX_FLAGS "${WARNINGS} ${RISCV_ABI} -std=c++2a ${COMMON}")
 
