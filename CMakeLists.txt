@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.1.0)
 project(script_bench CXX)
 
-option(MINIMAL     "Minimal build" ON)
 option(DEBUGGING   "Debugging build" OFF)
 
-set(OPTIMIZE  "-Ofast -march=native")
+set(OPTIMIZE  "-Ofast -march=native -DNDEBUG=1")
 set(COMMON    "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS "${COMMON} ${OPTIMIZE} -std=c++17")
 

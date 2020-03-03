@@ -1,0 +1,19 @@
+GCC 9.2.1
+libriscv: vector append => median 0.123ms  lowest: 0.121ms  highest: 0.264ms
+lua5.3: table append => median 0.412ms  lowest: 0.396ms  highest: 0.700ms
+libriscv: many arguments => median 0.237ms  lowest: 0.231ms  highest: 0.310ms
+lua5.3: many arguments => median 1.583ms  lowest: 1.540ms  highest: 1.777ms
+libriscv: integer math => median 0.116ms  lowest: 0.113ms  highest: 0.180ms
+lua5.3: integer math => median 0.494ms  lowest: 0.486ms  highest: 0.588ms
+libriscv: call print => median 0.555ms  lowest: 0.550ms  highest: 0.862ms
+lua5.3: call print => median 0.426ms  lowest: 0.421ms  highest: 0.494ms
+
+Clang 11 (trunk)
+libriscv: vector append => median 0.102ms  lowest: 0.102ms  highest: 0.181ms
+lua5.3: table append => median 0.403ms  lowest: 0.390ms  highest: 0.429ms
+libriscv: many arguments => median 0.195ms  lowest: 0.194ms  highest: 0.277ms
+lua5.3: many arguments => median 1.587ms  lowest: 1.541ms  highest: 1.746ms
+libriscv: integer math => median 0.112ms  lowest: 0.109ms  highest: 0.164ms
+lua5.3: integer math => median 0.489ms  lowest: 0.477ms  highest: 0.647ms
+libriscv: call print => median 0.427ms  lowest: 0.415ms  highest: 0.514ms
+lua5.3: call print => median 0.430ms  lowest: 0.419ms  highest: 0.498ms
