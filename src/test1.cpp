@@ -12,15 +12,22 @@ static Script* luascript = nullptr;
 template <int W>
 long syscall_print(Machine<W>& machine)
 {
-	using namespace riscv;
 	const auto address = machine.template sysarg<address_type<W>>(0);
-	const size_t len   = std::min(machine.template sysarg<address_type<W>>(1),
-						 2048u);
 	// get string directly from memory, with max-length
 	if (machine.memory.memstring(address) != "This is a string") {
 		abort();
 	}
-	return len;
+	return 0;
+}
+template <int W>
+long syscall_longcall(Machine<W>& machine)
+{
+	const auto address = machine.template sysarg<address_type<W>>(0);
+	// get string directly from memory, with max-length
+	if (machine.memory.memstring(address) != "This is a string") {
+		abort();
+	}
+	return 0;
 }
 
 void test_setup()
@@ -37,7 +44,9 @@ void test_setup()
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, *machine);
 	setup_native_heap_syscalls(state, *machine);
+	machine->throw_on_unhandled_syscall = true;
 	machine->install_syscall_handler(50, syscall_print<RISCV32>);
+	machine->install_syscall_handler(51, syscall_longcall<RISCV32>);
 	machine->setup_argv({"rvprogram"});
 
 	try {
@@ -55,6 +64,8 @@ void test_setup()
 	assert(machine->address_of("test") != 0);
 	assert(machine->address_of("test_args") != 0);
 	assert(machine->address_of("test_maffs") != 0);
+	assert(machine->address_of("test_print") != 0);
+	assert(machine->address_of("test_longcall") != 0);
 
 	delete luascript;
 	luascript = new Script("../luaprogram/script.lua");
@@ -124,4 +135,13 @@ void test_4_riscv()
 void test_4_lua()
 {
 	luascript->call("test_print");
+}
+
+void test_5_riscv()
+{
+	machine->vmcall("test_longcall");
+}
+void test_5_lua()
+{
+	luascript->call("test_longcall");
 }

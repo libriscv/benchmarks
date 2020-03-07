@@ -17,7 +17,7 @@ int main()
 	_exit(666);
 }
 
-//#define USE_ARRAY
+#define USE_ARRAY
 #ifdef USE_ARRAY
 #include <array>
 std::array<int, 2000*9> array;
@@ -69,15 +69,24 @@ PUBLIC_API long test_maffs(int a1, int a2)
 
 #include <include/syscall.hpp>
 extern "C"
-long sys_print(const char* data, size_t len)
+long sys_print(const char* data)
 {
-	return syscall(50, (long) data, len);
+	return syscall(50, (long) data);
+}
+extern "C"
+long sys_longcall(const char* data, int b, int c, int d, int e, int f, int g)
+{
+	return syscall(51, (long) data, b, c, d, e, f, g);
 }
 
 PUBLIC_API void test_print()
 {
-	const char* text = "This is a string";
-	sys_print(text, __builtin_strlen(text));
+	sys_print("This is a string");
+}
+
+PUBLIC_API void test_longcall()
+{
+	sys_longcall("This is a string", 2, 3, 4, 5, 6, 7);
 }
 
 PUBLIC_API long selftest(int i, float f)

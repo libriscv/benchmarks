@@ -10,6 +10,13 @@ static void print(const std::string& text)
 	}
 }
 
+static void longcall(const std::string& str, int, int, int, int, int, int)
+{
+	if (str != "This is a string") {
+		abort();
+	}
+}
+
 Script::Script(const std::string& file)
 {
     this->state = luaL_newstate();
@@ -21,7 +28,8 @@ Script::Script(const std::string& file)
 	}
 	auto gns = getGlobalNamespace(this->state);
     gns.beginNamespace("script")
-	.addFunction("print", print)
+	.addFunction("print",    print)
+	.addFunction("longcall", longcall)
 	.endNamespace();
 }
 Script::~Script()

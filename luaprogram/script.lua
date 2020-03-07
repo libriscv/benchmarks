@@ -26,3 +26,7 @@ end
 function test_print()
 	script.print("This is a string")
 end
+
+function test_longcall()
+	script.longcall("This is a string", 2, 3, 4, 5, 6, 7)
+end
