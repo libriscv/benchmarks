@@ -16,6 +16,9 @@ void run_selftest()
 	machine.setup_argv({"rvprogram"});
 #ifndef RISCV_DEBUG
 	machine.memory.set_exit_address(machine.address_of("fastexit"));
+#else
+	machine.verbose_instructions = true;
+	machine.print_and_pause();
 #endif
 
 	printf("Self-test running ELF entry at 0x%X\n",
@@ -32,6 +35,7 @@ void run_selftest()
 		exit(1);
 	}
 	assert(state.exit_code == 666);
+	assert(machine.address_of("selftest") != 0);
 
 	printf("Self-test running test function\n");
 	try {

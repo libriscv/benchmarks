@@ -1,17 +1,22 @@
 #include <cassert>
 #include <cstdio>
-#include <vector>
-extern "C" void _exit(int);
+#include <deque>
+extern "C" __attribute__((noreturn)) void _exit(int);
 #define PUBLIC_API extern "C" __attribute__((used))
 
-std::vector<int> vec;
+namespace std {
+	void __throw_bad_alloc() {
+		_exit(-1);
+	}
+}
+
+std::deque<int> vec;
 int main()
 {
-	vec.reserve(9 * 2000);
 	_exit(666);
 }
 
-#define USE_ARRAY
+//#define USE_ARRAY
 #ifdef USE_ARRAY
 #include <array>
 std::array<int, 2000*9> array;
