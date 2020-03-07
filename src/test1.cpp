@@ -16,13 +16,10 @@ long syscall_print(Machine<W>& machine)
 	const auto address = machine.template sysarg<address_type<W>>(0);
 	const size_t len   = std::min(machine.template sysarg<address_type<W>>(1),
 						 2048u);
-	// TODO: support memview function w/callback
-	machine.memory.memview(address, len,
-		[] (const uint8_t* buffer, size_t len) {
-			if (std::string((char*) buffer, len) != "This is a string") {
-				abort();
-			}
-		});
+	// get string directly from memory, with max-length
+	if (machine.memory.memstring(address) != "This is a string") {
+		abort();
+	}
 	return len;
 }
 
@@ -122,7 +119,7 @@ void test_3_lua()
 
 void test_4_riscv()
 {
-	machine->vmcall("test_print", {});
+	machine->vmcall("test_print");
 }
 void test_4_lua()
 {

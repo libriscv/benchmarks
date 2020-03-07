@@ -6,6 +6,7 @@ extern "C" __attribute__((noreturn)) void _exit(int);
 
 namespace std {
 	void __throw_bad_alloc() {
+		printf("exception: bad_alloc thrown\n");
 		_exit(-1);
 	}
 }
@@ -68,15 +69,15 @@ PUBLIC_API long test_maffs(int a1, int a2)
 
 #include <include/syscall.hpp>
 extern "C"
-long sys_print(const void* data, size_t len)
+long sys_print(const char* data, size_t len)
 {
 	return syscall(50, (long) data, len);
 }
 
 PUBLIC_API void test_print()
 {
-	const char text[] = "This is a string";
-	sys_print(text, sizeof(text)-1);
+	const char* text = "This is a string";
+	sys_print(text, __builtin_strlen(text));
 }
 
 PUBLIC_API long selftest(int i, float f)

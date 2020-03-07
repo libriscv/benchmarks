@@ -37,6 +37,11 @@ void run_selftest()
 	assert(state.exit_code == 666);
 	assert(machine.address_of("selftest") != 0);
 
+	// verify serialization works
+	std::vector<uint8_t> mstate;
+	machine.serialize_to(mstate);
+	machine.deserialize_from(mstate);
+
 	printf("Self-test running test function\n");
 	try {
 		int ret = machine.vmcall("selftest", {1234}, {5678.0});
