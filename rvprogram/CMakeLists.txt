@@ -4,7 +4,7 @@ project(rvbinary C CXX)
 option(MINIMAL     "Minimal build" OFF)
 option(DEBUGGING   "Debugging build" OFF)
 option(GCSECTIONS  "Garbage collect empty sections" ON)
-set(PUBLIC_API "test" CACHE STRING "Symbols to keep during GC")
+set(VERSION_FILE   "symbols.map" CACHE STRING "Retained symbols file")
 
 set(RISCV_ABI "-march=rv32imfd -mabi=ilp32d")
 set(WARNINGS  "-Wall -Wextra")
@@ -24,11 +24,14 @@ if (GCSECTIONS)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffunction-sections -fdata-sections")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-gc-sections")
-	foreach(SYM ${PUBLIC_API})
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--undefined=${SYM}")
+	file(STRINGS "${CMAKE_SOURCE_DIR}/${VERSION_FILE}" SYMBOLS)
+	foreach(SYMBOL ${SYMBOLS})
+		if (NOT ${SYMBOL} STREQUAL "")
+			message(STATUS "Symbol retained: ${SYMBOL}")
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--undefined=${SYMBOL}")
+		endif()
 	endforeach()
 endif()
-
 
 set(SOURCES
 	src/rvmain.cpp
@@ -46,6 +49,8 @@ target_link_libraries(rvbinary -static libc)
 set_target_properties(rvbinary
 	PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 )
+
 if (NOT DEBUGGING)
-	target_link_libraries(rvbinary -Wl,-S)
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--retain-symbols-file=${CMAKE_SOURCE_DIR}/${VERSION_FILE}")
+	set_target_properties(rvbinary PROPERTIES LINK_DEPENDS ${CMAKE_SOURCE_DIR}/${VERSION_FILE})
 endif()
