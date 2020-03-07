@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cstdio>
+#include <cstring>
 #include <deque>
 extern "C" __attribute__((noreturn)) void _exit(int);
 #define PUBLIC_API extern "C" __attribute__((used))
@@ -34,28 +35,19 @@ PUBLIC_API void test(int arg1)
 #endif
 }
 
-PUBLIC_API void
-test_args(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8)
+struct Test {
+	int32_t a;
+	int64_t b;
+};
+
+PUBLIC_API long
+test_args(const char* a1, Test& a2, int a3, int a4, int a5, int a6, int a7, int a8)
 {
-#ifdef USE_ARRAY
-	*setter++ = a1;
-	*setter++ = a2;
-	*setter++ = a3;
-	*setter++ = a4;
-	*setter++ = a5;
-	*setter++ = a6;
-	*setter++ = a7;
-	*setter++ = a8;
-#else
-	vec.push_back(a1);
-	vec.push_back(a2);
-	vec.push_back(a3);
-	vec.push_back(a4);
-	vec.push_back(a5);
-	vec.push_back(a6);
-	vec.push_back(a7);
-	vec.push_back(a8);
-#endif
+	static const char* str = "This is a string";
+	if (memcmp(a1, str, __builtin_strlen(str)) == 0
+	&& (a2.a == 222 && a2.b == 666) && (a3 == 333) && (a4 == 444) && (a5 == 555)
+	&& (a6 == 666) && (a7 == 777) && (a8 == 888)) return 666;
+	return -1;
 }
 
 PUBLIC_API long test_maffs(int a1, int a2)

@@ -44,7 +44,7 @@ void run_selftest()
 
 	printf("Self-test running test function\n");
 	try {
-		int ret = machine.vmcall("selftest", {1234}, {5678.0});
+		int ret = machine.vmcall("selftest", 1234, 5678.0);
 		printf("Output:\n%s", state.output.c_str());
 		assert(ret == 200);
 	} catch (riscv::MachineException& me) {

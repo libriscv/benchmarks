@@ -75,14 +75,14 @@ void test_1_riscv()
 {
 #ifdef RISCV_DEBUG
 	try {
-		machine->vmcall("test", {555});
+		machine->vmcall<0>("test", 555);
 	} catch (riscv::MachineException& me) {
 		printf(">>> test_1 Machine exception %d: %s (data: %d)\n",
 				me.type(), me.what(), me.data());
 		machine->print_and_pause();
 	}
 #else
-	machine->vmcall("test", {555});
+	machine->vmcall<0>("test", 555);
 #endif
 }
 void test_1_lua()
@@ -92,35 +92,46 @@ void test_1_lua()
 
 void test_2_riscv()
 {
+	static const struct Test {
+		int32_t a = 222;
+		int64_t b = 666;
+	} test;
 #ifdef RISCV_DEBUG
 	try {
-		machine->vmcall("test_args", {111, 222, 333, 444, 555, 666, 777, 888});
+		int ret =
+		machine->vmcall<0>("test_args", "This is a string", test, 333,
+										444, 555, 666, 777, 888);
+		if (ret != 666) abort();
 	} catch (riscv::MachineException& me) {
 		printf(">>> test_2 Machine exception %d: %s (data: %d)\n",
 				me.type(), me.what(), me.data());
 		machine->print_and_pause();
 	}
 #else
-	machine->vmcall("test_args", {111, 222, 333, 444, 555, 666, 777, 888});
+	int ret =
+	machine->vmcall<0>("test_args", "This is a string", test, 333,
+									444, 555, 666, 777, 888);
+	if (ret != 666) abort();
 #endif
 }
 void test_2_lua()
 {
-	luascript->call("test_args", 111, 222, 333, 444, 555, 666, 777, 888);
+	luascript->call("test_args", "This is a string", 222, 333,
+								444, 555, 666, 777, 888);
 }
 
 void test_3_riscv()
 {
 #ifdef RISCV_DEBUG
 	try {
-		machine->vmcall("test_maffs", {111, 222});
+		machine->vmcall<0>("test_maffs", 111, 222);
 	} catch (riscv::MachineException& me) {
 		printf(">>> test_3 Machine exception %d: %s (data: %d)\n",
 				me.type(), me.what(), me.data());
 		machine->print_and_pause();
 	}
 #else
-	machine->vmcall("test_maffs", {111, 222});
+	machine->vmcall<0>("test_maffs", 111, 222);
 #endif
 }
 void test_3_lua()
@@ -130,7 +141,7 @@ void test_3_lua()
 
 void test_4_riscv()
 {
-	machine->vmcall("test_print");
+	machine->vmcall<0>("test_print");
 }
 void test_4_lua()
 {
@@ -139,7 +150,7 @@ void test_4_lua()
 
 void test_5_riscv()
 {
-	machine->vmcall("test_longcall");
+	machine->vmcall<0>("test_longcall");
 }
 void test_5_lua()
 {
