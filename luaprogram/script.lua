@@ -28,5 +28,7 @@ function test_print()
 end
 
 function test_longcall()
-	script.longcall("This is a string", 2, 3, 4, 5, 6, 7)
+	for i=1,10 do
+		script.longcall("This is a string", 2, 3, 4, 5, 6, 7)
+	end
 end

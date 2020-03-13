@@ -4,7 +4,7 @@ using namespace riscv;
 
 void run_selftest()
 {
-	auto rvbinary = load_file("../rvprogram/build/rvbinary");
+	auto rvbinary = load_file("../rvprogram/build_clang/rvbinary");
 
 	riscv::verbose_machine = false;
 	Machine<RISCV32> machine {rvbinary, 4*1024*1024};

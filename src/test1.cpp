@@ -8,6 +8,8 @@ static Machine<RISCV32>* machine = nullptr;
 static State<RISCV32> state;
 
 static Script* luascript = nullptr;
+//static const char* TEST_BINARY = "../rvprogram/build_clang/rvbinary";
+static const char* TEST_BINARY = "../rvprogram/build/rvbinary";
 
 template <int W>
 long syscall_print(Machine<W>& machine)
@@ -33,7 +35,7 @@ long syscall_longcall(Machine<W>& machine)
 void test_setup()
 {
 	riscv::verbose_machine = false;
-	rvbinary = load_file("../rvprogram/build/rvbinary");
+	rvbinary = load_file(TEST_BINARY);
 	delete machine;
 	machine = new Machine<RISCV32> {rvbinary, 4*1024*1024};
 #ifndef RISCV_DEBUG

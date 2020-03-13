@@ -19,7 +19,7 @@ int __cxa_atexit ( void (*f)(void *), void *p, void *d )
 }
 
 std::deque<int> vec;
-int main()
+int main(int, const char**)
 {
 	_exit(666);
 }
@@ -84,6 +84,7 @@ PUBLIC_API void test_print()
 
 PUBLIC_API void test_longcall()
 {
+	for (int i = 0; i < 10; i++)
 	sys_longcall("This is a string", 2, 3, 4, 5, 6, 7);
 }
 
