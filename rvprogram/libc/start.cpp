@@ -56,6 +56,9 @@ void _start()
 	__testable_global = 1;
 	// zero-initialize .bss section
 	extern uint32_t __bss_start;
+	#ifdef __clang__
+	#define __BSS_END__ _end
+	#endif
 	extern uint32_t __BSS_END__;
 	for (uint32_t* bss = &__bss_start; bss < &__BSS_END__; bss++) {
 		*bss = 0;
