@@ -24,7 +24,7 @@ int main(int, const char**)
 	_exit(666);
 }
 
-#define USE_ARRAY
+//#define USE_ARRAY
 #ifdef USE_ARRAY
 #include <array>
 std::array<int, 2000*9> array;
