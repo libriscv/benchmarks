@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.9)
 project(script_bench CXX)
 
 option(DEBUGGING   "Debugging build" OFF)
+option(LTO         "Enable interprocedural optimizations" OFF)
 
 set(OPTIMIZE  "-Ofast -march=native -DNDEBUG=1")
 set(COMMON    "-Wall -Wextra")
@@ -29,3 +30,11 @@ target_link_libraries(bench riscv lua5.3)
 target_include_directories(bench PRIVATE ext/LuaBridge/Source/LuaBridge)
 # for some reason this causes -std=gnu++1z
 #set_target_properties(bench PROPERTIES CXX_STANDARD 17)
+
+if (LTO)
+	set_target_properties(riscv PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
+	set_property(TARGET bench PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld")
+	endif()
+endif()
