@@ -4,7 +4,7 @@ project(script_bench CXX)
 option(DEBUGGING   "Debugging build" OFF)
 option(LTO         "Enable interprocedural optimizations" OFF)
 
-set(OPTIMIZE  "-Ofast -march=native -DNDEBUG=1")
+set(OPTIMIZE  "-Ofast -march=native")
 set(COMMON    "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS "${COMMON} ${OPTIMIZE} -std=c++17")
 

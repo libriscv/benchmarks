@@ -94,7 +94,7 @@ void test_1_lua()
 
 void test_2_riscv()
 {
-	static const struct Test {
+	const struct Test {
 		int32_t a = 222;
 		int64_t b = 666;
 	} test;
@@ -118,8 +118,13 @@ void test_2_riscv()
 }
 void test_2_lua()
 {
-	luascript->call("test_args", "This is a string", 222, 333,
-								444, 555, 666, 777, 888);
+	auto tab = luascript->new_table();
+	tab[0] = 222;
+	tab[1] = 666;
+	auto ret =
+	luascript->retcall("test_args", "This is a string",
+			tab, 333, 444, 555, 666, 777, 888);
+	if ((int) ret != 666) abort();
 }
 
 void test_3_riscv()

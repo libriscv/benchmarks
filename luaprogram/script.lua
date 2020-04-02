@@ -5,14 +5,14 @@ function test(arg)
 end
 
 function test_args(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
-	table.insert(array, arg1)
-	table.insert(array, arg2)
-	table.insert(array, arg3)
-	table.insert(array, arg4)
-	table.insert(array, arg5)
-	table.insert(array, arg6)
-	table.insert(array, arg7)
-	table.insert(array, arg8)
+	if arg1 == "This is a string"
+		and arg2[0] == 222 and arg2[1] == 666
+		and arg3 == 333 and arg4 == 444
+		and arg5 == 555 and arg6 == 666
+		and arg7 == 777 and arg8 == 888 then
+		return 666
+	end
+	return -1
 end
 
 function test_maffs(arg1, arg2)
