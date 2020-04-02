@@ -28,7 +28,7 @@ long State<W>::syscall_write(Machine<W>& machine)
 		char buffer[1024];
 		const size_t len_g = std::min(sizeof(buffer), len);
 		machine.memory.memcpy_out(buffer, address, len_g);
-		output += std::string(buffer, len_g);
+		output.append(buffer, len_g);
 #ifdef RISCV_DEBUG
 		return write(fd, buffer, len);
 #else
