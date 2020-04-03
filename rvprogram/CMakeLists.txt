@@ -52,6 +52,7 @@ set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "") # remove -rdynamic
 
 add_executable(rvbinary ${SOURCES})
+target_include_directories(rvbinary PRIVATE ${CMAKE_SOURCE_DIR}/../src/include)
 target_link_libraries(rvbinary -static libc)
 # place ELF into the top binary folder
 set_target_properties(rvbinary

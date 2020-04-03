@@ -1,6 +1,7 @@
 #include "luascript.hpp"
 #include "testhelp.hpp"
 #include "syscalls.hpp"
+#include "include/crc32.hpp"
 
 using namespace riscv;
 static std::vector<uint8_t> rvbinary;
@@ -111,7 +112,7 @@ void test_2_riscv()
 	}
 #else
 	int ret =
-	machine->vmcall<0>("test_args", "This is a string", test, 333,
+	machine->vmcall<0>("test_args", crc32("This is a string"), test, 333,
 									444, 555, 666, 777, 888);
 	if (ret != 666) abort();
 #endif

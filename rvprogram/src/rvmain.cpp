@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstring>
 #include <deque>
+#include <crc32.hpp>
 extern "C" __attribute__((noreturn)) void _exit(int);
 #define PUBLIC_API extern "C" __attribute__((used))
 
@@ -47,10 +48,9 @@ struct Test {
 };
 
 PUBLIC_API long
-test_args(const char* a1, Test& a2, int a3, int a4, int a5, int a6, int a7, int a8)
+test_args(uint32_t a1, Test& a2, int a3, int a4, int a5, int a6, int a7, int a8)
 {
-	static const char* str = "This is a string";
-	if (__builtin_memcmp(a1, str, __builtin_strlen(str)) == 0
+	if (a1 == crc32("This is a string") //__builtin_strcmp("This is a string", a1) == 0
 	&& (a2.a == 222 && a2.b == 666) && (a3 == 333) && (a4 == 444) && (a5 == 555)
 	&& (a6 == 666) && (a7 == 777) && (a8 == 888)) return 666;
 	return -1;
