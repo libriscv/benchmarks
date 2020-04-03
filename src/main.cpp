@@ -19,8 +19,8 @@ run_test(const char* name, int samples, test_func setup, test_func execone)
 	long lowest = results[0] / TIMES;
 	long highest = results[results.size()-1] / TIMES;
 
-	printf("%s => median %.3f μs  lowest: %.3f μs  highest: %.3f μs\n",
-			name, median / 1e3, lowest / 1e3, highest / 1e3);
+	printf("%s => median %ldns  lowest: %ldns  highest: %ldns\n",
+			name, median, lowest, highest);
 	return median;
 }
 
