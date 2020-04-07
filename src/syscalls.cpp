@@ -19,21 +19,19 @@ long State<W>::syscall_exit(Machine<W>& machine)
 template <int W>
 long State<W>::syscall_write(Machine<W>& machine)
 {
-	const int  fd      = machine.template sysarg<int>(0);
-	const auto address = machine.template sysarg<address_type<W>>(1);
-	const size_t len   = machine.template sysarg<address_type<W>>(2);
+	auto [fd, address, len] = machine.template sysargs<int, address_type<W>, address_type<W>> ();
 	SYSPRINT("SYSCALL write: addr = 0x%X, len = %zu\n", address, len);
 	// we only accept standard pipes, for now :)
 	if (fd >= 0 && fd < 3) {
-		char buffer[1024];
-		const size_t len_g = std::min(sizeof(buffer), len);
-		machine.memory.memcpy_out(buffer, address, len_g);
-		output.append(buffer, len_g);
+		const size_t len_g = std::min(1024u, len);
+		machine.memory.memview(address, len_g,
+			[this] (auto* data, size_t len) {
+				output.append((char*) data, len);
 #ifdef RISCV_DEBUG
-		return write(fd, buffer, len);
-#else
-		return len_g;
+				(void) write(fd, data, len);
 #endif
+			});
+		return len_g;
 	}
 	return -EBADF;
 }
@@ -41,9 +39,7 @@ long State<W>::syscall_write(Machine<W>& machine)
 template <int W>
 long State<W>::syscall_writev(Machine<W>& machine)
 {
-	const int  fd     = machine.template sysarg<int>(0);
-	const auto iov_g  = machine.template sysarg<uint32_t>(1);
-	const auto count  = machine.template sysarg<int>(2);
+	auto [fd, iov_g, count] = machine.template sysargs<int, uint32_t, int> ();
 	if constexpr (false) {
 		printf("SYSCALL writev called, iov = %#X  cnt = %d\n", iov_g, count);
 	}

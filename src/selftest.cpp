@@ -12,7 +12,7 @@ void run_selftest()
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, machine);
-	setup_native_heap_syscalls(state, machine);
+	setup_native_heap_syscalls(state, machine, 1*1024*1024);
 	machine.setup_argv({"rvprogram"});
 #ifndef RISCV_DEBUG
 	machine.memory.set_exit_address(machine.address_of("fastexit"));

@@ -46,7 +46,7 @@ void test_setup()
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, *machine);
-	setup_native_heap_syscalls(state, *machine);
+	setup_native_heap_syscalls(state, *machine, 4*1024*1024);
 	machine->throw_on_unhandled_syscall = true;
 	machine->install_syscall_handler(50, syscall_print<RISCV32>);
 	machine->install_syscall_handler(51, syscall_longcall<RISCV32>);
