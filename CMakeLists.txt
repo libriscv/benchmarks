@@ -3,6 +3,7 @@ project(script_bench CXX)
 
 option(DEBUGGING   "Debugging build" OFF)
 option(LTO         "Enable interprocedural optimizations" OFF)
+option(SANITIZE    "Enable sanitizers" OFF)
 
 set(OPTIMIZE  "-Ofast -march=native")
 set(COMMON    "-Wall -Wextra")
@@ -12,6 +13,10 @@ if (DEBUGGING)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
 elseif (MINIMAL)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os")
+endif()
+
+if (SANITIZE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -march=native -ggdb3 -fsanitize=address,undefined")
 endif()
 
 add_subdirectory(ext/libriscv/lib libriscv)
