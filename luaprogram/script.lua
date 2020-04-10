@@ -32,3 +32,13 @@ function test_longcall()
 		script.longcall("This is a string", 2, 3, 4, 5, 6, 7)
 	end
 end
+
+function test_threads()
+	co = coroutine.create(function ()
+		--script.print("This is a string")
+		coroutine.yield()
+		--script.print("This is a string")
+	end)
+	coroutine.resume(co)
+	coroutine.resume(co)
+end

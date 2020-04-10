@@ -20,9 +20,10 @@ inline constexpr auto gen_crc32_table()
     return crc32_table;
 }
 
+template <uint32_t POLYNOMIAL = 0xEDB88320>
 inline constexpr auto crc32(const char* data)
 {
-	constexpr auto crc32_table = gen_crc32_table<0xEDB88320>();
+	constexpr auto crc32_table = gen_crc32_table<POLYNOMIAL>();
 
     auto crc = 0xFFFFFFFFu;
     for (auto i = 0u; auto c = data[i]; ++i) {

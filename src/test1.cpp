@@ -46,7 +46,8 @@ void test_setup()
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, *machine);
-	setup_native_heap_syscalls(state, *machine, 4*1024*1024);
+	setup_native_heap_syscalls(*machine, 4*1024*1024);
+	setup_native_threads(state.exit_code, *machine);
 	machine->throw_on_unhandled_syscall = true;
 	machine->install_syscall_handler(50, syscall_print<RISCV32>);
 	machine->install_syscall_handler(51, syscall_longcall<RISCV32>);
@@ -102,8 +103,8 @@ void test_2_riscv()
 #ifdef RISCV_DEBUG
 	try {
 		int ret =
-		machine->vmcall<0>("test_args", "This is a string", test, 333,
-										444, 555, 666, 777, 888);
+		machine->vmcall("test_args", crc32("This is a string"), test,
+									333, 444, 555, 666, 777, 888);
 		if (ret != 666) abort();
 	} catch (riscv::MachineException& me) {
 		printf(">>> test_2 Machine exception %d: %s (data: %d)\n",
@@ -112,8 +113,8 @@ void test_2_riscv()
 	}
 #else
 	int ret =
-	machine->vmcall<0>("test_args", crc32("This is a string"), test, 333,
-									444, 555, 666, 777, 888);
+	machine->vmcall("test_args", crc32("This is a string"), test,
+								333, 444, 555, 666, 777, 888);
 	if (ret != 666) abort();
 #endif
 }
@@ -139,7 +140,7 @@ void test_3_riscv()
 		machine->print_and_pause();
 	}
 #else
-	machine->vmcall<0>("test_maffs", 111, 222);
+	machine->vmcall("test_maffs", 111, 222);
 #endif
 }
 void test_3_lua()
@@ -149,7 +150,7 @@ void test_3_lua()
 
 void test_4_riscv()
 {
-	machine->vmcall<0>("test_print");
+	machine->vmcall("test_print");
 }
 void test_4_lua()
 {
@@ -158,9 +159,18 @@ void test_4_lua()
 
 void test_5_riscv()
 {
-	machine->vmcall<0>("test_longcall");
+	machine->vmcall("test_longcall");
 }
 void test_5_lua()
 {
 	luascript->call("test_longcall");
+}
+
+void test_6_riscv()
+{
+	machine->vmcall("test_threads");
+}
+void test_6_lua()
+{
+	luascript->call("test_threads");
 }

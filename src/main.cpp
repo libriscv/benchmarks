@@ -37,6 +37,8 @@ extern void test_4_riscv();
 extern void test_4_lua();
 extern void test_5_riscv();
 extern void test_5_lua();
+extern void test_6_riscv();
+extern void test_6_lua();
 
 int main()
 {
@@ -54,5 +56,7 @@ int main()
 	run_test("lua5.3: syscall print", S, test_setup, test_4_lua);
 	run_test("libriscv: complex syscall", S, test_setup, test_5_riscv);
 	run_test("lua5.3: complex syscall", S, test_setup, test_5_lua);
+	run_test("libriscv: micro threads", S, test_setup, test_6_riscv);
+	run_test("lua5.3: coroutines", S, test_setup, test_6_lua);
 	return 0;
 }

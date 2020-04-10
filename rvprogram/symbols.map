@@ -8,3 +8,4 @@ test_args
 test_maffs
 test_print
 test_longcall
+test_threads

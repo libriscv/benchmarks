@@ -1,6 +1,6 @@
 #include <cassert>
 #include <cstdio>
-#include <cstring>
+#include <include/libc.hpp>
 #include <deque>
 #include <crc32.hpp>
 extern "C" __attribute__((noreturn)) void _exit(int);
@@ -11,12 +11,6 @@ namespace std {
 		printf("exception: bad_alloc thrown\n");
 		_exit(-1);
 	}
-}
-
-extern "C"
-int __cxa_atexit ( void (*f)(void *), void *p, void *d )
-{
-	return -1;
 }
 
 std::deque<int> vec;
@@ -66,13 +60,11 @@ PUBLIC_API long test_maffs(int a1, int a2)
 }
 
 #include <include/syscall.hpp>
-extern "C"
-long sys_print(const char* data)
+inline long sys_print(const char* data)
 {
 	return syscall(50, (long) data);
 }
-extern "C"
-long sys_longcall(const char* data, int b, int c, int d, int e, int f, int g)
+inline long sys_longcall(const char* data, int b, int c, int d, int e, int f, int g)
 {
 	return syscall(51, (long) data, b, c, d, e, f, g);
 }
@@ -88,6 +80,19 @@ PUBLIC_API void test_longcall()
 	sys_longcall("This is a string", 2, 3, 4, 5, 6, 7);
 }
 
+#include <microthread.hpp>
+PUBLIC_API long test_threads()
+{
+	auto* thread = microthread::create(
+		[] () -> void {
+			//sys_print("This is a string");
+			microthread::yield();
+			//sys_print("This is a string");
+		});
+	microthread::yield();
+	return microthread::join(thread);
+}
+
 PUBLIC_API long selftest(int i, float f)
 {
 	static int bss = 0;
@@ -95,5 +100,11 @@ PUBLIC_API long selftest(int i, float f)
 	assert(i == 1234);
 	assert(f == 5678.0);
 	assert(bss == 0);
-	return 200;
+	
+	auto* thread = microthread::create(
+		[] (int a, int b, int c) -> long {
+			return a + b + c;
+		}, 111, 222, 333);
+	long retval = microthread::join(thread);
+	return retval;
 }

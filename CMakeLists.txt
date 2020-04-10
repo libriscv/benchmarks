@@ -27,12 +27,14 @@ set(SOURCES
 	src/selftest.cpp
 	src/syscalls.cpp
 	src/test1.cpp
-	ext/libriscv/emulator/src/native_libc.cpp
+	ext/libriscv/emulator/syscalls/src/native_libc.cpp
+	ext/libriscv/emulator/syscalls/src/native_threads.cpp
 )
 
 add_executable(bench ${SOURCES})
 target_link_libraries(bench riscv lua5.3)
 target_include_directories(bench PRIVATE ext/LuaBridge/Source/LuaBridge)
+target_include_directories(bench PRIVATE ext/libriscv/emulator/syscalls)
 # for some reason this causes -std=gnu++1z
 #set_target_properties(bench PROPERTIES CXX_STANDARD 17)
 

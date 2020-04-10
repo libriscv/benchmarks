@@ -28,7 +28,7 @@ long State<W>::syscall_write(Machine<W>& machine)
 			[this] (auto* data, size_t len) {
 				output.append((char*) data, len);
 #ifdef RISCV_DEBUG
-				(void) write(fd, data, len);
+				(void) write(0, data, len);
 #endif
 			});
 		return len_g;
