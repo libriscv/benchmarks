@@ -39,6 +39,8 @@ extern void test_5_riscv();
 extern void test_5_lua();
 extern void test_6_riscv();
 extern void test_6_lua();
+extern void test_7_riscv();
+extern void test_7_lua();
 
 int main()
 {
@@ -46,6 +48,7 @@ int main()
 	printf("RISC-V self-test OK\n");
 	printf("* All benchmark results are measured in 2000 samples\n");
 	const int S = 200;
+	/*
 	run_test("libriscv: vector append", S, test_setup, test_1_riscv);
 	run_test("lua5.3: table append", S, test_setup, test_1_lua);
 	run_test("libriscv: many arguments", S, test_setup, test_2_riscv);
@@ -56,7 +59,10 @@ int main()
 	run_test("lua5.3: syscall print", S, test_setup, test_4_lua);
 	run_test("libriscv: complex syscall", S, test_setup, test_5_riscv);
 	run_test("lua5.3: complex syscall", S, test_setup, test_5_lua);
+	*/
 	run_test("libriscv: micro threads", S, test_setup, test_6_riscv);
 	run_test("lua5.3: coroutines", S, test_setup, test_6_lua);
+	run_test("libriscv: micro thread args", S, test_setup, test_7_riscv);
+	run_test("lua5.3: coroutine args", S, test_setup, test_7_lua);
 	return 0;
 }

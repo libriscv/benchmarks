@@ -42,3 +42,12 @@ function test_threads()
 	coroutine.resume(co)
 	coroutine.resume(co)
 end
+
+function test_threads_args()
+	co = coroutine.create(function (arg1, arg2, arg3, arg4)
+		coroutine.yield()
+		return arg1 + arg2 + arg3 + arg4
+	end)
+	coroutine.resume(co, 1, 2, 3, 4)
+	return coroutine.resume(co)
+end

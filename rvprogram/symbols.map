@@ -9,3 +9,4 @@ test_maffs
 test_print
 test_longcall
 test_threads
+test_threads_args

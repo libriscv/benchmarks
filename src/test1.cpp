@@ -174,3 +174,12 @@ void test_6_lua()
 {
 	luascript->call("test_threads");
 }
+
+void test_7_riscv()
+{
+	machine->vmcall("test_threads_args");
+}
+void test_7_lua()
+{
+	luascript->call("test_threads_args");
+}
