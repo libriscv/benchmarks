@@ -94,17 +94,11 @@ PUBLIC_API long test_threads()
 }
 PUBLIC_API long test_threads_args()
 {
-	struct Args {
-		int a = 1;
-		int b = 2;
-		int c = 3;
-		int d = 4;
-	} args;
 	auto* thread = microthread::create(
-		[&args] () -> long {
+		[] (int a, int b, int c, int d) -> long {
 			microthread::yield();
-			return args.a + args.b + args.c + args.d;
-		});
+			return a + b + c + d;
+		}, 1, 2, 3, 4);
 	microthread::yield();
 	return microthread::join(thread);
 }
