@@ -20,6 +20,7 @@ if (SANITIZE)
 endif()
 
 add_subdirectory(ext/libriscv/lib libriscv)
+target_compile_definitions(riscv PUBLIC RISCV_EXEC_TRAPS_ENABLED=1)
 
 set(SOURCES
 	src/main.cpp
