@@ -52,7 +52,7 @@ void run_selftest()
 
 	printf("Self-test running test function\n");
 	try {
-		int ret = machine.vmcall("selftest", 1234, 5678.0);
+		int ret = machine.vmcall("selftest", 1234, 5678.0, 5l);
 		printf("Output:\n%s", state.output.c_str());
 		if (ret != 666) {
 			printf("The self-test did not return the correct value\n");

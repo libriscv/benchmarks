@@ -103,8 +103,11 @@ PUBLIC_API long test_threads_args()
 	return microthread::join(thread);
 }
 
-PUBLIC_API long selftest(int i, float f)
+PUBLIC_API long selftest(int i, float f, long number)
 {
+	uint64_t value = 555ull / number;
+	printf("Value: %lld / %ld == %llu\n", 555ull, number, value);
+
 	static int bss = 0;
 	printf("i: %d   f: %d   bss: %d\n", i, (int) f, bss);
 	assert(i == 1234);

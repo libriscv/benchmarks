@@ -6,3 +6,4 @@ target_include_directories(tinyprintf PUBLIC
 		tinyprintf
 	)
 target_compile_definitions(tinyprintf PUBLIC TINYPRINTF_OVERRIDE_LIBC=0)
+target_compile_definitions(tinyprintf PRIVATE PRINTF_LONG_LONG_SUPPORT=1)

@@ -17,12 +17,15 @@ else()
 	set(RISCV_ABI "-march=rv32imfd -mabi=ilp32d")
 	#set(COMMON    "${COMMON} -flto")
 endif()
+# we need this libgcc for 64-bit divisions
+set(LIBGCC ${LIBRARY_DIR}/rv32imfd/ilp32d/libgcc.a)
+
 set(CMAKE_C_FLAGS "${WARNINGS} ${COMMON} -std=c11 ${RISCV_ABI}")
 set(CMAKE_CXX_FLAGS "${WARNINGS} ${COMMON} -std=c++2a ${RISCV_ABI} -fno-exceptions -fno-rtti")
 
 if (DEBUGGING)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -ggdb3")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb3")
 elseif (MINIMAL)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Os")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os")
@@ -45,15 +48,18 @@ set(SOURCES
 	src/rvmain.cpp
 )
 
+# this fixes a bug in CMake where it randomly removes system includes
+unset(CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES)
+unset(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES)
+# this fixes a bug where CMake adds -rdynamic to literally everything
+set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+
 add_subdirectory(ext)
 add_subdirectory(libc)
 
-set(BUILD_SHARED_LIBS OFF)
-set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "") # remove -rdynamic
-
 add_executable(rvbinary ${SOURCES})
 target_include_directories(rvbinary PRIVATE ${CMAKE_SOURCE_DIR}/../src/include)
-target_link_libraries(rvbinary -static libc)
+target_link_libraries(rvbinary -static libc tinyprintf gcc)
 # place ELF into the top binary folder
 set_target_properties(rvbinary
 	PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
