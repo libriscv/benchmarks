@@ -103,19 +103,23 @@ PUBLIC_API long test_threads_args()
 	return microthread::join(thread);
 }
 
-PUBLIC_API long selftest(int i, float f, long number)
+PUBLIC_API long selftest(int i, float f, long long number)
 {
 	uint64_t value = 555ull / number;
-	printf("Value: %lld / %ld == %llu\n", 555ull, number, value);
+	printf("Value: %lld / %lld == %llu\n", 555ull, number, value);
 
 	static int bss = 0;
 	printf("i: %d   f: %d   bss: %d\n", i, (int) f, bss);
 	assert(i == 1234);
 	assert(f == 5678.0);
 	assert(bss == 0);
-	
+
+	// test sending a 64-bit integral value
+	uint64_t testvalue = 0x5678000012340000;
+	syscall(8, testvalue, testvalue >> 32);
+
 	auto* thread = microthread::create(
-		[] (int a, int b, int c) -> long {
+		[] (int a, int b, long long c) -> long {
 			return a + b + c;
 		}, 111, 222, 333);
 	long retval = microthread::join(thread);

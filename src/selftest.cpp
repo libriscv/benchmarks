@@ -45,6 +45,17 @@ void run_selftest()
 		exit(1);
 	}
 
+	machine.install_syscall_handler(8,
+		[] (auto& machine) -> long {
+			auto [ll] = machine.template sysargs<uint64_t> ();
+			if (ll != 0x5678000012340000) {
+				printf("The self-test did not return the correct value\n");
+				printf("Got %#lX instead\n", ll);
+				exit(1);
+			}
+			return 0;
+		});
+
 	// verify serialization works
 	std::vector<uint8_t> mstate;
 	machine.serialize_to(mstate);
@@ -52,7 +63,7 @@ void run_selftest()
 
 	printf("Self-test running test function\n");
 	try {
-		int ret = machine.vmcall("selftest", 1234, 5678.0, 5l);
+		int ret = machine.vmcall("selftest", 1234, 5678.0, 5ull);
 		printf("Output:\n%s", state.output.c_str());
 		if (ret != 666) {
 			printf("The self-test did not return the correct value\n");
