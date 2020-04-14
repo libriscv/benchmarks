@@ -48,7 +48,6 @@ void test_setup()
 	setup_minimal_syscalls(state, *machine);
 	setup_native_heap_syscalls(*machine, 4*1024*1024);
 	setup_native_threads(state.exit_code, *machine);
-	machine->throw_on_unhandled_syscall = true;
 	machine->install_syscall_handler(50, syscall_print<RISCV32>);
 	machine->install_syscall_handler(51, syscall_longcall<RISCV32>);
 	machine->setup_argv({"rvprogram"});

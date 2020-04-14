@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9)
 project(script_bench CXX)
 
 option(DEBUGGING   "Debugging build" OFF)
-option(LTO         "Enable interprocedural optimizations" OFF)
+option(LTO         "Enable interprocedural optimizations" ON)
 option(SANITIZE    "Enable sanitizers" OFF)
 
 set(OPTIMIZE  "-Ofast -march=native")
@@ -20,7 +20,8 @@ if (SANITIZE)
 endif()
 
 add_subdirectory(ext/libriscv/lib libriscv)
-target_compile_definitions(riscv PUBLIC RISCV_EXEC_TRAPS_ENABLED=1)
+target_compile_definitions(riscv PUBLIC RISCV_EXEC_TRAPS_ENABLED=1
+										RISCV_THROW_UNIMPLEMENTED=1)
 
 set(SOURCES
 	src/main.cpp
