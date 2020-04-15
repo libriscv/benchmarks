@@ -1,7 +1,8 @@
 #include <cassert>
-#include <cstdio>
+#include <stdio.h>
 #include <include/libc.hpp>
 #include <deque>
+#include <vector>
 #include <crc32.hpp>
 extern "C" __attribute__((noreturn)) void _exit(int);
 #define PUBLIC_API extern "C" __attribute__((used))
@@ -13,26 +14,26 @@ namespace std {
 	}
 }
 
-std::deque<int> vec;
+static std::vector<int> vec;
 int main(int, const char**)
 {
+	vec.reserve(1 + 2000);
 	_exit(666);
 }
 
 #define USE_ARRAY
 #ifdef USE_ARRAY
 #include <array>
-std::array<int, 2000*9> array;
-static int* setter = array.data();
+static std::array<int, 2001> array;
+static int counter = 0;
 #endif
 
 PUBLIC_API void test(int arg1)
 {
 #ifdef USE_ARRAY
-	//array[counter++] = arg1;
-	*setter++ = arg1;
+	array[counter++] = arg1;
 #else
-	vec.emplace_back(arg1);
+	vec.push_back(arg1);
 #endif
 }
 

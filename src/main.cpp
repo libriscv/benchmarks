@@ -27,6 +27,7 @@ run_test(const char* name, int samples, test_func setup, test_func execone)
 /* TESTS */
 extern void run_selftest();
 extern void test_setup();
+extern void test_1_native();
 extern void test_1_riscv();
 extern void test_1_lua();
 extern void test_2_riscv();
@@ -46,9 +47,10 @@ int main()
 {
 	run_selftest();
 	printf("RISC-V self-test OK\n");
-	printf("* All benchmark results are measured in 2000 samples\n");
+	printf("* All benchmark results are measured in 200x2000 samples\n");
 	const int S = 200;
-	run_test("libriscv: vector append", S, test_setup, test_1_riscv);
+	run_test("native: vector append", S, test_setup, test_1_native);
+	run_test("libriscv: array append", S, test_setup, test_1_riscv);
 	run_test("lua5.3: table append", S, test_setup, test_1_lua);
 	printf("\n");
 	run_test("libriscv: many arguments", S, test_setup, test_2_riscv);

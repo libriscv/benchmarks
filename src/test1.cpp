@@ -7,6 +7,7 @@ using namespace riscv;
 static std::vector<uint8_t> rvbinary;
 static Machine<RISCV32>* machine = nullptr;
 static State<RISCV32> state;
+std::vector<int> native_vector;
 
 static Script* luascript = nullptr;
 //static const char* TEST_BINARY = "../rvprogram/build_clang/rvbinary";
@@ -72,6 +73,8 @@ void test_setup()
 
 	delete luascript;
 	luascript = new Script("../luaprogram/script.lua");
+	
+	native_vector.clear();
 }
 
 void test_1_riscv()

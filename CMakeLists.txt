@@ -25,6 +25,7 @@ target_compile_definitions(riscv PUBLIC RISCV_EXEC_TRAPS_ENABLED=1
 
 set(SOURCES
 	src/main.cpp
+	src/native.cpp
 	src/luascript.cpp
 	src/selftest.cpp
 	src/syscalls.cpp
