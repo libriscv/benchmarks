@@ -3,6 +3,7 @@ fastexit
 
 selftest
 
+empty_function
 test
 test_args
 test_maffs

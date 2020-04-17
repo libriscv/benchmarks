@@ -8,6 +8,8 @@ static std::vector<uint8_t> rvbinary;
 static Machine<RISCV32>* machine = nullptr;
 static State<RISCV32> state;
 std::vector<int> native_vector;
+static uint32_t test_1_empty_addr = 0x0;
+static uint32_t test_1_address = 0x0;
 
 static Script* luascript = nullptr;
 //static const char* TEST_BINARY = "../rvprogram/build_clang/rvbinary";
@@ -65,16 +67,24 @@ void test_setup()
 	}
 	assert(state.exit_code == 666);
 
+	assert(machine->address_of("empty_function") != 0);
 	assert(machine->address_of("test") != 0);
 	assert(machine->address_of("test_args") != 0);
 	assert(machine->address_of("test_maffs") != 0);
 	assert(machine->address_of("test_print") != 0);
 	assert(machine->address_of("test_longcall") != 0);
+	test_1_empty_addr = machine->address_of("empty_function");
+	test_1_address = machine->address_of("test");
 
 	delete luascript;
 	luascript = new Script("../luaprogram/script.lua");
 	
 	native_vector.clear();
+}
+
+void test_1_riscv_empty()
+{
+	machine->vmcall<0>(test_1_empty_addr);
 }
 
 void test_1_riscv()
@@ -90,6 +100,10 @@ void test_1_riscv()
 #else
 	machine->vmcall<0>("test", 555);
 #endif
+}
+void test_1_riscv_direct()
+{
+	machine->vmcall<0>(test_1_address, 555);
 }
 void test_1_lua()
 {

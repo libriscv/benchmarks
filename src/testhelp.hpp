@@ -13,6 +13,7 @@ inline long nanodiff(timespec start_time, timespec end_time);
 template <int ROUNDS = 2000> inline test_result
 perform_test(test_func func)
 {
+	func(); // warmup
 	asm("" : : : "memory");
 	auto t0 = time_now();
 	asm("" : : : "memory");

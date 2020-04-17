@@ -28,6 +28,10 @@ static std::array<int, 2001> array;
 static int counter = 0;
 #endif
 
+PUBLIC_API void empty_function()
+{
+}
+
 PUBLIC_API void test(int arg1)
 {
 #ifdef USE_ARRAY
@@ -84,18 +88,16 @@ PUBLIC_API void test_longcall()
 #include <microthread.hpp>
 PUBLIC_API long test_threads()
 {
-	auto* thread = microthread::create(
-		[] () -> void {
-			//sys_print("This is a string");
+	microthread::sovereign(
+		[] {
 			microthread::yield();
-			//sys_print("This is a string");
 		});
 	microthread::yield();
-	return microthread::join(thread);
+	return 0;
 }
 PUBLIC_API long test_threads_args()
 {
-	auto* thread = microthread::create(
+	auto thread = microthread::create(
 		[] (int a, int b, int c, int d) -> long {
 			microthread::yield();
 			return a + b + c + d;
@@ -119,7 +121,7 @@ PUBLIC_API long selftest(int i, float f, long long number)
 	uint64_t testvalue = 0x5678000012340000;
 	syscall(8, testvalue, testvalue >> 32);
 
-	auto* thread = microthread::create(
+	auto thread = microthread::create(
 		[] (int a, int b, long long c) -> long {
 			return a + b + c;
 		}, 111, 222, 333);

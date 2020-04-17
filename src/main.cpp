@@ -19,7 +19,7 @@ run_test(const char* name, int samples, test_func setup, test_func execone)
 	long lowest = results[0] / TIMES;
 	long highest = results[results.size()-1] / TIMES;
 
-	printf("%32s\tmedian %ldns  \t\tlowest: %ldns    \thighest: %ldns\n",
+	printf("%32s\tmedian %ldns  \t\tlowest: %ldns     \thighest: %ldns\n",
 			name, median, lowest, highest);
 	return median;
 }
@@ -27,8 +27,10 @@ run_test(const char* name, int samples, test_func setup, test_func execone)
 /* TESTS */
 extern void run_selftest();
 extern void test_setup();
+extern void test_1_riscv_empty();
 extern void test_1_native();
 extern void test_1_riscv();
+extern void test_1_riscv_direct();
 extern void test_1_lua();
 extern void test_2_riscv();
 extern void test_2_lua();
@@ -49,8 +51,11 @@ int main()
 	printf("RISC-V self-test OK\n");
 	printf("* All benchmark results are measured in 200x2000 samples\n");
 	const int S = 200;
-	run_test("native: vector append", S, test_setup, test_1_native);
+	run_test("libriscv: function call", S, test_setup, test_1_riscv_empty);
+	printf("\n");
+	run_test("native: array append", S, test_setup, test_1_native);
 	run_test("libriscv: array append", S, test_setup, test_1_riscv);
+	run_test("libriscv: array app. direct", S, test_setup, test_1_riscv_direct);
 	run_test("lua5.3: table append", S, test_setup, test_1_lua);
 	printf("\n");
 	run_test("libriscv: many arguments", S, test_setup, test_2_riscv);

@@ -1,7 +1,8 @@
-#include <vector>
-extern std::vector<int> native_vector;
+#include <array>
+static std::array<int, 2001> array;
+static int counter = 0;
 
 void test_1_native()
 {
-	native_vector.push_back(44);
+	array[counter++] = 44;
 }
