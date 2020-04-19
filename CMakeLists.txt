@@ -22,7 +22,7 @@ endif()
 add_subdirectory(ext/libriscv/lib libriscv)
 target_compile_definitions(riscv PUBLIC RISCV_EXEC_TRAPS_ENABLED=1
 										RISCV_THROW_UNIMPLEMENTED=1
-										RISCV_FENCE_MEANS_STOP=1)
+										RISCV_EBREAK_MEANS_STOP=1)
 
 set(SOURCES
 	src/main.cpp

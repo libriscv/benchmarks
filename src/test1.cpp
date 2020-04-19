@@ -50,6 +50,7 @@ void test_setup()
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, *machine);
 	setup_native_heap_syscalls(*machine, 4*1024*1024);
+	setup_native_memory_syscalls(*machine, false);
 	setup_native_threads(state.exit_code, *machine);
 	machine->install_syscall_handler(50, syscall_print<RISCV32>);
 	machine->install_syscall_handler(51, syscall_longcall<RISCV32>);
@@ -73,6 +74,8 @@ void test_setup()
 	assert(machine->address_of("test_maffs") != 0);
 	assert(machine->address_of("test_print") != 0);
 	assert(machine->address_of("test_longcall") != 0);
+	assert(machine->address_of("test_memcpy") != 0);
+	assert(machine->address_of("test_syscall_memcpy") != 0);
 	test_1_empty_addr = machine->address_of("empty_function");
 	test_1_address = machine->address_of("test");
 
@@ -198,4 +201,17 @@ void test_7_riscv()
 void test_7_lua()
 {
 	luascript->call("test_threads_args");
+}
+
+void test_8_riscv()
+{
+	machine->vmcall<1'000'000>("test_memcpy");
+}
+void test_8_native_riscv()
+{
+	machine->vmcall<1'000'000>("test_syscall_memcpy");
+}
+void test_8_lua()
+{
+	luascript->call("test_memcpy");
 }

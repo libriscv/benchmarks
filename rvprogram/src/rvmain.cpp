@@ -128,3 +128,23 @@ PUBLIC_API long selftest(int i, float f, long long number)
 	long retval = microthread::join(thread);
 	return retval;
 }
+
+uint8_t src_array[300];
+uint8_t dst_array[300];
+static_assert(sizeof(src_array) == sizeof(dst_array), "!");
+
+PUBLIC_API long test_memcpy()
+{
+	const char* src = (const char*) src_array;
+	char* dest = (char*) dst_array;
+	const size_t size = sizeof(dst_array);
+	
+	for (size_t i = 0; i < size; i++)
+		dest[i] = src[i];
+	return (long) dest;
+}
+
+PUBLIC_API long test_syscall_memcpy()
+{
+	return (long) memcpy(dst_array, src_array, sizeof(dst_array));
+}

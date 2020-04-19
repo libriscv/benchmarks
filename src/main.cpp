@@ -44,6 +44,9 @@ extern void test_6_riscv();
 extern void test_6_lua();
 extern void test_7_riscv();
 extern void test_7_lua();
+extern void test_8_riscv();
+extern void test_8_native_riscv();
+extern void test_8_lua();
 
 int main()
 {
@@ -75,6 +78,10 @@ int main()
 	printf("\n");
 	run_test("libriscv: micro thread args", S, test_setup, test_7_riscv);
 	run_test("lua5.3: coroutine args", S, test_setup, test_7_lua);
+	printf("\n");
+	run_test("libriscv: memcpy", S, test_setup, test_8_riscv);
+	run_test("libriscv: memcpy native", S, test_setup, test_8_native_riscv);
+	run_test("lua5.3: memcpy", S, test_setup, test_8_lua);
 	printf("\n");
 	return 0;
 }

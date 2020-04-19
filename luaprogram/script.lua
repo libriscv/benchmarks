@@ -51,3 +51,25 @@ function test_threads_args()
 	coroutine.resume(co, 1, 2, 3, 4)
 	return coroutine.resume(co)
 end
+
+
+function table.shallow_copy(t)
+  local t2 = {}
+  for k,v in pairs(t) do
+    t2[k] = v
+  end
+  return t2
+end
+
+src = {}    -- new array
+dst = {}
+for i=1, 300 do
+  src[i] = 0
+  dst[i] = 0
+end
+
+function test_memcpy()
+	for i=1, 300 do
+		dst[i] = src[i]
+	end
+end
