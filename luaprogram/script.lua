@@ -1,5 +1,9 @@
 array = {}
 
+function empty_function()
+	-- do nothing
+end
+
 function test(arg)
 	table.insert(array, arg)
 end

@@ -28,6 +28,7 @@ run_test(const char* name, int samples, test_func setup, test_func execone)
 extern void run_selftest();
 extern void test_setup();
 extern void test_1_riscv_empty();
+extern void test_1_lua_empty();
 extern void test_1_native();
 extern void test_1_riscv();
 extern void test_1_riscv_direct();
@@ -55,6 +56,7 @@ int main()
 	printf("* All benchmark results are measured in 200x2000 samples\n");
 	const int S = 200;
 	run_test("libriscv: function call", S, test_setup, test_1_riscv_empty);
+	run_test("lua5.3: function call", S, test_setup, test_1_lua_empty);
 	printf("\n");
 	run_test("native: array append", S, test_setup, test_1_native);
 	run_test("libriscv: array append", S, test_setup, test_1_riscv);

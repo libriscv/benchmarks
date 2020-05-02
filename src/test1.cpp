@@ -7,7 +7,6 @@ using namespace riscv;
 static std::vector<uint8_t> rvbinary;
 static Machine<RISCV32>* machine = nullptr;
 static State<RISCV32> state;
-std::vector<int> native_vector;
 static uint32_t test_1_empty_addr = 0x0;
 static uint32_t test_1_address = 0x0;
 
@@ -82,12 +81,17 @@ void test_setup()
 	delete luascript;
 	luascript = new Script("../luaprogram/script.lua");
 	
-	native_vector.clear();
+	extern void reset_native_tests();
+	reset_native_tests();
 }
 
 void test_1_riscv_empty()
 {
 	machine->vmcall<0>(test_1_empty_addr);
+}
+void test_1_lua_empty()
+{
+	luascript->call("empty_function");
 }
 
 void test_1_riscv()
