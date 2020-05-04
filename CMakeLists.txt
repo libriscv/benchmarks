@@ -36,7 +36,7 @@ set(SOURCES
 )
 
 add_executable(bench ${SOURCES})
-target_link_libraries(bench riscv lua5.3)
+target_link_libraries(bench riscv luajit-5.1) #lua5.3)
 target_include_directories(bench PRIVATE ext/LuaBridge/Source/LuaBridge)
 target_include_directories(bench PRIVATE ext/libriscv/emulator/syscalls)
 # for some reason this causes -std=gnu++1z

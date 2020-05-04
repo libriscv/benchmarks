@@ -88,7 +88,7 @@ PUBLIC_API void test_longcall()
 #include <microthread.hpp>
 PUBLIC_API long test_threads()
 {
-	microthread::oneshot(
+	microthread::direct(
 		[] {
 			microthread::yield();
 		});
