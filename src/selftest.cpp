@@ -57,26 +57,30 @@ void run_selftest()
 			return 0;
 		});
 
-	// verify serialization works
-	std::vector<uint8_t> mstate;
-	machine.serialize_to(mstate);
-	machine.deserialize_from(mstate);
-
 	printf("Self-test running test function\n");
-	try {
-		int ret = machine.vmcall("selftest", 1234, 5678.0, 5ull);
-		printf("Output:\n%s", state.output.c_str());
-		if (ret != 666) {
-			printf("The self-test did not return the correct value\n");
-			printf("Got %d instead\n", ret);
+	for (int i = 0; i < 10; i++)
+	{
+		// verify serialization works
+		std::vector<uint8_t> mstate;
+		machine.serialize_to(mstate);
+		machine.deserialize_from(mstate);
+
+		try {
+			int ret = machine.vmcall("selftest", 1234, 5678.0, 5ull);
+			if (i == 0)
+				printf("Output:\n%s", state.output.c_str());
+			if (ret != 666) {
+				printf("The self-test did not return the correct value\n");
+				printf("Got %d instead\n", ret);
+				exit(1);
+			}
+		} catch (riscv::MachineException& me) {
+			printf(">>> Machine exception %d: %s (data: %d)\n",
+					me.type(), me.what(), me.data());
+#ifdef RISCV_DEBUG
+			machine.print_and_pause();
+#endif
 			exit(1);
 		}
-	} catch (riscv::MachineException& me) {
-		printf(">>> Machine exception %d: %s (data: %d)\n",
-				me.type(), me.what(), me.data());
-#ifdef RISCV_DEBUG
-		machine.print_and_pause();
-#endif
-		exit(1);
 	}
 }

@@ -137,10 +137,10 @@ PUBLIC_API long test_memcpy()
 {
 	const char* src = (const char*) src_array;
 	char* dest = (char*) dst_array;
-	const size_t size = sizeof(dst_array);
+	char* dest_end = dest + sizeof(dst_array);
 	
-	for (size_t i = 0; i < size; i++)
-		dest[i] = src[i];
+	while (dest < dest_end)
+		*dest++ = *src++;
 	return (long) dest;
 }
 

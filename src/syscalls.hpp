@@ -14,10 +14,6 @@ struct State
 {
 	int exit_code = 0;
 	std::string output;
-
-	long syscall_exit(riscv::Machine<W>&);
-	long syscall_write(riscv::Machine<W>&);
-	long syscall_writev(riscv::Machine<W>&);
 };
 
 template <int W>
