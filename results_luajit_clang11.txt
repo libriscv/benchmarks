@@ -34,32 +34,32 @@ RISC-V self-test OK
 
 RISC-V self-test OK
 * All benchmark results are measured in 200x2000 samples
-       libriscv: function call	median 10ns  		lowest: 10ns     	highest: 20ns
-         luajit: function call	median 92ns  		lowest: 91ns     	highest: 128ns
+       libriscv: function call	median 11ns  		lowest: 10ns     	highest: 24ns
+         luajit: function call	median 89ns  		lowest: 87ns     	highest: 127ns
 
-          native: array append	median 0ns  		lowest: 0ns     	highest: 1ns
-        libriscv: array append	median 34ns  		lowest: 34ns     	highest: 59ns
-   libriscv: array app. direct	median 27ns  		lowest: 27ns     	highest: 52ns
-          luajit: table append	median 126ns  		lowest: 125ns     	highest: 195ns
+          native: array append	median 0ns  		lowest: 0ns     	highest: 0ns
+        libriscv: array append	median 36ns  		lowest: 35ns     	highest: 55ns
+   libriscv: array app. direct	median 27ns  		lowest: 27ns     	highest: 55ns
+          luajit: table append	median 128ns  		lowest: 127ns     	highest: 200ns
 
-      libriscv: many arguments	median 141ns  		lowest: 133ns     	highest: 202ns
-        luajit: many arguments	median 448ns  		lowest: 444ns     	highest: 518ns
+      libriscv: many arguments	median 140ns  		lowest: 137ns     	highest: 221ns
+        luajit: many arguments	median 451ns  		lowest: 450ns     	highest: 508ns
 
-        libriscv: integer math	median 42ns  		lowest: 41ns     	highest: 68ns
-          luajit: integer math	median 127ns  		lowest: 124ns     	highest: 151ns
+        libriscv: integer math	median 47ns  		lowest: 44ns     	highest: 49ns
+          luajit: integer math	median 127ns  		lowest: 125ns     	highest: 176ns
 
-       libriscv: syscall print	median 65ns  		lowest: 64ns     	highest: 121ns
-         luajit: syscall print	median 169ns  		lowest: 168ns     	highest: 225ns
+       libriscv: syscall print	median 73ns  		lowest: 69ns     	highest: 98ns
+         luajit: syscall print	median 167ns  		lowest: 167ns     	highest: 225ns
 
-     libriscv: complex syscall	median 746ns  		lowest: 714ns     	highest: 953ns
-       luajit: complex syscall	median 1061ns  		lowest: 1041ns     	highest: 1195ns
+     libriscv: complex syscall	median 794ns  		lowest: 769ns     	highest: 977ns
+       luajit: complex syscall	median 1057ns  		lowest: 1030ns     	highest: 1787ns
 
-       libriscv: micro threads	median 250ns  		lowest: 243ns     	highest: 303ns
-            luajit: coroutines	median 367ns  		lowest: 357ns     	highest: 407ns
+       libriscv: micro threads	median 243ns  		lowest: 239ns     	highest: 299ns
+            luajit: coroutines	median 373ns  		lowest: 362ns     	highest: 765ns
 
-   libriscv: micro thread args	median 388ns  		lowest: 375ns     	highest: 511ns
-        luajit: coroutine args	median 420ns  		lowest: 418ns     	highest: 498ns
+   libriscv: micro thread args	median 417ns  		lowest: 407ns     	highest: 460ns
+        luajit: coroutine args	median 428ns  		lowest: 424ns     	highest: 490ns
 
-              libriscv: memcpy	median 5492ns  		lowest: 5393ns     	highest: 6466ns
-       libriscv: memcpy native	median 151ns  		lowest: 146ns     	highest: 221ns
-                luajit: memcpy	median 249ns  		lowest: 248ns     	highest: 327ns
+              libriscv: memcpy	median 6119ns  		lowest: 5954ns     	highest: 6944ns
+       libriscv: memcpy native	median 71ns  		lowest: 64ns     	highest: 91ns
+                luajit: memcpy	median 251ns  		lowest: 250ns     	highest: 308ns

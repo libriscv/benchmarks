@@ -7,11 +7,11 @@ option(GCSECTIONS  "Garbage collect empty sections" ON)
 set(VERSION_FILE   "symbols.map" CACHE STRING "Retained symbols file")
 
 set(WARNINGS  "-Wall -Wextra")
-set(COMMON    "-O2 -fstack-protector -nostdlib -nostdinc -fno-builtin")
+set(COMMON    "-O2 -fsingle-precision-constant -nostdlib -nostdinc -fno-builtin")
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set(RISCV_ABI "-target riscv32 -mabi=ilp32d -march=rv32imfd")
-	set(COMMON    "${COMMON} -flto")
+	#set(COMMON    "${COMMON} -flto")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld")
 else()
 	set(RISCV_ABI "-march=rv32imfd -mabi=ilp32d")
@@ -56,10 +56,14 @@ set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
 add_subdirectory(ext)
 add_subdirectory(libc)
+target_compile_definitions(libc PUBLIC
+	NATIVE_SYSCALLS_BASE=1
+	THREAD_SYSCALLS_BASE=10
+)
 
 add_executable(rvbinary ${SOURCES})
 target_include_directories(rvbinary PRIVATE ${CMAKE_SOURCE_DIR}/../src/include)
-target_link_libraries(rvbinary -static -Wl,--whole-archive libc -Wl,--no-whole-archive gcc)
+target_link_libraries(rvbinary -static -Wl,--whole-archive libc -Wl,--no-whole-archive ${LIBGCC})
 # place ELF into the top binary folder
 set_target_properties(rvbinary
 	PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"

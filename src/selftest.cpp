@@ -11,7 +11,9 @@ void run_selftest()
 	State<RISCV32> state;
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
+#ifdef RISCV_DEBUG
 	setup_minimal_syscalls(state, machine);
+#endif
 	setup_native_heap_syscalls(machine, 1*1024*1024);
 	setup_native_memory_syscalls(machine, false);
 	setup_native_threads(state.exit_code, machine);
@@ -36,7 +38,7 @@ void run_selftest()
 #endif
 		exit(1);
 	}
-	if (state.exit_code != 666) {
+	if (machine.cpu.reg(10) != 666) {
 		printf(">>> The selftest main function did not return correctly\n");
 		printf(">>> The return value was: %d\n", state.exit_code);
 		exit(1);
@@ -46,7 +48,7 @@ void run_selftest()
 		exit(1);
 	}
 
-	machine.install_syscall_handler(8,
+	machine.install_syscall_handler(20,
 		[] (auto& machine) -> long {
 			auto [ll] = machine.template sysargs<uint64_t> ();
 			if (ll != 0x5678000012340000) {
@@ -63,12 +65,9 @@ void run_selftest()
 		// verify serialization works
 		std::vector<uint8_t> mstate;
 		machine.serialize_to(mstate);
-		machine.deserialize_from(mstate);
 
 		try {
 			int ret = machine.vmcall("selftest", 1234, 5678.0, 5ull);
-			if (i == 0)
-				printf("Output:\n%s", state.output.c_str());
 			if (ret != 666) {
 				printf("The self-test did not return the correct value\n");
 				printf("Got %d instead\n", ret);
@@ -82,5 +81,6 @@ void run_selftest()
 #endif
 			exit(1);
 		}
+		machine.deserialize_from(mstate);
 	}
 }

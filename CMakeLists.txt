@@ -4,8 +4,10 @@ project(script_bench CXX)
 option(DEBUGGING   "Debugging build" OFF)
 option(LTO         "Enable interprocedural optimizations" ON)
 option(SANITIZE    "Enable sanitizers" OFF)
+option(PGO         "Generate PGO binary" OFF)
+option(PROFILING   "Profiling mode" OFF)
 
-set(OPTIMIZE  "-Ofast -march=native")
+set(OPTIMIZE  "-O3 -march=native")
 set(COMMON    "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS "${COMMON} ${OPTIMIZE} -std=c++17")
 
@@ -19,10 +21,21 @@ if (SANITIZE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -march=native -ggdb3 -fsanitize=address,undefined")
 endif()
 
+if (PGO)
+	set(PROFPATH $ENV{HOME}/pgo)
+	if (PROFILING)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-generate=${PROFPATH}")
+	else()
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-use=${PROFPATH}/default.profdata")
+	endif()
+endif()
+
 add_subdirectory(ext/libriscv/lib libriscv)
+# NOTE: We have to enable exec traps to get a realistic picture
+# as they are used in the game engine these benchmarks are for.
 target_compile_definitions(riscv PUBLIC RISCV_EXEC_TRAPS_ENABLED=1
-										RISCV_THROW_UNIMPLEMENTED=1
-										RISCV_EBREAK_MEANS_STOP=1)
+										RISCV_EBREAK_MEANS_STOP=1
+									RISCV_SYSCALLS_MAX=24)
 
 set(SOURCES
 	src/main.cpp
@@ -41,6 +54,9 @@ target_include_directories(bench PRIVATE ext/LuaBridge/Source/LuaBridge)
 target_include_directories(bench PRIVATE ext/libriscv/emulator/syscalls)
 # for some reason this causes -std=gnu++1z
 #set_target_properties(bench PROPERTIES CXX_STANDARD 17)
+target_compile_definitions(bench PRIVATE
+		NATIVE_SYSCALLS_BASE=1
+		THREADS_SYSCALL_BASE=10)
 
 if (LTO)
 	set_target_properties(riscv PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)

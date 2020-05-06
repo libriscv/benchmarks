@@ -47,12 +47,14 @@ void test_setup()
 #endif
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
+#ifdef RISCV_DEBUG
 	setup_minimal_syscalls(state, *machine);
+#endif
 	setup_native_heap_syscalls(*machine, 4*1024*1024);
-	setup_native_memory_syscalls(*machine, false);
+	setup_native_memory_syscalls(*machine, true);
 	setup_native_threads(state.exit_code, *machine);
-	machine->install_syscall_handler(50, syscall_print<RISCV32>);
-	machine->install_syscall_handler(51, syscall_longcall<RISCV32>);
+	machine->install_syscall_handler(20, syscall_print<RISCV32>);
+	machine->install_syscall_handler(21, syscall_longcall<RISCV32>);
 	machine->setup_argv({"rvprogram"});
 
 	try {
@@ -65,7 +67,7 @@ void test_setup()
 		machine->print_and_pause();
 #endif
 	}
-	assert(state.exit_code == 666);
+	assert(machine->cpu.reg(10) == 666);
 
 	assert(machine->address_of("empty_function") != 0);
 	assert(machine->address_of("test") != 0);
