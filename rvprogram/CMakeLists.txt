@@ -7,7 +7,7 @@ option(GCSECTIONS  "Garbage collect empty sections" ON)
 set(VERSION_FILE   "symbols.map" CACHE STRING "Retained symbols file")
 
 set(WARNINGS  "-Wall -Wextra")
-set(COMMON    "-O2 -fsingle-precision-constant -nostdlib -nostdinc -fno-builtin")
+set(COMMON    "-O2 -nostdlib -nostdinc -fno-builtin")
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set(RISCV_ABI "-target riscv32 -mabi=ilp32d -march=rv32imfd")
@@ -21,7 +21,7 @@ endif()
 set(LIBGCC ${LIBRARY_DIR}/rv32imfd/ilp32d/libgcc.a)
 
 set(CMAKE_C_FLAGS "${WARNINGS} ${COMMON} -std=c11 ${RISCV_ABI}")
-set(CMAKE_CXX_FLAGS "${WARNINGS} ${COMMON} -std=c++2a ${RISCV_ABI} -fno-exceptions -fno-rtti")
+set(CMAKE_CXX_FLAGS "${WARNINGS} ${COMMON} -std=c++17 ${RISCV_ABI} -fno-exceptions -fno-rtti")
 
 if (DEBUGGING)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -ggdb3")
@@ -63,7 +63,7 @@ target_compile_definitions(libc PUBLIC
 
 add_executable(rvbinary ${SOURCES})
 target_include_directories(rvbinary PRIVATE ${CMAKE_SOURCE_DIR}/../src/include)
-target_link_libraries(rvbinary -static -Wl,--whole-archive libc -Wl,--no-whole-archive ${LIBGCC})
+target_link_libraries(rvbinary -static -Wl,--whole-archive libc tinyprintf -Wl,--no-whole-archive ${LIBGCC})
 # place ELF into the top binary folder
 set_target_properties(rvbinary
 	PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
