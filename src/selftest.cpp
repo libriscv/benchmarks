@@ -11,12 +11,10 @@ void run_selftest()
 	State<RISCV32> state;
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
-#ifdef RISCV_DEBUG
 	setup_minimal_syscalls(state, machine);
-#endif
 	setup_native_heap_syscalls(machine, 1*1024*1024);
 	setup_native_memory_syscalls(machine, false);
-	setup_native_threads(state.exit_code, machine);
+	setup_native_threads(machine);
 	machine.setup_argv({"rvprogram"});
 #ifndef RISCV_DEBUG
 	machine.memory.set_exit_address(machine.address_of("fastexit"));
@@ -83,4 +81,22 @@ void run_selftest()
 		}
 		machine.deserialize_from(mstate);
 	}
+
+	// test event loop
+	machine.install_syscall_handler(20,
+		[] (auto& machine) -> long {
+			auto [text] = machine.template sysargs<std::string> ();
+			printf("%s", text.c_str());
+			return 0;
+		});
+	printf("Calling into event loop...!\n");
+	machine.vmcall("event_loop");
+
+	machine.preempt(machine.address_of("add_work"));
+
+	printf("Resuming event loop...!\n");
+	machine.simulate(1000);
+	machine.simulate(1000);
+	machine.preempt(machine.address_of("add_work"));
+	machine.simulate(1000);
 }

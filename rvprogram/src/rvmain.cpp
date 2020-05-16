@@ -1,8 +1,13 @@
 #include <cassert>
 #include <include/libc.hpp>
 #include <crc32.hpp>
+#include <microthread.hpp>
 extern "C" __attribute__((noreturn)) void fastexit(int);
-#define PUBLIC_API extern "C" __attribute__((used))
+#define PUBLIC_API extern "C" __attribute__((used, naked))
+#define PUBLIC_RETURN() { asm volatile("ebreak"); __builtin_unreachable(); }
+#define PUBLIC_RETVAL(x) \
+		{register long __a0 asm("a0") = (long) (x); \
+		asm volatile("ebreak" :: "r"(__a0)); __builtin_unreachable(); }
 
 #include <include/syscall.hpp>
 inline long sys_print(const char* data)
@@ -28,73 +33,6 @@ int main(int, const char**)
 	fastexit(666);
 }
 
-#include <array>
-static std::array<int, 2001> array;
-static int counter = 0;
-
-PUBLIC_API void empty_function()
-{
-}
-
-PUBLIC_API void test(int arg1)
-{
-	array[counter++] = arg1;
-}
-
-struct Test {
-	int32_t a;
-	int64_t b;
-};
-
-PUBLIC_API long
-test_args(uint32_t a1, Test& a2, int a3, int a4, int a5, int a6, int a7, int a8)
-{
-	if (a1 == crc32("This is a string") //__builtin_strcmp("This is a string", a1) == 0
-	&& (a2.a == 222 && a2.b == 666) && (a3 == 333) && (a4 == 444) && (a5 == 555)
-	&& (a6 == 666) && (a7 == 777) && (a8 == 888)) return 666;
-	return -1;
-}
-
-PUBLIC_API long test_maffs(int a1, int a2)
-{
-	int a = a1 + a2;
-	int b = a1 - a2;
-	int c = a1 * a2;
-	int d = a1 / a2;
-	return a + b + c + d;
-}
-
-PUBLIC_API void test_print()
-{
-	sys_print("This is a string");
-}
-
-PUBLIC_API void test_longcall()
-{
-	for (int i = 0; i < 10; i++)
-	sys_longcall("This is a string", 2, 3, 4, 5, 6, 7);
-}
-
-#include <microthread.hpp>
-PUBLIC_API void test_threads()
-{
-	microthread::direct(
-		[] {
-			microthread::yield();
-		});
-	microthread::yield();
-}
-PUBLIC_API long test_threads_args()
-{
-	auto thread = microthread::create(
-		[] (int a, int b, int c, int d) -> long {
-			microthread::yield();
-			return a + b + c + d;
-		}, 1, 2, 3, 4);
-	microthread::yield();
-	return microthread::join(thread);
-}
-
 PUBLIC_API long selftest(int i, float f, long long number)
 {
 	uint64_t value = 555ull / number;
@@ -113,8 +51,78 @@ PUBLIC_API long selftest(int i, float f, long long number)
 		[] (int a, int b, long long c) -> long {
 			return a + b + c;
 		}, 111, 222, 333);
-	long retval = microthread::join(thread);
-	return retval;
+	PUBLIC_RETVAL(microthread::join(thread));
+}
+
+#include <array>
+static std::array<int, 2001> array;
+static int counter = 0;
+
+PUBLIC_API void empty_function()
+{
+	PUBLIC_RETURN();
+}
+
+PUBLIC_API void test(int arg1)
+{
+	array[counter++] = arg1;
+	PUBLIC_RETURN();
+}
+
+struct Test {
+	int32_t a;
+	int64_t b;
+};
+
+PUBLIC_API long
+test_args(uint32_t a1, Test& a2, int a3, int a4, int a5, int a6, int a7, int a8)
+{
+	if (a1 == crc32("This is a string") //__builtin_strcmp("This is a string", a1) == 0
+	&& (a2.a == 222 && a2.b == 666) && (a3 == 333) && (a4 == 444) && (a5 == 555)
+	&& (a6 == 666) && (a7 == 777) && (a8 == 888)) PUBLIC_RETVAL(666);
+	PUBLIC_RETVAL(-1);
+}
+
+PUBLIC_API long test_maffs(int a1, int a2)
+{
+	int a = a1 + a2;
+	int b = a1 - a2;
+	int c = a1 * a2;
+	int d = a1 / a2;
+	PUBLIC_RETVAL(a + b + c + d);
+}
+
+PUBLIC_API void test_print()
+{
+	sys_print("This is a string");
+	PUBLIC_RETURN();
+}
+
+PUBLIC_API void test_longcall()
+{
+	for (int i = 0; i < 10; i++)
+		sys_longcall("This is a string", 2, 3, 4, 5, 6, 7);
+	PUBLIC_RETURN();
+}
+
+PUBLIC_API void test_threads()
+{
+	microthread::direct(
+		[] {
+			microthread::yield();
+		});
+	microthread::yield();
+	PUBLIC_RETURN();
+}
+PUBLIC_API long test_threads_args()
+{
+	auto thread = microthread::create(
+		[] (int a, int b, int c, int d) -> long {
+			microthread::yield();
+			return a + b + c + d;
+		}, 1, 2, 3, 4);
+	microthread::yield();
+	PUBLIC_RETVAL(microthread::join(thread));
 }
 
 uint8_t src_array[300];
@@ -129,10 +137,39 @@ PUBLIC_API long test_memcpy()
 	
 	while (dest < dest_end)
 		*dest++ = *src++;
-	return (long) dest;
+	PUBLIC_RETVAL(dest);
 }
 
 PUBLIC_API long test_syscall_memcpy()
 {
-	return (long) memcpy(dst_array, src_array, sizeof(dst_array));
+	PUBLIC_RETVAL(memcpy(dst_array, src_array, sizeof(dst_array)));
+}
+
+
+#include <include/event_loop.hpp>
+static std::array<Events, 2> events;
+
+PUBLIC_API void event_loop()
+{
+	while (true) {
+		sys_print("event_loop: Checking for work\n");
+		for (auto& ev : events) ev.handle();
+		sys_print("event_loop: Going to sleep!\n");
+		asm volatile("ebreak" ::: "memory");
+	}
+}
+
+PUBLIC_API bool add_work()
+{
+	Events::Work work {
+		.event = [] (const void* work) {
+			sys_print((const char*) work);
+		},
+		.data = "work: Doing some work!\n"
+	};
+	sys_print("add_work: Adding work\n");
+	for (auto& ev : events)
+		if (ev.delegate(work)) PUBLIC_RETVAL(true);
+	sys_print("add_work: Not adding work this time\n");
+	PUBLIC_RETVAL(false);
 }

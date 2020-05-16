@@ -13,3 +13,6 @@ test_threads
 test_threads_args
 test_memcpy
 test_syscall_memcpy
+
+event_loop
+add_work
