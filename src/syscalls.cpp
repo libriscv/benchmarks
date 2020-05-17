@@ -1,4 +1,5 @@
 #include "syscalls.hpp"
+#include <stdexcept>
 #include <unistd.h>
 using namespace riscv;
 static constexpr uint32_t G_SHMEM_BASE = 0x70000000;
