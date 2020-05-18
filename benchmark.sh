@@ -5,7 +5,7 @@ mkdir -p $HOME/pgo
 
 mkdir -p build_profile_clang
 pushd build_profile_clang
-cmake .. -DPROFILING=ON -DPGO=ON -DCMAKE_BUILD_TYPE=Release
+cmake .. -DPROFILING=ON -DPGO=ON -DCMAKE_BUILD_TYPE=Release -DRISCV_SYSCALL_THROW=ON -DRISCV_ICACHE=ON -DRISCV_EXT_A=OFF -DRISCV_EXT_C=OFF
 make -j16
 ./bench
 popd
@@ -14,7 +14,7 @@ llvm-profdata merge -output=$HOME/pgo/default.profdata $HOME/pgo/*.profraw
 
 mkdir -p build_clang
 pushd build_clang
-cmake .. -DPROFILING=OFF -DPGO=ON -DCMAKE_BUILD_TYPE=Release
+cmake .. -DPROFILING=OFF -DPGO=ON -DCMAKE_BUILD_TYPE=Release -DRISCV_SYSCALL_THROW=ON -DRISCV_ICACHE=ON -DRISCV_EXT_A=OFF -DRISCV_EXT_C=OFF
 make -j16
 ./bench
 popd
