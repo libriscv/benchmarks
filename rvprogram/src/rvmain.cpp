@@ -162,10 +162,9 @@ PUBLIC_API void event_loop()
 PUBLIC_API bool add_work()
 {
 	Events::Work work {
-		.event = [] (const void* work) {
-			sys_print((const char*) work);
-		},
-		.data = "work: Doing some work!\n"
+		[] {
+			sys_print("work: Doing some work!\n");
+		}
 	};
 	sys_print("add_work: Adding work\n");
 	for (auto& ev : events)
