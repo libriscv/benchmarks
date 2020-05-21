@@ -3,7 +3,7 @@ project(rvbinary C CXX)
 
 option(MINIMAL     "Minimal build" OFF)
 option(DEBUGGING   "Debugging build" OFF)
-option(GCSECTIONS  "Garbage collect empty sections" ON)
+option(GCSECTIONS  "Garbage collect empty sections" OFF)
 set(VERSION_FILE   "symbols.map" CACHE STRING "Retained symbols file")
 
 set(WARNINGS  "-Wall -Wextra")

@@ -7,7 +7,7 @@ option(SANITIZE    "Enable sanitizers" OFF)
 option(PGO         "Generate PGO binary" OFF)
 option(PROFILING   "Profiling mode" OFF)
 
-set(OPTIMIZE  "-O3 -march=native")
+set(OPTIMIZE  "-O2 -msse4.2")
 set(COMMON    "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS "${COMMON} ${OPTIMIZE} -std=c++17")
 
@@ -35,7 +35,7 @@ add_subdirectory(ext/libriscv/lib libriscv)
 # as they are used in the game engine these benchmarks are for.
 target_compile_definitions(riscv PUBLIC RISCV_EXEC_TRAPS_ENABLED=1
 										RISCV_EBREAK_MEANS_STOP=1
-									RISCV_SYSCALLS_MAX=128)
+										RISCV_SYSCALLS_MAX=128)
 
 set(SOURCES
 	src/main.cpp

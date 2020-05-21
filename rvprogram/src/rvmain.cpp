@@ -3,11 +3,20 @@
 #include <crc32.hpp>
 #include <microthread.hpp>
 extern "C" __attribute__((noreturn)) void fastexit(int);
-#define PUBLIC_API extern "C" __attribute__((used, naked))
-#define PUBLIC_RETURN() { asm volatile("ebreak"); __builtin_unreachable(); }
-#define PUBLIC_RETVAL(x) \
+#define FAST_RETURN() { asm volatile("ebreak"); __builtin_unreachable(); }
+#define FAST_RETVAL(x) \
 		{register long __a0 asm("a0") = (long) (x); \
 		asm volatile("ebreak" :: "r"(__a0)); __builtin_unreachable(); }
+
+#ifdef __clang__
+#define PUBLIC_API extern "C" __attribute__((used))
+#define PUBLIC_RETURN()  return;
+#define PUBLIC_RETVAL(x) return (long)(x);
+#else
+#define PUBLIC_API extern "C" __attribute__((used, naked))
+#define PUBLIC_RETURN()  FAST_RETURN()
+#define PUBLIC_RETVAL(x) FAST_RETVAL(x)
+#endif
 
 #include <include/syscall.hpp>
 inline long sys_print(const char* data)
