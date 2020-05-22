@@ -49,9 +49,6 @@ fastexit:
 #[no_mangle]
 pub extern "C" fn empty_function()
 {
-	unsafe {
-		llvm_asm!("ebreak");
-	}
 }
 
 /// Benchmark 2: Store argument into array, increment index
@@ -63,6 +60,5 @@ pub extern "C" fn test(arg1: i32)
 	unsafe {
 		ARRAY[COUNTER] = arg1;
 		COUNTER += 1;
-		llvm_asm!("ebreak");
 	}
 }
