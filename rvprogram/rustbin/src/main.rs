@@ -2,6 +2,7 @@
 #![no_std]
 #![feature(llvm_asm)]
 #![feature(global_asm)]
+#![feature(naked_functions)]
 
 use core::panic::PanicInfo;
 
@@ -44,17 +45,22 @@ fastexit:
 
 
 /// Benchmark 1: Function call overhead
+#[naked]
 #[no_mangle]
-pub extern "C" fn empty_function()
+pub unsafe extern "C" fn empty_function()
 {
+	llvm_asm!("ebreak");
 }
 
 /// Benchmark 2: Store argument into array, increment index
 static mut ARRAY:   [i32; 4096] = [0; 4096];
 static mut COUNTER: usize = 0;
+
+#[naked]
 #[no_mangle]
 pub unsafe extern "C" fn test(arg1: i32)
 {
 	ARRAY[COUNTER] = arg1;
 	COUNTER += 1;
+	llvm_asm!("ebreak");
 }

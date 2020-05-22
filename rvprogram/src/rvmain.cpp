@@ -8,7 +8,11 @@ extern "C" __attribute__((noreturn)) void fastexit(int);
 		{register long __a0 asm("a0") = (long) (x); \
 		asm volatile("ebreak" :: "r"(__a0)); __builtin_unreachable(); }
 
-#ifdef __clang__
+#if defined(__clang__)
+#define NORMAL_FUNCTIONS
+#endif
+
+#ifdef NORMAL_FUNCTIONS
 #define PUBLIC_API extern "C" __attribute__((used))
 #define PUBLIC_RETURN()  return;
 #define PUBLIC_RETVAL(x) return (long)(x);
@@ -63,18 +67,19 @@ PUBLIC_API long selftest(int i, float f, long long number)
 	PUBLIC_RETVAL(microthread::join(thread));
 }
 
-#include <array>
-static std::array<int, 2001> array;
-static int counter = 0;
-
 PUBLIC_API void empty_function()
 {
 	PUBLIC_RETURN();
 }
 
+#include <array>
+static std::array<int, 4096> array;
+static int counter = 0;
+
 PUBLIC_API void test(int arg1)
 {
 	array[counter++] = arg1;
+	//array.at(counter++) = arg1;
 	PUBLIC_RETURN();
 }
 
