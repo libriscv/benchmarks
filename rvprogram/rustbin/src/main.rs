@@ -19,10 +19,8 @@ pub unsafe fn abort() -> !
 }
 
 #[no_mangle]
-pub extern "C" fn libc_start() {
-	unsafe {
-		llvm_asm!("ebreak");
-	}
+pub unsafe extern "C" fn libc_start() {
+	llvm_asm!("ebreak");
 }
 
 global_asm!(r#"
@@ -55,10 +53,8 @@ pub extern "C" fn empty_function()
 static mut ARRAY:   [i32; 4096] = [0; 4096];
 static mut COUNTER: usize = 0;
 #[no_mangle]
-pub extern "C" fn test(arg1: i32)
+pub unsafe extern "C" fn test(arg1: i32)
 {
-	unsafe {
-		ARRAY[COUNTER] = arg1;
-		COUNTER += 1;
-	}
+	ARRAY[COUNTER] = arg1;
+	COUNTER += 1;
 }
