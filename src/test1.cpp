@@ -11,8 +11,7 @@ static uint32_t test_1_empty_addr = 0x0;
 static uint32_t test_1_address = 0x0;
 
 static Script* luascript = nullptr;
-//static const char* TEST_BINARY = "../rvprogram/build_clang/rvbinary";
-static const char* TEST_BINARY = "../rvprogram/build/rvbinary";
+extern const char* TEST_BINARY;
 
 template <int W>
 long syscall_print(Machine<W>& machine)

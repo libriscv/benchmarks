@@ -1,0 +1,23 @@
+=== Rust nightly --release, RV32GC ===
+RISC-V self-test OK
+* All benchmark results are measured in 200x2000 samples
+         libriscv: function call	median 26ns  		lowest: 25ns     	highest: 55ns
+           luajit: function call	median 90ns  		lowest: 87ns     	highest: 117ns
+
+            native: array append	median 0ns  		lowest: 0ns     	highest: 0ns
+          libriscv: array append	median 73ns  		lowest: 72ns     	highest: 108ns
+     libriscv: array app. direct	median 64ns  		lowest: 64ns     	highest: 91ns
+            luajit: table append	median 125ns  		lowest: 124ns     	highest: 151ns
+
+=== C++17 naked, RV32IMFD ===
+RISC-V self-test OK
+* All benchmark results are measured in 200x2000 samples
+         libriscv: function call	median 4ns  		lowest: 4ns     	highest: 14ns
+           luajit: function call	median 89ns  		lowest: 88ns     	highest: 116ns
+
+            native: array append	median 0ns  		lowest: 0ns     	highest: 0ns
+          libriscv: array append	median 28ns  		lowest: 27ns     	highest: 54ns
+     libriscv: array app. direct	median 20ns  		lowest: 19ns     	highest: 37ns
+            luajit: table append	median 127ns  		lowest: 126ns     	highest: 167ns
+
+As we can see, there is a big gap between Rust and C++ currently, however this is just the first benchmark, and I expect to be able to make some improvements to the Rust benchmarks in time.

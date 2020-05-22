@@ -2,9 +2,12 @@
 #include "testhelp.hpp"
 using namespace riscv;
 
+//static const char* TEST_BINARY = "../rvprogram/rustbin/target/riscv32imac-unknown-none-elf/debug/rustbin";
+static const char* TEST_BINARY = "../rvprogram/build/rvbinary";
+
 void run_selftest()
 {
-	auto rvbinary = load_file("../rvprogram/build/rvbinary");
+	auto rvbinary = load_file(TEST_BINARY);
 
 	riscv::verbose_machine = false;
 	Machine<RISCV32> machine {rvbinary, 4*1024*1024};

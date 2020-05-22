@@ -49,6 +49,10 @@ extern void test_8_riscv();
 extern void test_8_native_riscv();
 extern void test_8_lua();
 
+//const char* TEST_BINARY = "../rvprogram/build_clang/rvbinary";
+const char* TEST_BINARY = "../rvprogram/build/rvbinary";
+//const char* TEST_BINARY = "../rvprogram/rustbin/target/riscv32imac-unknown-none-elf/debug/rustbin";
+
 int main()
 {
 	run_selftest();
