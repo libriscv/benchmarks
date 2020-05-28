@@ -1,6 +1,6 @@
+#include <include/syscall_helpers.hpp>
 #include "luascript.hpp"
 #include "testhelp.hpp"
-#include "syscalls.hpp"
 #include "include/crc32.hpp"
 
 using namespace riscv;
@@ -47,9 +47,9 @@ void test_setup()
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, *machine);
-	setup_native_heap_syscalls(*machine, 4*1024*1024);
+	auto* arena = setup_native_heap_syscalls(*machine, 4*1024*1024);
 	setup_native_memory_syscalls(*machine, true);
-	setup_native_threads(*machine);
+	auto* threads = setup_native_threads(*machine, arena);
 	machine->install_syscall_handler(20, syscall_print<RISCV32>);
 	machine->install_syscall_handler(21, syscall_longcall<RISCV32>);
 	machine->setup_argv({"rvprogram"});

@@ -34,18 +34,6 @@ inline long sys_longcall(const char* data, int b, int c, int d, int e, int f, in
 }
 
 
-namespace std {
-	void __throw_bad_alloc() {
-		sys_print("exception: bad_alloc thrown\n");
-		fastexit(-1);
-	}
-}
-
-int main(int, const char**)
-{
-	fastexit(666);
-}
-
 PUBLIC_API long selftest(int i, float f, long long number)
 {
 	uint64_t value = 555ull / number;
@@ -59,6 +47,12 @@ PUBLIC_API long selftest(int i, float f, long long number)
 	// test sending a 64-bit integral value
 	uint64_t testvalue = 0x5678000012340000;
 	syscall(20, testvalue, testvalue >> 32);
+
+	microthread::direct(
+		[] {
+			microthread::yield();
+		});
+	microthread::yield();
 
 	auto thread = microthread::create(
 		[] (int a, int b, long long c) -> long {
