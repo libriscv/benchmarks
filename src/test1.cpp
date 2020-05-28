@@ -37,7 +37,7 @@ long syscall_longcall(Machine<W>& machine)
 void test_setup()
 {
 	riscv::verbose_machine = false;
-	rvbinary = load_file(TEST_BINARY);
+	if (rvbinary.empty()) rvbinary = load_file(TEST_BINARY);
 	delete machine;
 	machine = new Machine<RISCV32> {rvbinary, 4*1024*1024};
 #ifndef RISCV_DEBUG
