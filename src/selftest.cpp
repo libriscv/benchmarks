@@ -9,7 +9,6 @@ void run_selftest()
 {
 	auto rvbinary = load_file(TEST_BINARY);
 
-	riscv::verbose_machine = false;
 	Machine<RISCV32> machine {rvbinary, 4*1024*1024};
 	State<RISCV32> state;
 

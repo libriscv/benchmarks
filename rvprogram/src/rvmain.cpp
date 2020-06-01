@@ -32,7 +32,10 @@ inline long sys_longcall(const char* data, int b, int c, int d, int e, int f, in
 {
 	return syscall(21, (long) data, b, c, d, e, f, g);
 }
-
+inline long sys_nada()
+{
+	FAST_RETVAL(syscall(22));
+}
 
 PUBLIC_API long selftest(int i, float f, long long number)
 {
@@ -102,6 +105,7 @@ PUBLIC_API long test_maffs(int a1, int a2)
 
 PUBLIC_API void test_print()
 {
+	//sys_nada();
 	sys_print("This is a string");
 	PUBLIC_RETURN();
 }

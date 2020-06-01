@@ -33,10 +33,14 @@ long syscall_longcall(Machine<W>& machine)
 	}
 	return 0;
 }
+template <int W>
+long syscall_nothing(Machine<W>&)
+{
+	return 0;
+}
 
 void test_setup()
 {
-	riscv::verbose_machine = false;
 	if (rvbinary.empty()) rvbinary = load_file(TEST_BINARY);
 	delete machine;
 	machine = new Machine<RISCV32> {rvbinary, 4*1024*1024};
@@ -52,6 +56,7 @@ void test_setup()
 	auto* threads = setup_native_threads(*machine, arena);
 	machine->install_syscall_handler(20, syscall_print<RISCV32>);
 	machine->install_syscall_handler(21, syscall_longcall<RISCV32>);
+	machine->install_syscall_handler(22, syscall_nothing<RISCV32>);
 	machine->setup_argv({"rvprogram"});
 
 	try {
