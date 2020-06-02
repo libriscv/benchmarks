@@ -48,7 +48,9 @@ RISC-V self-test OK
           libriscv: integer math	median 34ns  		lowest: 33ns     	highest: 67ns
             luajit: integer math	median 125ns  		lowest: 121ns     	highest: 234ns
 
+	  libriscv: syscall overhead	median 11ns  		lowest: 11ns     	highest: 22ns
          libriscv: syscall print	median 61ns  		lowest: 59ns     	highest: 119ns
+		luajit: syscall overhead	median 111ns  		lowest: 109ns     	highest: 140ns
            luajit: syscall print	median 168ns  		lowest: 167ns     	highest: 320ns
 
        libriscv: complex syscall	median 724ns  		lowest: 692ns     	highest: 809ns
