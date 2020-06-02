@@ -3,6 +3,11 @@
 
 using namespace luabridge;
 
+static void nada()
+{
+	// empty - used to measure syscall overhead
+}
+
 static void print(const std::string& text)
 {
 	if (text != "This is a string") {
@@ -28,6 +33,7 @@ Script::Script(const std::string& file)
 	}
 	auto gns = getGlobalNamespace(this->state);
     gns.beginNamespace("script")
+	.addFunction("nada",     nada)
 	.addFunction("print",    print)
 	.addFunction("longcall", longcall)
 	.endNamespace();

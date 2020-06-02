@@ -8,6 +8,7 @@ static std::vector<uint8_t> rvbinary;
 static Machine<RISCV32>* machine = nullptr;
 static State<RISCV32> state;
 static uint32_t test_1_empty_addr = 0x0;
+static uint32_t test_1_syscall_addr = 0x0;
 static uint32_t test_1_address = 0x0;
 
 static Script* luascript = nullptr;
@@ -81,6 +82,7 @@ void test_setup()
 	assert(machine->address_of("test_syscall_memcpy") != 0);
 	test_1_empty_addr = machine->address_of("empty_function");
 	test_1_address = machine->address_of("test");
+	test_1_syscall_addr = machine->address_of("test_syscall");
 
 	delete luascript;
 	luascript = new Script("../luaprogram/script.lua");
@@ -175,6 +177,10 @@ void test_3_lua()
 	luascript->call("test_maffs", 111, 222);
 }
 
+void test_4_riscv_syscall()
+{
+	machine->vmcall(test_1_syscall_addr);
+}
 void test_4_riscv()
 {
 	machine->vmcall("test_print");
@@ -182,6 +188,10 @@ void test_4_riscv()
 void test_4_lua()
 {
 	luascript->call("test_print");
+}
+void test_4_lua_syscall()
+{
+	luascript->call("test_syscall");
 }
 
 void test_5_riscv()

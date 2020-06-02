@@ -65,7 +65,7 @@ void run_selftest()
 	{
 		// verify serialization works
 		std::vector<uint8_t> mstate;
-		//machine.serialize_to(mstate);
+		machine.serialize_to(mstate);
 
 		try {
 			int ret = machine.vmcall("selftest", 1234, 5678.0, 5ull);
@@ -82,7 +82,9 @@ void run_selftest()
 #endif
 			exit(1);
 		}
-		//machine.deserialize_from(mstate);
+		machine.deserialize_from(mstate);
+		// NOTE: This is a cheap hack to get the threadcall page trap back
+		setup_native_threads(machine, arena);
 	}
 
 	// test event loop

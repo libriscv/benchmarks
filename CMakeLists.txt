@@ -19,7 +19,7 @@ elseif (MINIMAL)
 endif()
 
 if (SANITIZE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -march=native -ggdb3 -fsanitize=address,undefined")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -ggdb3 -fsanitize=address,undefined")
 endif()
 
 if (PGO)

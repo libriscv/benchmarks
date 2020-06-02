@@ -103,9 +103,13 @@ PUBLIC_API long test_maffs(int a1, int a2)
 	PUBLIC_RETVAL(a + b + c + d);
 }
 
+PUBLIC_API void test_syscall()
+{
+	sys_nada();
+	PUBLIC_RETURN();
+}
 PUBLIC_API void test_print()
 {
-	//sys_nada();
 	sys_print("This is a string");
 	PUBLIC_RETURN();
 }
