@@ -39,6 +39,24 @@ long syscall_nothing(Machine<W>&)
 {
 	return 0;
 }
+template <int W>
+long syscall_fmod(Machine<W>& machine)
+{
+	auto& regs = machine.cpu.registers();
+	auto& f1 = regs.getfl(0).f32[0];
+	auto& f2 = regs.getfl(1).f32[0];
+	f1 = std::fmod(f1, f2);
+	return 0;
+}
+template <int W>
+long syscall_powf(Machine<W>& machine)
+{
+	auto& regs = machine.cpu.registers();
+	auto& f1 = regs.getfl(0).f32[0];
+	auto& f2 = regs.getfl(1).f32[0];
+	f1 = std::pow(f1, f2);
+	return 0;
+}
 
 void test_setup()
 {
@@ -58,6 +76,9 @@ void test_setup()
 	machine->install_syscall_handler(20, syscall_print<RISCV32>);
 	machine->install_syscall_handler(21, syscall_longcall<RISCV32>);
 	machine->install_syscall_handler(22, syscall_nothing<RISCV32>);
+
+	machine->install_syscall_handler(23, syscall_fmod<RISCV32>);
+	machine->install_syscall_handler(24, syscall_powf<RISCV32>);
 	machine->setup_argv({"rvprogram"});
 
 	try {
@@ -162,19 +183,35 @@ void test_3_riscv()
 {
 #ifdef RISCV_DEBUG
 	try {
-		machine->vmcall<0>("test_maffs", 111, 222);
+		machine->vmcall<0>("test_maffs1", 111, 222);
 	} catch (riscv::MachineException& me) {
 		printf(">>> test_3 Machine exception %d: %s (data: %d)\n",
 				me.type(), me.what(), me.data());
 		machine->print_and_pause();
 	}
 #else
-	machine->vmcall("test_maffs", 111, 222);
+	machine->vmcall("test_maffs1", 111, 222);
 #endif
 }
-void test_3_lua()
+void test_3_riscv_math2()
 {
-	luascript->call("test_maffs", 111, 222);
+	machine->vmcall("test_maffs2", 3.0, 3.0, 3.0);
+}
+void test_3_riscv_math3()
+{
+	machine->vmcall("test_maffs3", 3.0, 3.0, 3.0);
+}
+void test_3_lua_math1()
+{
+	luascript->call("test_maffs1", 111, 222);
+}
+void test_3_lua_math2()
+{
+	luascript->call("test_maffs2", 3.0, 3.0, 3.0);
+}
+void test_3_lua_math3()
+{
+	luascript->call("test_maffs3", 3.0, 3.0, 3.0);
 }
 
 void test_4_riscv_syscall()

@@ -36,6 +36,14 @@ inline long sys_nada()
 {
 	FAST_RETVAL(syscall(22));
 }
+inline float sys_fmod(float a1, float a2)
+{
+	return fsyscallf(23, a1, a2);
+}
+inline float sys_powf(float a1, float a2)
+{
+	return fsyscallf(24, a1, a2);
+}
 
 PUBLIC_API long selftest(int i, float f, long long number)
 {
@@ -94,13 +102,22 @@ test_args(uint32_t a1, Test& a2, int a3, int a4, int a5, int a6, int a7, int a8)
 	PUBLIC_RETVAL(-1);
 }
 
-PUBLIC_API long test_maffs(int a1, int a2)
+#include <cmath>
+PUBLIC_API long test_maffs1(int a1, int a2)
 {
 	int a = a1 + a2;
 	int b = a1 - a2;
 	int c = a1 * a2;
 	int d = a1 / a2;
 	PUBLIC_RETVAL(a + b + c + d);
+}
+PUBLIC_API float test_maffs2(float arg1, float arg2, float arg3)
+{
+	return (arg1 * arg1 * arg3) / (arg2 * arg2 * arg3) + sys_fmod(arg1, arg3);
+}
+PUBLIC_API float test_maffs3(float arg1, float arg2, float arg3)
+{
+	return sys_powf(sys_powf(sys_powf(arg1, arg2), 1.0 / arg3), 1.0 / arg3);
 }
 
 PUBLIC_API void test_syscall()

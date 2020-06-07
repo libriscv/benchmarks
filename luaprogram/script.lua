@@ -19,12 +19,18 @@ function test_args(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
 	return -1
 end
 
-function test_maffs(arg1, arg2)
+function test_maffs1(arg1, arg2)
 	a = arg1 + arg2
 	b = arg1 - arg2
 	c = arg1 * arg2
 	d = arg1 / arg2
 	return a + b + c + d
+end
+function test_maffs2(arg1, arg2, arg3)
+	return (arg1 * arg1 * arg3) / (arg2 * arg2 * arg3) + math.fmod(arg1, arg3)
+end
+function test_maffs3(arg1, arg2, arg3)
+	return (arg1 ^ arg2) ^ (1.0 / arg3) ^ (1.0 / arg3)
 end
 
 function test_syscall()

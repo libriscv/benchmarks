@@ -64,7 +64,7 @@ target_compile_definitions(libc PUBLIC
 
 add_executable(rvbinary ${SOURCES})
 target_include_directories(rvbinary PRIVATE ${CMAKE_SOURCE_DIR}/../src/include)
-target_link_libraries(rvbinary -static -Wl,--whole-archive libc tinyprintf -Wl,--no-whole-archive ${LIBGCC})
+target_link_libraries(rvbinary -static -Wl,--whole-archive libc tinyprintf -Wl,--no-whole-archive m ${LIBGCC})
 # place ELF into the top binary folder
 set_target_properties(rvbinary
 	PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
