@@ -167,7 +167,26 @@ PUBLIC_API long test_memcpy()
 	const char* src = (const char*) src_array;
 	char* dest = (char*) dst_array;
 	char* dest_end = dest + sizeof(dst_array);
-	
+
+	if ((uintptr_t) dest % 4 == (uintptr_t) src % 4)
+	{
+		while ((uintptr_t) dest % 4 && dest < dest_end)
+			*dest++ = *src++;
+
+		while (dest + 16 <= dest_end) {
+			*(uint32_t*) &dest[0] = *(uint32_t*) &src[0];
+			*(uint32_t*) &dest[4] = *(uint32_t*) &src[4];
+			*(uint32_t*) &dest[8] = *(uint32_t*) &src[8];
+			*(uint32_t*) &dest[12] = *(uint32_t*) &src[12];
+			dest += 16; src += 16;
+		}
+
+		while (dest + 4 <= dest_end) {
+			*(uint32_t*) dest = *(uint32_t*) src;
+			dest += 4; src += 4;
+		}
+	}
+
 	while (dest < dest_end)
 		*dest++ = *src++;
 	PUBLIC_RETVAL(dest);

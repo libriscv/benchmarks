@@ -66,6 +66,6 @@ RISC-V self-test OK
      libriscv: micro thread args	median 320ns  		lowest: 306ns     	highest: 374ns
           luajit: coroutine args	median 422ns  		lowest: 419ns     	highest: 496ns
 
-                libriscv: memcpy	median 5354ns  		lowest: 5253ns     	highest: 5617ns
+                libriscv: memcpy	median 1057ns  		lowest: 949ns     	highest: 2669ns
          libriscv: memcpy native	median 59ns  		lowest: 58ns     	highest: 96ns
                   luajit: memcpy	median 248ns  		lowest: 246ns     	highest: 315ns
