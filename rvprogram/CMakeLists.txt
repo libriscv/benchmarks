@@ -10,11 +10,11 @@ set(WARNINGS  "-Wall -Wextra")
 set(COMMON    "-O2 -nostdlib -nostdinc -fno-builtin -fno-threadsafe-statics")
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	set(RISCV_ABI "-target riscv32 -mabi=ilp32d -march=rv32imfd")
+	set(RISCV_ABI "-target riscv32 -mabi=ilp32d -march=rv32g")
 	#set(COMMON    "${COMMON} -flto")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld")
 else()
-	set(RISCV_ABI "-march=rv32imfd -mabi=ilp32d")
+	set(RISCV_ABI "-march=rv32g -mabi=ilp32d")
 	set(COMMON    "${COMMON} -flto=4")
 endif()
 # we need this libgcc for 64-bit divisions
