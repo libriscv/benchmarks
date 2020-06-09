@@ -48,15 +48,23 @@ end
 
 function test_threads()
 	co = coroutine.create(function ()
-		--script.print("This is a string")
 		coroutine.yield()
-		--script.print("This is a string")
 	end)
 	coroutine.resume(co)
 	coroutine.resume(co)
 end
 
-function test_threads_args()
+local testvalue = 0
+function test_threads_args1()
+	co = coroutine.create(function (arg1, arg2, arg3, arg4)
+		coroutine.yield()
+		testvalue = arg1 + arg2 + arg3 + arg4
+	end)
+	coroutine.resume(co, 1, 2, 3, 4)
+	return coroutine.resume(co)
+end
+
+function test_threads_args2()
 	co = coroutine.create(function (arg1, arg2, arg3, arg4)
 		coroutine.yield()
 		return arg1 + arg2 + arg3 + arg4

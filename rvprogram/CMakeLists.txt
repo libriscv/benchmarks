@@ -7,7 +7,7 @@ option(GCSECTIONS  "Garbage collect empty sections" OFF)
 set(VERSION_FILE   "symbols.map" CACHE STRING "Retained symbols file")
 
 set(WARNINGS  "-Wall -Wextra")
-set(COMMON    "-O2 -nostdlib -nostdinc -fno-builtin")
+set(COMMON    "-O2 -nostdlib -nostdinc -fno-builtin -fno-threadsafe-statics")
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set(RISCV_ABI "-target riscv32 -mabi=ilp32d -march=rv32imfd")

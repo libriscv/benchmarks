@@ -13,7 +13,8 @@ test_syscall
 test_print
 test_longcall
 test_threads
-test_threads_args
+test_threads_args1
+test_threads_args2
 test_memcpy
 test_syscall_memcpy
 

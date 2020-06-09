@@ -91,12 +91,14 @@ void test_setup()
 		machine->print_and_pause();
 #endif
 	}
-	assert(machine->cpu.reg(10) == 666);
+	assert(machine->cpu.reg(10) == 0);
 
 	assert(machine->address_of("empty_function") != 0);
 	assert(machine->address_of("test") != 0);
 	assert(machine->address_of("test_args") != 0);
-	assert(machine->address_of("test_maffs") != 0);
+	assert(machine->address_of("test_maffs1") != 0);
+	assert(machine->address_of("test_maffs2") != 0);
+	assert(machine->address_of("test_maffs3") != 0);
 	assert(machine->address_of("test_print") != 0);
 	assert(machine->address_of("test_longcall") != 0);
 	assert(machine->address_of("test_memcpy") != 0);
@@ -249,13 +251,21 @@ void test_6_lua()
 	luascript->call("test_threads");
 }
 
-void test_7_riscv()
+void test_7_riscv_1()
 {
-	machine->vmcall("test_threads_args");
+	machine->vmcall("test_threads_args1");
 }
-void test_7_lua()
+void test_7_riscv_2()
 {
-	luascript->call("test_threads_args");
+	machine->vmcall("test_threads_args2");
+}
+void test_7_lua_1()
+{
+	luascript->call("test_threads_args1");
+}
+void test_7_lua_2()
+{
+	luascript->call("test_threads_args2");
 }
 
 void test_8_riscv()

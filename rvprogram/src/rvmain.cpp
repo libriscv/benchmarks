@@ -59,11 +59,22 @@ PUBLIC_API long selftest(int i, float f, long long number)
 	uint64_t testvalue = 0x5678000012340000;
 	syscall(20, testvalue, testvalue >> 32);
 
+	static int changeme = 444;
 	microthread::direct(
-		[] {
+		[] (auto&, int a, int b, int c, int d) {
+			assert(a == 1);
+			assert(b == 2);
+			assert(c == 3);
+			assert(d == 4);
 			microthread::yield();
-		});
+			changeme = 555;
+		}, 1, 2, 3, 4);
 	microthread::yield();
+	if (changeme != 555) {
+		fprintf(stderr,
+			"The microthread direct() call did not fully complete\n");
+		abort();
+	}
 
 	auto thread = microthread::create(
 		[] (int a, int b, long long c) -> long {
@@ -141,13 +152,24 @@ PUBLIC_API void test_longcall()
 PUBLIC_API void test_threads()
 {
 	microthread::direct(
-		[] {
+		[] (auto&) {
 			microthread::yield();
 		});
 	microthread::yield();
 	PUBLIC_RETURN();
 }
-PUBLIC_API long test_threads_args()
+static int ttvalue = 0;
+PUBLIC_API void test_threads_args1()
+{
+	microthread::direct(
+		[] (auto&, int a, int b, int c, int d) {
+			microthread::yield();
+			ttvalue = a + b + c + d;
+		}, 1, 2, 3, 4);
+	microthread::yield();
+	PUBLIC_RETURN();
+}
+PUBLIC_API long test_threads_args2()
 {
 	auto thread = microthread::create(
 		[] (int a, int b, int c, int d) -> long {
