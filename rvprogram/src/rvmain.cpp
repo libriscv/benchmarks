@@ -75,6 +75,9 @@ PUBLIC_API long selftest(int i, float f, long long number)
 			"The microthread direct() call did not fully complete\n");
 		abort();
 	}
+	microthread::direct(
+		[] (auto&) {
+		});
 
 	auto thread = microthread::create(
 		[] (int a, int b, long long c) -> long {
