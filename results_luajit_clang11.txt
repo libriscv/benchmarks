@@ -42,7 +42,7 @@ RISC-V self-test OK
      libriscv: array app. direct	median 20ns  		lowest: 19ns     	highest: 41ns
             luajit: table append	median 126ns  		lowest: 125ns     	highest: 214ns
 
-        libriscv: many arguments	median 132ns  		lowest: 124ns     	highest: 817ns
+		libriscv: many arguments	median 172ns  		lowest: 165ns     	highest: 251ns
           luajit: many arguments	median 443ns  		lowest: 443ns     	highest: 707ns
 
 		  libriscv: integer math	median 38ns  		lowest: 37ns     	highest: 63ns
@@ -57,7 +57,7 @@ RISC-V self-test OK
 		luajit: syscall overhead	median 111ns  		lowest: 109ns     	highest: 140ns
            luajit: syscall print	median 168ns  		lowest: 167ns     	highest: 320ns
 
-       libriscv: complex syscall	median 724ns  		lowest: 692ns     	highest: 809ns
+	   libriscv: complex syscall	median 523ns  		lowest: 514ns     	highest: 576ns
          luajit: complex syscall	median 1034ns  		lowest: 1014ns     	highest: 1228ns
 
 		 libriscv: micro threads	median 141ns  		lowest: 138ns     	highest: 183ns

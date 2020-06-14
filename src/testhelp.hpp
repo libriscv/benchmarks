@@ -49,7 +49,7 @@ inline std::vector<uint8_t> load_file(const std::string& filename)
 timespec time_now()
 {
 	timespec t;
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
+	clock_gettime(CLOCK_THREAD_CPUTIME_ID, &t);
 	return t;
 }
 long nanodiff(timespec start_time, timespec end_time)

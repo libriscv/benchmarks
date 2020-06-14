@@ -29,7 +29,9 @@ long syscall_longcall(Machine<W>& machine)
 {
 	const auto address = machine.template sysarg<address_type<W>>(0);
 	// get string directly from memory, with max-length
-	if (machine.memory.memstring(address) != "This is a string") {
+	static const std::string str("This is a string");
+	//if (str.compare(machine.memory.memstring(address))) {
+	if (machine.memory.memcmp(str.data(), address, str.size())) {
 		abort();
 	}
 	return 0;
@@ -57,6 +59,15 @@ long syscall_powf(Machine<W>& machine)
 	f1 = std::pow(f1, f2);
 	return 0;
 }
+template <int W>
+long syscall_strcmp(Machine<W>& machine)
+{
+	const auto a1 = machine.template sysarg<address_type<W>>(0);
+	const auto a2 = machine.template sysarg<address_type<W>>(1);
+	// this is slightly faster than making both strings
+	const std::string s1 = machine.memory.memstring(a1);
+	return machine.memory.memcmp(s1.data(), a2, s1.size());
+}
 
 void test_setup()
 {
@@ -79,6 +90,7 @@ void test_setup()
 
 	machine->install_syscall_handler(23, syscall_fmod<RISCV32>);
 	machine->install_syscall_handler(24, syscall_powf<RISCV32>);
+	machine->install_syscall_handler(25, syscall_strcmp<RISCV32>);
 	machine->setup_argv({"rvprogram"});
 
 	try {
@@ -155,7 +167,7 @@ void test_2_riscv()
 #ifdef RISCV_DEBUG
 	try {
 		int ret =
-		machine->vmcall("test_args", crc32("This is a string"), test,
+		machine->vmcall("test_args", "This is a string", test,
 									333, 444, 555, 666, 777, 888);
 		if (ret != 666) abort();
 	} catch (riscv::MachineException& me) {
@@ -165,7 +177,7 @@ void test_2_riscv()
 	}
 #else
 	int ret =
-	machine->vmcall("test_args", crc32("This is a string"), test,
+	machine->vmcall("test_args", "This is a string", test,
 								333, 444, 555, 666, 777, 888);
 	if (ret != 666) abort();
 #endif

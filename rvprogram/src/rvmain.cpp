@@ -44,6 +44,10 @@ inline float sys_powf(float a1, float a2)
 {
 	return fsyscallf(24, a1, a2);
 }
+inline float sys_strcmp(const char* str1, const char* str2)
+{
+	return psyscall(25, str1, str2);
+}
 
 PUBLIC_API long selftest(int i, float f, long long number)
 {
@@ -108,9 +112,9 @@ struct Test {
 };
 
 PUBLIC_API long
-test_args(uint32_t a1, Test& a2, int a3, int a4, int a5, int a6, int a7, int a8)
+test_args(const char* a1, Test& a2, int a3, int a4, int a5, int a6, int a7, int a8)
 {
-	if (a1 == crc32("This is a string") //__builtin_strcmp("This is a string", a1) == 0
+	if (sys_strcmp(a1, "This is a string") == 0
 	&& (a2.a == 222 && a2.b == 666) && (a3 == 333) && (a4 == 444) && (a5 == 555)
 	&& (a6 == 666) && (a7 == 777) && (a8 == 888)) PUBLIC_RETVAL(666);
 	PUBLIC_RETVAL(-1);
