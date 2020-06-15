@@ -104,8 +104,8 @@ int main()
 	run_test("luajit: coroutine args", S, test_setup, test_7_lua_1);
 	run_test("luajit: coroutine args", S, test_setup, test_7_lua_2);
 	printf("\n");
-	run_test("libriscv: memcpy", S, test_setup, test_8_riscv);
-	run_test("libriscv: memcpy native", S, test_setup, test_8_native_riscv);
+	run_test("libriscv: naive memcpy", S, test_setup, test_8_riscv);
+	run_test("libriscv: syscall memcpy", S, test_setup, test_8_native_riscv);
 	run_test("luajit: memcpy", S, test_setup, test_8_lua);
 	printf("\n");
 	return 0;

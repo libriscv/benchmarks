@@ -25,8 +25,7 @@ extern "C" __attribute__((noreturn)) void fastexit(int);
 #include <include/syscall.hpp>
 inline long sys_print(const char* data)
 {
-	asm ("" ::: "memory");
-	return syscall(20, (long) data);
+	return psyscall(20, data);
 }
 inline long sys_longcall(const char* data, int b, int c, int d, int e, int f, int g)
 {
@@ -96,13 +95,13 @@ PUBLIC_API void empty_function()
 }
 
 #include <array>
-static std::array<int, 4096> array;
+static std::array<int, 2048> array;
 static int counter = 0;
 
 PUBLIC_API void test(int arg1)
 {
-	array[counter++] = arg1;
-	//array.at(counter++) = arg1;
+	//array[counter++] = arg1;
+	array.at(counter++) = arg1;
 	PUBLIC_RETURN();
 }
 
@@ -131,11 +130,11 @@ PUBLIC_API long test_maffs1(int a1, int a2)
 }
 PUBLIC_API float test_maffs2(float arg1, float arg2, float arg3)
 {
-	return (arg1 * arg1 * arg3) / (arg2 * arg2 * arg3) + sys_fmod(arg1, arg3);
+	PUBLIC_RETVAL((arg1 * arg1 * arg3) / (arg2 * arg2 * arg3) + sys_fmod(arg1, arg3));
 }
 PUBLIC_API float test_maffs3(float arg1, float arg2, float arg3)
 {
-	return sys_powf(sys_powf(sys_powf(arg1, arg2), 1.0 / arg3), 1.0 / arg3);
+	PUBLIC_RETVAL(sys_powf(sys_powf(sys_powf(arg1, arg2), 1.0 / arg3), 1.0 / arg3));
 }
 
 PUBLIC_API void test_syscall()
