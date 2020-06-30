@@ -49,8 +49,16 @@ set(SOURCES
 	ext/libriscv/emulator/syscalls/src/native_threads.cpp
 )
 
+set (LUAPATH "/home/gonzo/github/lua")
+
+add_library(lua54 STATIC IMPORTED)
+set_target_properties(lua54 PROPERTIES IMPORTED_LOCATION "${LUAPATH}/liblua.a")
+set_target_properties(lua54 PROPERTIES LINKER_LANGUAGE C11)
+target_link_libraries(lua54 INTERFACE dl)
+
 add_executable(bench ${SOURCES})
-target_link_libraries(bench riscv luajit-5.1) #lua5.3)
+target_link_libraries(bench riscv lua54)
+target_include_directories(bench PRIVATE ${LUAPATH})
 target_include_directories(bench PRIVATE ext/LuaBridge/Source/LuaBridge)
 target_include_directories(bench PRIVATE ext/libriscv/emulator/syscalls)
 # for some reason this causes -std=gnu++1z
