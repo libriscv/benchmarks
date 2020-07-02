@@ -72,6 +72,7 @@ void run_selftest()
 			if (ret != 666) {
 				printf("The self-test did not return the correct value\n");
 				printf("Got %d instead\n", ret);
+				printf("Output: %s\n", state.output.c_str());
 				exit(1);
 			}
 		} catch (riscv::MachineException& me) {

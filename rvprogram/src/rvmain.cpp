@@ -2,6 +2,7 @@
 #include <include/libc.hpp>
 #include <crc32.hpp>
 #include <microthread.hpp>
+#include <stdio.h>
 extern "C" __attribute__((noreturn)) void fastexit(int);
 #define FAST_RETURN() { asm volatile("ebreak"); __builtin_unreachable(); }
 #define FAST_RETVAL(x) \
@@ -11,15 +12,12 @@ extern "C" __attribute__((noreturn)) void fastexit(int);
 #if defined(__clang__)
 #define NORMAL_FUNCTIONS
 #endif
+#define PUBLIC_API extern "C" __attribute__((used))
 
 #ifdef NORMAL_FUNCTIONS
-#define PUBLIC_API extern "C" __attribute__((used))
-#define PUBLIC_RETURN()  return;
-#define PUBLIC_RETVAL(x) return (long)(x);
+#define FAST_API extern "C" __attribute__((used))
 #else
-#define PUBLIC_API extern "C" __attribute__((used, naked))
-#define PUBLIC_RETURN()  FAST_RETURN()
-#define PUBLIC_RETVAL(x) FAST_RETVAL(x)
+#define FAST_API extern "C" __attribute__((used, naked))
 #endif
 
 #include <include/syscall.hpp>
@@ -86,23 +84,23 @@ PUBLIC_API long selftest(int i, float f, long long number)
 		[] (int a, int b, long long c) -> long {
 			return a + b + c;
 		}, 111, 222, 333);
-	PUBLIC_RETVAL(microthread::join(thread));
+	return microthread::join(thread);
 }
 
 PUBLIC_API void empty_function()
 {
-	PUBLIC_RETURN();
+	FAST_RETURN();
 }
 
 #include <array>
 static std::array<int, 2048> array;
 static int counter = 0;
 
-PUBLIC_API void test(int arg1)
+FAST_API void test(int arg1)
 {
 	//array[counter++] = arg1;
 	array.at(counter++) = arg1;
-	PUBLIC_RETURN();
+	FAST_RETURN();
 }
 
 struct Test {
@@ -110,62 +108,62 @@ struct Test {
 	int64_t b;
 };
 
-PUBLIC_API long
+FAST_API long
 test_args(const char* a1, Test& a2, int a3, int a4, int a5, int a6, int a7, int a8)
 {
 	if (sys_strcmp(a1, "This is a string") == 0
 	&& (a2.a == 222 && a2.b == 666) && (a3 == 333) && (a4 == 444) && (a5 == 555)
-	&& (a6 == 666) && (a7 == 777) && (a8 == 888)) PUBLIC_RETVAL(666);
-	PUBLIC_RETVAL(-1);
+	&& (a6 == 666) && (a7 == 777) && (a8 == 888)) FAST_RETVAL(666);
+	FAST_RETVAL(-1);
 }
 
 #include <cmath>
-PUBLIC_API long test_maffs1(int a1, int a2)
+FAST_API long test_maffs1(int a1, int a2)
 {
 	int a = a1 + a2;
 	int b = a1 - a2;
 	int c = a1 * a2;
 	int d = a1 / a2;
-	PUBLIC_RETVAL(a + b + c + d);
+	FAST_RETVAL(a + b + c + d);
 }
-PUBLIC_API float test_maffs2(float arg1, float arg2, float arg3)
+FAST_API float test_maffs2(float arg1, float arg2, float arg3)
 {
-	PUBLIC_RETVAL((arg1 * arg1 * arg3) / (arg2 * arg2 * arg3) + sys_fmod(arg1, arg3));
+	FAST_RETVAL((arg1 * arg1 * arg3) / (arg2 * arg2 * arg3) + sys_fmod(arg1, arg3));
 }
-PUBLIC_API float test_maffs3(float arg1, float arg2, float arg3)
+FAST_API float test_maffs3(float arg1, float arg2, float arg3)
 {
-	PUBLIC_RETVAL(sys_powf(sys_powf(sys_powf(arg1, arg2), 1.0 / arg3), 1.0 / arg3));
+	FAST_RETVAL(sys_powf(sys_powf(sys_powf(arg1, arg2), 1.0 / arg3), 1.0 / arg3));
 }
 
-PUBLIC_API void test_syscall()
+FAST_API void test_syscall()
 {
 	sys_nada();
-	PUBLIC_RETURN();
+	FAST_RETURN();
 }
-PUBLIC_API void test_print()
+FAST_API void test_print()
 {
 	sys_print("This is a string");
-	PUBLIC_RETURN();
+	FAST_RETURN();
 }
 
-PUBLIC_API void test_longcall()
+FAST_API void test_longcall()
 {
 	for (int i = 0; i < 10; i++)
 		sys_longcall("This is a string", 2, 3, 4, 5, 6, 7);
-	PUBLIC_RETURN();
+	FAST_RETURN();
 }
 
-PUBLIC_API void test_threads()
+FAST_API void test_threads()
 {
 	microthread::direct(
 		[] (auto&) {
 			microthread::yield();
 		});
 	microthread::yield();
-	PUBLIC_RETURN();
+	FAST_RETURN();
 }
 static int ttvalue = 0;
-PUBLIC_API void test_threads_args1()
+FAST_API void test_threads_args1()
 {
 	microthread::direct(
 		[] (auto&, int a, int b, int c, int d) {
@@ -173,7 +171,7 @@ PUBLIC_API void test_threads_args1()
 			ttvalue = a + b + c + d;
 		}, 1, 2, 3, 4);
 	microthread::yield();
-	PUBLIC_RETURN();
+	FAST_RETURN();
 }
 PUBLIC_API long test_threads_args2()
 {
@@ -183,14 +181,14 @@ PUBLIC_API long test_threads_args2()
 			return a + b + c + d;
 		}, 1, 2, 3, 4);
 	microthread::yield();
-	PUBLIC_RETVAL(microthread::join(thread));
+	FAST_RETVAL(microthread::join(thread));
 }
 
 uint8_t src_array[300];
 uint8_t dst_array[300];
 static_assert(sizeof(src_array) == sizeof(dst_array), "!");
 
-PUBLIC_API long test_memcpy()
+FAST_API long test_memcpy()
 {
 	const char* src = (const char*) src_array;
 	char* dest = (char*) dst_array;
@@ -217,12 +215,12 @@ PUBLIC_API long test_memcpy()
 
 	while (dest < dest_end)
 		*dest++ = *src++;
-	PUBLIC_RETVAL(dest);
+	FAST_RETVAL(dest);
 }
 
-PUBLIC_API long test_syscall_memcpy()
+FAST_API long test_syscall_memcpy()
 {
-	PUBLIC_RETVAL(memcpy(dst_array, src_array, sizeof(dst_array)));
+	FAST_RETVAL(memcpy(dst_array, src_array, sizeof(dst_array)));
 }
 
 
@@ -248,7 +246,7 @@ PUBLIC_API bool add_work()
 	};
 	sys_print("add_work: Adding work\n");
 	for (auto& ev : events)
-		if (ev.delegate(work)) PUBLIC_RETVAL(true);
+		if (ev.delegate(work)) FAST_RETVAL(true);
 	sys_print("add_work: Not adding work this time\n");
-	PUBLIC_RETVAL(false);
+	FAST_RETVAL(false);
 }
