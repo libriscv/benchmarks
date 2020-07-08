@@ -11,6 +11,15 @@ static uint32_t test_1_empty_addr = 0x0;
 static uint32_t test_1_syscall_addr = 0x0;
 static uint32_t test_1_address = 0x0;
 
+struct FunctionAddress {
+	uint32_t addr = 0;
+
+	uint32_t get(Machine<RISCV32>* m, const char* func) {
+		if (addr) return addr;
+		return (addr = m->address_of(func));
+	}
+};
+
 static Script* luascript = nullptr;
 extern const char* TEST_BINARY;
 
@@ -160,6 +169,7 @@ void test_1_lua()
 
 void test_2_riscv()
 {
+	static FunctionAddress fa;
 	const struct Test {
 		int32_t a = 222;
 		int64_t b = 666;
@@ -167,7 +177,7 @@ void test_2_riscv()
 #ifdef RISCV_DEBUG
 	try {
 		int ret =
-		machine->vmcall("test_args", "This is a string", test,
+		machine->vmcall(fa.get(machine, "test_args"), "This is a string", test,
 									333, 444, 555, 666, 777, 888);
 		if (ret != 666) abort();
 	} catch (riscv::MachineException& me) {
@@ -177,7 +187,7 @@ void test_2_riscv()
 	}
 #else
 	int ret =
-	machine->vmcall("test_args", "This is a string", test,
+	machine->vmcall(fa.get(machine, "test_args"), "This is a string", test,
 								333, 444, 555, 666, 777, 888);
 	if (ret != 666) abort();
 #endif
@@ -195,25 +205,28 @@ void test_2_lua()
 
 void test_3_riscv()
 {
+	static FunctionAddress fa;
 #ifdef RISCV_DEBUG
 	try {
-		machine->vmcall<0>("test_maffs1", 111, 222);
+		machine->vmcall<0>(fa.get(machine, "test_maffs1"), 111, 222);
 	} catch (riscv::MachineException& me) {
 		printf(">>> test_3 Machine exception %d: %s (data: %d)\n",
 				me.type(), me.what(), me.data());
 		machine->print_and_pause();
 	}
 #else
-	machine->vmcall("test_maffs1", 111, 222);
+	machine->vmcall(fa.get(machine, "test_maffs1"), 111, 222);
 #endif
 }
 void test_3_riscv_math2()
 {
-	machine->vmcall("test_maffs2", 3.0, 3.0, 3.0);
+	static FunctionAddress fa;
+	machine->vmcall(fa.get(machine, "test_maffs2"), 3.0, 3.0, 3.0);
 }
 void test_3_riscv_math3()
 {
-	machine->vmcall("test_maffs3", 3.0, 3.0, 3.0);
+	static FunctionAddress fa;
+	machine->vmcall(fa.get(machine, "test_maffs3"), 3.0, 3.0, 3.0);
 }
 void test_3_lua_math1()
 {
@@ -234,7 +247,8 @@ void test_4_riscv_syscall()
 }
 void test_4_riscv()
 {
-	machine->vmcall("test_print");
+	static FunctionAddress fa;
+	machine->vmcall(fa.get(machine, "test_print"));
 }
 void test_4_lua()
 {
@@ -247,7 +261,8 @@ void test_4_lua_syscall()
 
 void test_5_riscv()
 {
-	machine->vmcall("test_longcall");
+	static FunctionAddress fa;
+	machine->vmcall(fa.get(machine, "test_longcall"));
 }
 void test_5_lua()
 {
@@ -256,7 +271,8 @@ void test_5_lua()
 
 void test_6_riscv()
 {
-	machine->vmcall("test_threads");
+	static FunctionAddress fa;
+	machine->vmcall(fa.get(machine, "test_threads"));
 }
 void test_6_lua()
 {
@@ -265,11 +281,13 @@ void test_6_lua()
 
 void test_7_riscv_1()
 {
-	machine->vmcall("test_threads_args1");
+	static FunctionAddress fa;
+	machine->vmcall(fa.get(machine, "test_threads_args1"));
 }
 void test_7_riscv_2()
 {
-	machine->vmcall("test_threads_args2");
+	static FunctionAddress fa;
+	machine->vmcall(fa.get(machine, "test_threads_args2"));
 }
 void test_7_lua_1()
 {
@@ -282,11 +300,13 @@ void test_7_lua_2()
 
 void test_8_riscv()
 {
-	machine->vmcall<1'000'000>("test_memcpy");
+	static FunctionAddress fa;
+	machine->vmcall<1'000'000>(fa.get(machine, "test_memcpy"));
 }
 void test_8_native_riscv()
 {
-	machine->vmcall<1'000'000>("test_syscall_memcpy");
+	static FunctionAddress fa;
+	machine->vmcall<1'000'000>(fa.get(machine, "test_syscall_memcpy"));
 }
 void test_8_lua()
 {

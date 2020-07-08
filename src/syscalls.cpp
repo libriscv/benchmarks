@@ -2,7 +2,6 @@
 #include <stdexcept>
 #include <unistd.h>
 using namespace riscv;
-static constexpr uint32_t G_SHMEM_BASE = 0x70000000;
 
 struct iovec32 {
     uint32_t iov_base;

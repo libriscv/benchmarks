@@ -13,7 +13,7 @@ set(COMMON    "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS "${COMMON} ${OPTIMIZE} -std=c++17")
 
 if (DEBUGGING)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb3")
 elseif (MINIMAL)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os")
 endif()
