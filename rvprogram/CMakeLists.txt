@@ -14,7 +14,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	#set(COMMON    "${COMMON} -flto")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld")
 else()
-	set(RISCV_ABI "-march=rv32g -mabi=ilp32d")
+	set(RISCV_ABI "-march=rv32gc -mabi=ilp32d")
 	set(COMMON    "${COMMON} -flto=4")
 endif()
 # we need this libgcc for 64-bit divisions

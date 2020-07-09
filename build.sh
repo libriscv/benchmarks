@@ -4,7 +4,7 @@ set -e
 
 mkdir -p build_clang
 pushd build_clang
-cmake .. -DCMAKE_BUILD_TYPE=Release -DLTO=ON -DRISCV_EXT_C=OFF -DRISCV_ICACHE=ON
+cmake .. -DCMAKE_BUILD_TYPE=Release -DLTO=ON -DRISCV_ICACHE=ON -DRISCV_EXPERIMENTAL=ON
 make -j8
 ./bench
 popd
