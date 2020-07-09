@@ -18,9 +18,8 @@ void run_selftest()
 	setup_native_memory_syscalls(machine, false);
 	setup_native_threads(machine, arena);
 	machine.setup_argv({"rvprogram"});
-#ifndef RISCV_DEBUG
 	machine.memory.set_exit_address(machine.address_of("fastexit"));
-#else
+#ifdef RISCV_DEBUG
 	machine.verbose_instructions = true;
 	machine.print_and_pause();
 #endif
