@@ -48,7 +48,7 @@ void run_selftest()
 		exit(1);
 	}
 
-	machine.install_syscall_handler(20,
+	machine.install_syscall_handler(40,
 		[] (auto& machine) -> long {
 			auto [ll] = machine.template sysargs<uint64_t> ();
 			if (ll != 0x5678000012340000) {

@@ -65,7 +65,7 @@ target_include_directories(bench PRIVATE ext/libriscv/emulator/syscalls)
 #set_target_properties(bench PROPERTIES CXX_STANDARD 17)
 target_compile_definitions(bench PRIVATE
 		NATIVE_SYSCALLS_BASE=1
-		THREADS_SYSCALL_BASE=10)
+		THREADS_SYSCALL_BASE=21)
 
 if (LTO)
 	set_target_properties(riscv PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)

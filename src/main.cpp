@@ -65,7 +65,7 @@ const char* TEST_BINARY = "../rvprogram/build/rvbinary";
 #endif
 
 static constexpr bool test_libriscv = true;
-static constexpr bool test_lua = false;
+static constexpr bool test_lua = true;
 
 int main()
 {

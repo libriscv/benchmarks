@@ -20,30 +20,32 @@ extern "C" __attribute__((noreturn)) void fastexit(int);
 #define FAST_API extern "C" __attribute__((used, naked))
 #endif
 
+#define PRINT(x) sys_print(x, __builtin_strlen(x))
+
 #include <include/syscall.hpp>
-inline long sys_print(const char* data)
+inline long sys_print(const char* data, size_t len)
 {
-	return psyscall(20, data);
+	return psyscall(30, data, len);
 }
 inline long sys_longcall(const char* data, int b, int c, int d, int e, int f, int g)
 {
-	return syscall(21, (long) data, b, c, d, e, f, g);
+	return syscall(31, (long) data, b, c, d, e, f, g);
 }
 inline long sys_nada()
 {
-	FAST_RETVAL(syscall(22));
+	FAST_RETVAL(syscall(32));
 }
 inline float sys_fmod(float a1, float a2)
 {
-	return fsyscallf(23, a1, a2);
+	return fsyscallf(33, a1, a2);
 }
 inline float sys_powf(float a1, float a2)
 {
-	return fsyscallf(24, a1, a2);
+	return fsyscallf(34, a1, a2);
 }
-inline float sys_strcmp(const char* str1, const char* str2)
+inline int sys_strcmp(const char* str1, size_t len1, const char* str2)
 {
-	return psyscall(25, str1, str2);
+	return psyscall(35, str1, len1, str2);
 }
 
 PUBLIC_API long selftest(int i, float f, long long number)
@@ -57,8 +59,8 @@ PUBLIC_API long selftest(int i, float f, long long number)
 	assert(bss == 0);
 
 	// test sending a 64-bit integral value
-	uint64_t testvalue = 0x5678000012340000;
-	syscall(20, testvalue, testvalue >> 32);
+	static const uint64_t testvalue = 0x5678000012340000;
+	syscall(40, testvalue, testvalue >> 32);
 
 	static int changeme = 444;
 	microthread::direct(
@@ -92,6 +94,8 @@ PUBLIC_API void empty_function()
 	FAST_RETURN();
 }
 
+static const char str[] = "This is a string";
+
 #include <array>
 static std::array<int, 2048> array;
 static int counter = 0;
@@ -108,10 +112,10 @@ struct Test {
 	int64_t b;
 };
 
-FAST_API long
+PUBLIC_API long
 test_args(const char* a1, Test& a2, int a3, int a4, int a5, int a6, int a7, int a8)
 {
-	if (sys_strcmp(a1, "This is a string") == 0
+	if (sys_strcmp(str, sizeof(str)-1, a1) == 0
 	&& (a2.a == 222 && a2.b == 666) && (a3 == 333) && (a4 == 444) && (a5 == 555)
 	&& (a6 == 666) && (a7 == 777) && (a8 == 888)) FAST_RETVAL(666);
 	FAST_RETVAL(-1);
@@ -142,7 +146,7 @@ FAST_API void test_syscall()
 }
 FAST_API void test_print()
 {
-	sys_print("This is a string");
+	PRINT("This is a string");
 	FAST_RETURN();
 }
 
@@ -230,9 +234,9 @@ static std::array<Events, 2> events;
 PUBLIC_API void event_loop()
 {
 	while (true) {
-		sys_print("event_loop: Checking for work\n");
+		PRINT("event_loop: Checking for work\n");
 		for (auto& ev : events) ev.handle();
-		sys_print("event_loop: Going to sleep!\n");
+		PRINT("event_loop: Going to sleep!\n");
 		asm volatile("ebreak" ::: "memory");
 	}
 }
@@ -241,12 +245,12 @@ PUBLIC_API bool add_work()
 {
 	Events::Work work {
 		[] {
-			sys_print("work: Doing some work!\n");
+			PRINT("work: Doing some work!\n");
 		}
 	};
-	sys_print("add_work: Adding work\n");
+	PRINT("add_work: Adding work\n");
 	for (auto& ev : events)
 		if (ev.delegate(work)) FAST_RETVAL(true);
-	sys_print("add_work: Not adding work this time\n");
+	PRINT("add_work: Not adding work this time\n");
 	FAST_RETVAL(false);
 }

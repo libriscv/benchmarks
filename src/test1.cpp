@@ -22,13 +22,14 @@ struct FunctionAddress {
 
 static Script* luascript = nullptr;
 extern const char* TEST_BINARY;
+static const std::string str("This is a string");
 
 template <int W>
 long syscall_print(Machine<W>& machine)
 {
-	const auto address = machine.template sysarg<address_type<W>>(0);
 	// get string directly from memory, with max-length
-	if (machine.memory.memstring(address) != "This is a string") {
+	const auto rvs = machine.template sysarg<riscv::Buffer>(0);
+	if (str != rvs.to_string()) {
 		abort();
 	}
 	return 0;
@@ -38,7 +39,6 @@ long syscall_longcall(Machine<W>& machine)
 {
 	const auto address = machine.template sysarg<address_type<W>>(0);
 	// get string directly from memory, with max-length
-	static const std::string str("This is a string");
 	//if (str.compare(machine.memory.memstring(address))) {
 	if (machine.memory.memcmp(str.data(), address, str.size())) {
 		abort();
@@ -71,11 +71,11 @@ long syscall_powf(Machine<W>& machine)
 template <int W>
 long syscall_strcmp(Machine<W>& machine)
 {
-	const auto a1 = machine.template sysarg<address_type<W>>(0);
-	const auto a2 = machine.template sysarg<address_type<W>>(1);
-	// this is slightly faster than making both strings
-	const std::string s1 = machine.memory.memstring(a1);
-	return machine.memory.memcmp(s1.data(), a2, s1.size());
+	const auto a1 = machine.template sysarg<riscv::Buffer>(0);
+	const auto a2 = machine.template sysarg<address_type<W>>(2);
+	// this is slightly faster because we know one of the lengths
+	const std::string str1 = a1.to_string();
+	return machine.memory.memcmp(str1.c_str(), a2, str1.size());
 }
 
 void test_setup()
@@ -93,13 +93,13 @@ void test_setup()
 	auto* arena = setup_native_heap_syscalls(*machine, 4*1024*1024);
 	setup_native_memory_syscalls(*machine, true);
 	auto* threads = setup_native_threads(*machine, arena);
-	machine->install_syscall_handler(20, syscall_print<RISCV32>);
-	machine->install_syscall_handler(21, syscall_longcall<RISCV32>);
-	machine->install_syscall_handler(22, syscall_nothing<RISCV32>);
+	machine->install_syscall_handler(30, syscall_print<RISCV32>);
+	machine->install_syscall_handler(31, syscall_longcall<RISCV32>);
+	machine->install_syscall_handler(32, syscall_nothing<RISCV32>);
 
-	machine->install_syscall_handler(23, syscall_fmod<RISCV32>);
-	machine->install_syscall_handler(24, syscall_powf<RISCV32>);
-	machine->install_syscall_handler(25, syscall_strcmp<RISCV32>);
+	machine->install_syscall_handler(33, syscall_fmod<RISCV32>);
+	machine->install_syscall_handler(34, syscall_powf<RISCV32>);
+	machine->install_syscall_handler(35, syscall_strcmp<RISCV32>);
 	machine->setup_argv({"rvprogram"});
 
 	try {
