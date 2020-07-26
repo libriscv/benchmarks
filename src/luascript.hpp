@@ -2,9 +2,15 @@
 #include <stdexcept>
 #include <string>
 extern "C" {
+#ifdef LUAJIT
+#include <luajit-2.1/lauxlib.h>
+#include <luajit-2.1/lua.h>
+#include <luajit-2.1/lualib.h>
+#else
 #include <lauxlib.h>
 #include <lua.h>
 #include <lualib.h>
+#endif
 }
 #include <LuaBridge.h>
 

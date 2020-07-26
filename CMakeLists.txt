@@ -56,14 +56,18 @@ set_target_properties(lua54 PROPERTIES IMPORTED_LOCATION "${LUAPATH}/liblua.a")
 set_target_properties(lua54 PROPERTIES LINKER_LANGUAGE C11)
 target_link_libraries(lua54 INTERFACE dl)
 
+find_library(LUAJIT luajit-5.1 REQUIRED)
+
 add_executable(bench ${SOURCES})
-target_link_libraries(bench riscv lua54)
-target_include_directories(bench PRIVATE ${LUAPATH})
+target_link_libraries(bench riscv ${LUAJIT})
+#target_include_directories(bench PRIVATE ${LUAPATH})
+target_include_directories(bench PRIVATE ${LUAJIT_INCLUDE_DIRS})
 target_include_directories(bench PRIVATE ext/LuaBridge/Source/LuaBridge)
 target_include_directories(bench PRIVATE ext/libriscv/emulator/syscalls)
 # for some reason this causes -std=gnu++1z
 #set_target_properties(bench PROPERTIES CXX_STANDARD 17)
 target_compile_definitions(bench PRIVATE
+		LUAJIT=1
 		NATIVE_SYSCALLS_BASE=1
 		THREADS_SYSCALL_BASE=21)
 

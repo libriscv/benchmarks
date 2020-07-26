@@ -66,6 +66,11 @@ const char* TEST_BINARY = "../rvprogram/build/rvbinary";
 
 static constexpr bool test_libriscv = true;
 static constexpr bool test_lua = true;
+#ifdef LUAJIT
+#define LUANAME "luajit"
+#else
+#define LUANAME "lua5.4"
+#endif
 
 int main()
 {
@@ -78,7 +83,7 @@ int main()
 		run_test("libriscv: function call", S, test_setup, test_1_riscv_empty);
 	}
 	if constexpr (test_lua) {
-		run_test("lua5.4: function call", S, test_setup, test_1_lua_empty);
+		run_test(LUANAME ": function call", S, test_setup, test_1_lua_empty);
 	}
 	printf("\n");
 	run_test("native: array append", S, test_setup, test_1_native);
@@ -87,14 +92,14 @@ int main()
 		run_test("libriscv: array app. direct", S, test_setup, test_1_riscv_direct);
 	}
 	if constexpr (test_lua) {
-		run_test("lua5.4: table append", S, test_setup, test_1_lua);
+		run_test(LUANAME ": table append", S, test_setup, test_1_lua);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
 		run_test("libriscv: many arguments", S, test_setup, test_2_riscv);
 	}
 	if constexpr (test_lua) {
-		run_test("lua5.4: many arguments", S, test_setup, test_2_lua);
+		run_test(LUANAME ": many arguments", S, test_setup, test_2_lua);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
@@ -103,9 +108,9 @@ int main()
 		run_test("libriscv: exp math", S, test_setup, test_3_riscv_math3);
 	}
 	if constexpr (test_lua) {
-		run_test("lua5.4: integer math", S, test_setup, test_3_lua_math1);
-		run_test("lua5.4: fp math", S, test_setup, test_3_lua_math2);
-		run_test("lua5.4: exp math", S, test_setup, test_3_lua_math3);
+		run_test(LUANAME ": integer math", S, test_setup, test_3_lua_math1);
+		run_test(LUANAME ": fp math", S, test_setup, test_3_lua_math2);
+		run_test(LUANAME ": exp math", S, test_setup, test_3_lua_math3);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
@@ -113,22 +118,22 @@ int main()
 		run_test("libriscv: syscall print", S, test_setup, test_4_riscv);
 	}
 	if constexpr (test_lua) {
-		run_test("lua5.4: syscall overhead", S, test_setup, test_4_lua_syscall);
-		run_test("lua5.4: syscall print", S, test_setup, test_4_lua);
+		run_test(LUANAME ": syscall overhead", S, test_setup, test_4_lua_syscall);
+		run_test(LUANAME ": syscall print", S, test_setup, test_4_lua);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
 		run_test("libriscv: complex syscall", S, test_setup, test_5_riscv);
 	}
 	if constexpr (test_lua) {
-		run_test("lua5.4: complex syscall", S, test_setup, test_5_lua);
+		run_test(LUANAME ": complex syscall", S, test_setup, test_5_lua);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
 		run_test("libriscv: micro threads", S, test_setup, test_6_riscv);
 	}
 	if constexpr (test_lua) {
-		run_test("lua5.4: coroutines", S, test_setup, test_6_lua);
+		run_test(LUANAME ": coroutines", S, test_setup, test_6_lua);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
@@ -136,8 +141,8 @@ int main()
 		run_test("libriscv: full thread args", S, test_setup, test_7_riscv_2);
 	}
 	if constexpr (test_lua) {
-		run_test("lua5.4: coroutine args", S, test_setup, test_7_lua_1);
-		run_test("lua5.4: coroutine args", S, test_setup, test_7_lua_2);
+		run_test(LUANAME ": coroutine args", S, test_setup, test_7_lua_1);
+		run_test(LUANAME ": coroutine args", S, test_setup, test_7_lua_2);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
@@ -145,7 +150,7 @@ int main()
 		run_test("libriscv: syscall memcpy", S, test_setup, test_8_native_riscv);
 	}
 	if constexpr (test_lua) {
-		run_test("lua5.4: memcpy", S, test_setup, test_8_lua);
+		run_test(LUANAME ": memcpy", S, test_setup, test_8_lua);
 	}
 	printf("\n");
 	return 0;
