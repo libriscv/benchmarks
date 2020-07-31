@@ -62,6 +62,7 @@ PUBLIC_API long selftest(int i, float f, long long number)
 	static const uint64_t testvalue = 0x5678000012340000;
 	syscall(40, testvalue, testvalue >> 32);
 
+#ifdef USE_THREADCALLS
 	static int changeme = 444;
 	microthread::direct(
 		[] (auto&, int a, int b, int c, int d) {
@@ -81,6 +82,7 @@ PUBLIC_API long selftest(int i, float f, long long number)
 	microthread::direct(
 		[] (auto&) {
 		});
+#endif
 
 	auto thread = microthread::create(
 		[] (int a, int b, long long c) -> long {
@@ -159,21 +161,36 @@ FAST_API void test_longcall()
 
 FAST_API void test_threads()
 {
+#ifdef USE_THREADCALLS
 	microthread::direct(
 		[] (auto&) {
 			microthread::yield();
 		});
+#else
+	microthread::direct(
+		[] () {
+			microthread::yield();
+		});
+#endif
 	microthread::yield();
 	FAST_RETURN();
 }
 static int ttvalue = 0;
 FAST_API void test_threads_args1()
 {
+#ifdef USE_THREADCALLS
 	microthread::direct(
 		[] (auto&, int a, int b, int c, int d) {
 			microthread::yield();
 			ttvalue = a + b + c + d;
 		}, 1, 2, 3, 4);
+#else
+	microthread::oneshot(
+		[] (int a, int b, int c, int d) {
+			microthread::yield();
+			ttvalue = a + b + c + d;
+		}, 1, 2, 3, 4);
+#endif
 	microthread::yield();
 	FAST_RETURN();
 }

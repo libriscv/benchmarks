@@ -135,6 +135,36 @@ void test_setup()
 	reset_native_tests();
 }
 
+void bench_install_syscall()
+{
+	machine->install_syscall_handlers({
+		{0,	[] (auto&) {
+			return 0L;
+		}},
+		{1,	[] (auto&) {
+			return 0L;
+		}},
+		{2,	[] (auto&) {
+			return 0L;
+		}},
+		{3,	[] (auto&) {
+			return 0L;
+		}},
+		{4,	[] (auto&) {
+			return 0L;
+		}},
+		{5,	[] (auto&) {
+			return 0L;
+		}},
+		{6,	[] (auto&) {
+			return 0L;
+		}},
+		{7,	[] (auto&) {
+			return 0L;
+		}}
+	});
+}
+
 void test_1_riscv_empty()
 {
 	machine->vmcall<0>(test_1_empty_addr);
