@@ -59,7 +59,7 @@ add_subdirectory(libc)
 target_compile_definitions(libc PUBLIC
 	NATIVE_SYSCALLS_BASE=1
 	THREAD_SYSCALLS_BASE=21
-	#USE_THREADCALLS=1
+	USE_THREADCALLS=1
 )
 
 add_executable(rvbinary ${SOURCES})
