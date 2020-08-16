@@ -130,11 +130,18 @@ void test_setup()
 
 	delete luascript;
 	luascript = new Script("../luaprogram/script.lua");
-	
+
 	extern void reset_native_tests();
 	reset_native_tests();
 }
 
+void bench_fork()
+{
+	riscv::MachineOptions<4> options {
+		.owning_machine = machine
+	};
+	riscv::Machine<4> other {rvbinary, options};
+}
 void bench_install_syscall()
 {
 	machine->install_syscall_handlers({

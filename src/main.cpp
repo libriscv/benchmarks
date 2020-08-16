@@ -27,6 +27,7 @@ run_test(const char* name, int samples, test_func setup, test_func execone)
 /* TESTS */
 extern void run_selftest();
 extern void test_setup();
+extern void bench_fork();
 extern void bench_install_syscall();
 extern void test_1_riscv_empty();
 extern void test_1_lua_empty();
@@ -81,6 +82,7 @@ int main()
 	if constexpr (test_libriscv) {
 		run_selftest();
 		printf("RISC-V self-test OK\n");
+		run_test("libriscv: fork", S, test_setup, bench_fork);
 		run_test("libriscv: install syscall", S, test_setup, bench_install_syscall);
 		run_test("libriscv: function call", S, test_setup, test_1_riscv_empty);
 	}
