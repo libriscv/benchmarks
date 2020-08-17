@@ -265,6 +265,11 @@ void test_3_riscv_math3()
 	static FunctionAddress fa;
 	machine->vmcall(fa.get(machine, "test_maffs3"), 3.0, 3.0, 3.0);
 }
+void test_3_riscv_fib()
+{
+	static FunctionAddress fa;
+	machine->vmcall(fa.get(machine, "test_fib"), 40, 0, 1);
+}
 void test_3_lua_math1()
 {
 	luascript->call("test_maffs1", 111, 222);

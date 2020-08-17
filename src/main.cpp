@@ -40,6 +40,7 @@ extern void test_2_lua();
 extern void test_3_riscv();
 extern void test_3_riscv_math2();
 extern void test_3_riscv_math3();
+extern void test_3_riscv_fib();
 extern void test_3_lua_math1();
 extern void test_3_lua_math2();
 extern void test_3_lua_math3();
@@ -110,6 +111,7 @@ int main()
 		run_test("libriscv: integer math", S, test_setup, test_3_riscv);
 		run_test("libriscv: fp math", S, test_setup, test_3_riscv_math2);
 		run_test("libriscv: exp math", S, test_setup, test_3_riscv_math3);
+		run_test("libriscv: fib(40)", S, test_setup, test_3_riscv_fib);
 	}
 	if constexpr (test_lua) {
 		run_test(LUANAME ": integer math", S, test_setup, test_3_lua_math1);
