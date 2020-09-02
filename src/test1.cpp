@@ -120,6 +120,7 @@ void test_setup()
 	assert(machine->address_of("test_maffs1") != 0);
 	assert(machine->address_of("test_maffs2") != 0);
 	assert(machine->address_of("test_maffs3") != 0);
+	assert(machine->address_of("test_fib") != 0);
 	assert(machine->address_of("test_print") != 0);
 	assert(machine->address_of("test_longcall") != 0);
 	assert(machine->address_of("test_memcpy") != 0);
@@ -281,6 +282,10 @@ void test_3_lua_math2()
 void test_3_lua_math3()
 {
 	luascript->call("test_maffs3", 3.0, 3.0, 3.0);
+}
+void test_3_lua_fib()
+{
+	luascript->call("test_fib", 40, 0, 1);
 }
 
 void test_4_riscv_syscall()

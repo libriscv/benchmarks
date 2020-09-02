@@ -32,6 +32,13 @@ end
 function test_maffs3(arg1, arg2, arg3)
 	return (arg1 ^ arg2) ^ (1.0 / arg3) ^ (1.0 / arg3)
 end
+function test_fib(n, acc, prev)
+	if (n < 1) then
+		return acc
+	else
+		return test_fib(n - 1, prev + acc, acc)
+	end
+end
 
 function test_syscall()
 	script.nada()
