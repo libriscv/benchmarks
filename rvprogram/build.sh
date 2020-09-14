@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-export CC=riscv32-unknown-elf-gcc
-export CXX=riscv32-unknown-elf-g++
+export CC=riscv64-unknown-elf-gcc
+export CXX=riscv64-unknown-elf-g++
 
 mkdir -p build
 pushd build

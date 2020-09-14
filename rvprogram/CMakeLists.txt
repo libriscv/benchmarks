@@ -9,14 +9,9 @@ set(VERSION_FILE   "symbols.map" CACHE STRING "Retained symbols file")
 set(WARNINGS  "-Wall -Wextra")
 set(COMMON    "-O3 -nostdlib -fno-builtin")
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	set(RISCV_ABI "-target riscv32 -mabi=ilp32d -march=rv32g")
-	#set(COMMON    "${COMMON} -flto")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld")
-else()
-	set(RISCV_ABI "-march=rv32imfd -mabi=ilp32d")
-	set(COMMON    "${COMMON} -flto=4")
-endif()
+set(RISCV_ABI "-march=rv64imfd -mabi=lp64d")
+set(COMMON    "${COMMON} -flto=4")
+
 # we need this libgcc for 64-bit divisions
 set(LIBGCC ${LIBRARY_DIR}/libgcc.a)
 

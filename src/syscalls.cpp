@@ -25,7 +25,7 @@ long syscall_write(Machine<W>& machine)
 	auto* state = machine.template get_userdata<State<W>> ();
 	// we only accept standard pipes, for now :)
 	if (fd >= 0 && fd < 3) {
-		const size_t len_g = std::min(1024u, len);
+		const size_t len_g = std::min((size_t) 1024u, (size_t) len);
 		machine.memory.memview(address, len_g,
 			[state] (auto* data, size_t len) {
 				state->output.append((char*) data, len);
@@ -114,3 +114,4 @@ inline void setup_minimal_syscalls(State<W>& state, Machine<W>& machine)
 
 /* le sigh */
 template void setup_minimal_syscalls<4>(State<4>&, Machine<4>&);
+template void setup_minimal_syscalls<8>(State<8>&, Machine<8>&);

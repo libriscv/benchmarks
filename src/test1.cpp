@@ -2,11 +2,13 @@
 #include "luascript.hpp"
 #include "testhelp.hpp"
 #include "include/crc32.hpp"
-
 using namespace riscv;
+static constexpr int CPUBITS = riscv::RISCV64;
+using machine_t = Machine<CPUBITS>;
+
 static std::vector<uint8_t> rvbinary;
-static Machine<RISCV32>* machine = nullptr;
-static State<RISCV32> state;
+static machine_t* machine = nullptr;
+static State<CPUBITS> state;
 static uint32_t test_1_empty_addr = 0x0;
 static uint32_t test_1_syscall_addr = 0x0;
 static uint32_t test_1_address = 0x0;
@@ -14,7 +16,7 @@ static uint32_t test_1_address = 0x0;
 struct FunctionAddress {
 	uint32_t addr = 0;
 
-	uint32_t get(Machine<RISCV32>* m, const char* func) {
+	uint32_t get(machine_t* m, const char* func) {
 		if (addr) return addr;
 		return (addr = m->address_of(func));
 	}
@@ -82,7 +84,7 @@ void test_setup()
 {
 	if (rvbinary.empty()) rvbinary = load_file(TEST_BINARY);
 	delete machine;
-	machine = new Machine<RISCV32> {rvbinary, 4*1024*1024};
+	machine = new machine_t {rvbinary, 4*1024*1024};
 #ifndef RISCV_DEBUG
 	assert(machine->address_of("fastexit") != 0);
 	machine->memory.set_exit_address(machine->address_of("fastexit"));
@@ -93,13 +95,13 @@ void test_setup()
 	auto* arena = setup_native_heap_syscalls(*machine, 4*1024*1024);
 	setup_native_memory_syscalls(*machine, true);
 	auto* threads = setup_native_threads(*machine, arena);
-	machine->install_syscall_handler(30, syscall_print<RISCV32>);
-	machine->install_syscall_handler(31, syscall_longcall<RISCV32>);
-	machine->install_syscall_handler(32, syscall_nothing<RISCV32>);
+	machine->install_syscall_handler(30, syscall_print<CPUBITS>);
+	machine->install_syscall_handler(31, syscall_longcall<CPUBITS>);
+	machine->install_syscall_handler(32, syscall_nothing<CPUBITS>);
 
-	machine->install_syscall_handler(33, syscall_fmod<RISCV32>);
-	machine->install_syscall_handler(34, syscall_powf<RISCV32>);
-	machine->install_syscall_handler(35, syscall_strcmp<RISCV32>);
+	machine->install_syscall_handler(33, syscall_fmod<CPUBITS>);
+	machine->install_syscall_handler(34, syscall_powf<CPUBITS>);
+	machine->install_syscall_handler(35, syscall_strcmp<CPUBITS>);
 	machine->setup_argv({"rvprogram"});
 
 	try {
@@ -138,10 +140,10 @@ void test_setup()
 
 void bench_fork()
 {
-	riscv::MachineOptions<4> options {
+	riscv::MachineOptions<CPUBITS> options {
 		.owning_machine = machine
 	};
-	riscv::Machine<4> other {rvbinary, options};
+	riscv::Machine<CPUBITS> other {rvbinary, options};
 }
 void bench_install_syscall()
 {

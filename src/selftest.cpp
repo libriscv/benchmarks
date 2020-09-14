@@ -1,16 +1,18 @@
 #include <include/syscall_helpers.hpp>
 #include "testhelp.hpp"
 using namespace riscv;
+static constexpr int CPUBITS = riscv::RISCV64;
+using machine_t = Machine<RISCV64>;
 
-//static const char* TEST_BINARY = "../rvprogram/rustbin/target/riscv32imac-unknown-none-elf/debug/rustbin";
+//static const char* TEST_BINARY = "../rvprogram/rustbin/target/CPUBITSimac-unknown-none-elf/debug/rustbin";
 static const char* TEST_BINARY = "../rvprogram/build/rvbinary";
 
 void run_selftest()
 {
 	auto rvbinary = load_file(TEST_BINARY);
 
-	Machine<RISCV32> machine {rvbinary, 4*1024*1024};
-	State<RISCV32> state;
+	machine_t machine {rvbinary, 4*1024*1024};
+	State<CPUBITS> state;
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, machine);
