@@ -140,7 +140,7 @@ FAST_API float test_maffs3(float arg1, float arg2, float arg3)
 {
 	FAST_RETVAL(sys_powf(sys_powf(sys_powf(arg1, arg2), 1.0 / arg3), 1.0 / arg3));
 }
-FAST_API int32_t test_fib(int32_t n, int32_t acc = 0, int32_t prev = 1)
+PUBLIC_API int32_t test_fib(int32_t n, int32_t acc = 0, int32_t prev = 1)
 {
 	if (n < 1)
 		return acc;
