@@ -14,9 +14,9 @@ static uint32_t test_1_syscall_addr = 0x0;
 static uint32_t test_1_address = 0x0;
 
 struct FunctionAddress {
-	uint32_t addr = 0;
+	riscv::address_type<CPUBITS> addr = 0;
 
-	uint32_t get(machine_t* m, const char* func) {
+	auto get(machine_t* m, const char* func) {
 		if (addr) return addr;
 		return (addr = m->address_of(func));
 	}

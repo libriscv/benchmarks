@@ -33,7 +33,7 @@ inline long sys_longcall(const char* data, int b, int c, int d, int e, int f, in
 }
 inline long sys_nada()
 {
-	FAST_RETVAL(syscall(32));
+	return syscall(32);
 }
 inline float sys_fmod(float a1, float a2)
 {
@@ -91,7 +91,7 @@ PUBLIC_API long selftest(int i, float f, long long number)
 	return microthread::join(thread);
 }
 
-PUBLIC_API void empty_function()
+FAST_API void empty_function()
 {
 	FAST_RETURN();
 }
@@ -104,8 +104,8 @@ static int counter = 0;
 
 FAST_API void test(int arg1)
 {
-	//array[counter++] = arg1;
-	array.at(counter++) = arg1;
+	array[counter++] = arg1;
+	//array.at(counter++) = arg1;
 	FAST_RETURN();
 }
 
@@ -119,8 +119,8 @@ test_args(const char* a1, Test& a2, int a3, int a4, int a5, int a6, int a7, int 
 {
 	if (sys_strcmp(str, sizeof(str)-1, a1) == 0
 	&& (a2.a == 222 && a2.b == 666) && (a3 == 333) && (a4 == 444) && (a5 == 555)
-	&& (a6 == 666) && (a7 == 777) && (a8 == 888)) FAST_RETVAL(666);
-	FAST_RETVAL(-1);
+	&& (a6 == 666) && (a7 == 777) && (a8 == 888)) return 666;
+	return -1;
 }
 
 #include <cmath>
@@ -183,7 +183,7 @@ FAST_API void test_threads()
 	FAST_RETURN();
 }
 static int ttvalue = 0;
-FAST_API void test_threads_args1()
+PUBLIC_API void test_threads_args1()
 {
 #ifdef USE_THREADCALLS
 	microthread::direct(
@@ -199,7 +199,6 @@ FAST_API void test_threads_args1()
 		}, 1, 2, 3, 4);
 #endif
 	microthread::yield();
-	FAST_RETURN();
 }
 PUBLIC_API long test_threads_args2()
 {
@@ -212,8 +211,8 @@ PUBLIC_API long test_threads_args2()
 	FAST_RETVAL(microthread::join(thread));
 }
 
-uint8_t src_array[300];
-uint8_t dst_array[300];
+static uint8_t src_array[300];
+static uint8_t dst_array[300];
 static_assert(sizeof(src_array) == sizeof(dst_array), "!");
 
 FAST_API long test_memcpy()
