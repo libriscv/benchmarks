@@ -10,6 +10,7 @@ test_maffs1
 test_maffs2
 test_maffs3
 test_fib
+test_sieve
 test_syscall
 test_print
 test_longcall

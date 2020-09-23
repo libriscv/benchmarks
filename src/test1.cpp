@@ -84,7 +84,7 @@ void test_setup()
 {
 	if (rvbinary.empty()) rvbinary = load_file(TEST_BINARY);
 	delete machine;
-	machine = new machine_t {rvbinary, 4*1024*1024};
+	machine = new machine_t {rvbinary, 16*1024*1024};
 #ifndef RISCV_DEBUG
 	assert(machine->address_of("fastexit") != 0);
 	machine->memory.set_exit_address(machine->address_of("fastexit"));
@@ -273,6 +273,21 @@ void test_3_riscv_fib()
 	static FunctionAddress fa;
 	machine->vmcall(fa.get(machine, "test_fib"), 40, 0, 1);
 }
+void test_3_native_sieve()
+{
+	const long N = 100;
+	asm("" ::: "memory");
+	extern long test_sieve(long);
+	const long p = test_sieve(N);
+	asm("" ::: "memory");
+	assert(p == 664579);
+}
+void test_3_riscv_sieve()
+{
+	static FunctionAddress fa;
+	machine->vmcall(fa.get(machine, "test_sieve"), 1000);
+}
+
 void test_3_lua_math1()
 {
 	luascript->call("test_maffs1", 111, 222);
@@ -288,6 +303,10 @@ void test_3_lua_math3()
 void test_3_lua_fib()
 {
 	luascript->call("test_fib", 40, 0, 1);
+}
+void test_3_lua_sieve()
+{
+	luascript->call("test_sieve", 1000);
 }
 
 void test_4_riscv_syscall()

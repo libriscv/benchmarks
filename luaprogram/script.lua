@@ -40,6 +40,21 @@ function test_fib(n, acc, prev)
 	end
 end
 
+function test_sieve(n)
+	local prime = {}
+	local primes = 0
+
+	for i = 2, n do prime[i] = true end
+
+	for i = 2, n do
+		if prime[i] then
+			primes = primes + 1
+			for j = i*2, n, i do prime[j] = false end
+		end
+	end
+	return primes
+end
+
 function test_syscall()
 	script.nada()
 end

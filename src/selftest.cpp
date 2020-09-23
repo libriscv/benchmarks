@@ -11,12 +11,12 @@ void run_selftest()
 {
 	auto rvbinary = load_file(TEST_BINARY);
 
-	machine_t machine {rvbinary, 4*1024*1024};
+	machine_t machine {rvbinary, 16*1024*1024};
 	State<CPUBITS> state;
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, machine);
-	auto* arena = setup_native_heap_syscalls(machine, 1*1024*1024);
+	auto* arena = setup_native_heap_syscalls(machine, 8*1024*1024);
 	setup_native_memory_syscalls(machine, false);
 	setup_native_threads(machine, arena);
 	machine.setup_argv({"rvprogram"});

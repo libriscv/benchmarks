@@ -41,10 +41,13 @@ extern void test_3_riscv();
 extern void test_3_riscv_math2();
 extern void test_3_riscv_math3();
 extern void test_3_riscv_fib();
+extern void test_3_native_sieve();
+extern void test_3_riscv_sieve();
 extern void test_3_lua_math1();
 extern void test_3_lua_math2();
 extern void test_3_lua_math3();
 extern void test_3_lua_fib();
+extern void test_3_lua_sieve();
 extern void test_4_riscv_syscall();
 extern void test_4_riscv();
 extern void test_4_lua_syscall();
@@ -78,8 +81,8 @@ static constexpr bool test_lua = true;
 
 int main()
 {
-	printf("* All benchmark results are measured in 200x2000 samples\n");
 	const int S = 200;
+	printf("* All benchmark results are measured in %dx2000 samples\n", S);
 
 	if constexpr (test_libriscv) {
 		run_selftest();
@@ -108,17 +111,20 @@ int main()
 		run_test(LUANAME ": many arguments", S, test_setup, test_2_lua);
 	}
 	printf("\n");
+	run_test("native: sieve(1000)", S, test_setup, test_3_native_sieve);
 	if constexpr (test_libriscv) {
 		run_test("libriscv: integer math", S, test_setup, test_3_riscv);
 		run_test("libriscv: fp math", S, test_setup, test_3_riscv_math2);
 		run_test("libriscv: exp math", S, test_setup, test_3_riscv_math3);
 		run_test("libriscv: fib(40)", S, test_setup, test_3_riscv_fib);
+		run_test("libriscv: sieve(1000)", 2, test_setup, test_3_riscv_sieve);
 	}
 	if constexpr (test_lua) {
 		run_test(LUANAME ": integer math", S, test_setup, test_3_lua_math1);
 		run_test(LUANAME ": fp math", S, test_setup, test_3_lua_math2);
 		run_test(LUANAME ": exp math", S, test_setup, test_3_lua_math3);
 		run_test(LUANAME ": fib(40)", S, test_setup, test_3_lua_fib);
+		run_test(LUANAME ": sieve(1000)", 2, test_setup, test_3_lua_sieve);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
