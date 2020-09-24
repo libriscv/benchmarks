@@ -2,11 +2,10 @@
 #include <algorithm>
 #include <vector>
 
+template <size_t TIMES = 2000>
 static long
 run_test(const char* name, int samples, test_func setup, test_func execone)
 {
-	static constexpr size_t TIMES = 2000;
-
 	std::vector<test_result> results;
 	for (int i = 0; i < samples; i++)
 	{
@@ -20,6 +19,27 @@ run_test(const char* name, int samples, test_func setup, test_func execone)
 	long highest = results[results.size()-1] / TIMES;
 
 	printf("%32s\tmedian %ldns  \t\tlowest: %ldns     \thighest: %ldns\n",
+			name, median, lowest, highest);
+	return median;
+}
+
+template <size_t TIMES = 50>
+static long
+slow_test(const char* name, int samples, test_func setup, test_func execone)
+{
+	std::vector<test_result> results;
+	for (int i = 0; i < samples; i++)
+	{
+		setup();
+		perform_test<1>(execone); // warmup
+		results.push_back( perform_test<TIMES>(execone) / 1000000 );
+	}
+	std::sort(results.begin(), results.end());
+	long median = results[results.size() / 2] / TIMES;
+	long lowest = results[0] / TIMES;
+	long highest = results[results.size()-1] / TIMES;
+
+	printf("%32s\tmedian %ldms  \t\tlowest: %ldms     \thighest: %ldms\n",
 			name, median, lowest, highest);
 	return median;
 }
@@ -117,14 +137,12 @@ int main()
 		run_test("libriscv: fp math", S, test_setup, test_3_riscv_math2);
 		run_test("libriscv: exp math", S, test_setup, test_3_riscv_math3);
 		run_test("libriscv: fib(40)", S, test_setup, test_3_riscv_fib);
-		run_test("libriscv: sieve(1000)", 2, test_setup, test_3_riscv_sieve);
 	}
 	if constexpr (test_lua) {
 		run_test(LUANAME ": integer math", S, test_setup, test_3_lua_math1);
 		run_test(LUANAME ": fp math", S, test_setup, test_3_lua_math2);
 		run_test(LUANAME ": exp math", S, test_setup, test_3_lua_math3);
 		run_test(LUANAME ": fib(40)", S, test_setup, test_3_lua_fib);
-		run_test(LUANAME ": sieve(1000)", 2, test_setup, test_3_lua_sieve);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
@@ -166,6 +184,9 @@ int main()
 	if constexpr (test_lua) {
 		run_test(LUANAME ": memcpy", S, test_setup, test_8_lua);
 	}
+	printf("\n");
+	slow_test<10>("libriscv: sieve(10M)", 2, test_setup, test_3_riscv_sieve);
+	slow_test<10>(LUANAME ": sieve(10M)", 2, test_setup, test_3_lua_sieve);
 	printf("\n");
 	return 0;
 }

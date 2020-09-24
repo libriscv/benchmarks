@@ -285,7 +285,7 @@ void test_3_native_sieve()
 void test_3_riscv_sieve()
 {
 	static FunctionAddress fa;
-	machine->vmcall(fa.get(machine, "test_sieve"), 1000);
+	machine->vmcall(fa.get(machine, "test_sieve"), 10000000);
 }
 
 void test_3_lua_math1()
@@ -306,7 +306,7 @@ void test_3_lua_fib()
 }
 void test_3_lua_sieve()
 {
-	luascript->call("test_sieve", 1000);
+	luascript->call("test_sieve", 10000000);
 }
 
 void test_4_riscv_syscall()
