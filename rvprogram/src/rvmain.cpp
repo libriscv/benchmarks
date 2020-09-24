@@ -147,9 +147,9 @@ PUBLIC_API int32_t test_fib(int32_t n, int32_t acc = 0, int32_t prev = 1)
 	else
 		return test_fib(n - 1, prev + acc, acc);
 }
-static bool prime[1000+1];
-FAST_API long test_sieve(const long N)
+PUBLIC_API long test_sieve(const long N)
 {
+	bool prime[N+1];
 	memset(prime, true, sizeof(prime));
 	long nprimes = 0;
 	for (long n = 2; n*n <= N; n++)
@@ -160,7 +160,7 @@ FAST_API long test_sieve(const long N)
 				prime[i] = false;
 		}
 	}
-	FAST_RETVAL(nprimes);
+	return nprimes;
 }
 
 FAST_API void test_syscall()

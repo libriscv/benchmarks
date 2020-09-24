@@ -185,8 +185,8 @@ int main()
 		run_test(LUANAME ": memcpy", S, test_setup, test_8_lua);
 	}
 	printf("\n");
-	slow_test<10>("libriscv: sieve(10M)", 2, test_setup, test_3_riscv_sieve);
-	slow_test<10>(LUANAME ": sieve(10M)", 2, test_setup, test_3_lua_sieve);
+	slow_test<10>("libriscv: sieve(10M)", 1, test_setup, test_3_riscv_sieve);
+	slow_test<10>(LUANAME ": sieve(10M)", 1, test_setup, test_3_lua_sieve);
 	printf("\n");
 	return 0;
 }
