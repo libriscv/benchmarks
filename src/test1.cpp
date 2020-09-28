@@ -85,10 +85,8 @@ void test_setup()
 	if (rvbinary.empty()) rvbinary = load_file(TEST_BINARY);
 	delete machine;
 	machine = new machine_t {rvbinary, 16*1024*1024};
-#ifndef RISCV_DEBUG
 	assert(machine->address_of("fastexit") != 0);
 	machine->memory.set_exit_address(machine->address_of("fastexit"));
-#endif
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, *machine);
@@ -116,6 +114,7 @@ void test_setup()
 	}
 	assert(machine->cpu.reg(10) == 0);
 
+	assert(machine->address_of("fastexit") != 0);
 	assert(machine->address_of("empty_function") != 0);
 	assert(machine->address_of("test") != 0);
 	assert(machine->address_of("test_args") != 0);
@@ -280,7 +279,7 @@ void test_3_native_sieve()
 	extern long test_sieve(long);
 	const long p = test_sieve(N);
 	asm("" ::: "memory");
-	assert(p == 664579);
+	//assert(p == 664579);
 }
 void test_3_riscv_sieve()
 {
