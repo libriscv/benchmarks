@@ -226,8 +226,8 @@ PUBLIC_API long test_threads_args2()
 	FAST_RETVAL(microthread::join(thread));
 }
 
-static uint8_t src_array[300];
-static uint8_t dst_array[300];
+static uint8_t src_array[300] __attribute__((aligned(16)));
+static uint8_t dst_array[300] __attribute__((aligned(16)));
 static_assert(sizeof(src_array) == sizeof(dst_array), "!");
 
 FAST_API long test_memcpy()

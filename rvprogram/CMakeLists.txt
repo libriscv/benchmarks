@@ -9,7 +9,11 @@ set(VERSION_FILE   "symbols.map" CACHE STRING "Retained symbols file")
 set(WARNINGS  "-Wall -Wextra")
 set(COMMON    "-O3 -nostdlib -fno-builtin")
 
-set(RISCV_ABI "-march=rv64imfd -mabi=lp64d")
+if (GCC_TRIPLE STREQUAL "riscv32-unknown-elf")
+	set(RISCV_ABI "-march=rv32imfd -mabi=ilp32d")
+else()
+	set(RISCV_ABI "-march=rv64imfd -mabi=lp64d")
+endif()
 set(COMMON    "${COMMON} -flto=4")
 
 # we need this libgcc for 64-bit divisions

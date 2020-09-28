@@ -3,7 +3,7 @@
 #include "testhelp.hpp"
 #include "include/crc32.hpp"
 using namespace riscv;
-static constexpr int CPUBITS = riscv::RISCV64;
+static constexpr int CPUBITS = riscv::RISCV32;
 using machine_t = Machine<CPUBITS>;
 
 static std::vector<uint8_t> rvbinary;
