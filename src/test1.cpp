@@ -93,13 +93,13 @@ void test_setup()
 	auto* arena = setup_native_heap_syscalls(*machine, 4*1024*1024);
 	setup_native_memory_syscalls(*machine, true);
 	auto* threads = setup_native_threads(*machine, arena);
-	machine->install_syscall_handler(30, syscall_print<CPUBITS>);
-	machine->install_syscall_handler(31, syscall_longcall<CPUBITS>);
-	machine->install_syscall_handler(32, syscall_nothing<CPUBITS>);
+	machine->install_syscall_handler(40, syscall_print<CPUBITS>);
+	machine->install_syscall_handler(41, syscall_longcall<CPUBITS>);
+	machine->install_syscall_handler(42, syscall_nothing<CPUBITS>);
 
-	machine->install_syscall_handler(33, syscall_fmod<CPUBITS>);
-	machine->install_syscall_handler(34, syscall_powf<CPUBITS>);
-	machine->install_syscall_handler(35, syscall_strcmp<CPUBITS>);
+	machine->install_syscall_handler(43, syscall_fmod<CPUBITS>);
+	machine->install_syscall_handler(44, syscall_powf<CPUBITS>);
+	machine->install_syscall_handler(45, syscall_strcmp<CPUBITS>);
 	machine->setup_argv({"rvprogram"});
 
 	try {

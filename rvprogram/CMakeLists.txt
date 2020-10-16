@@ -10,9 +10,9 @@ set(WARNINGS  "-Wall -Wextra")
 set(COMMON    "-O3 -nostdlib -fno-builtin")
 
 if (GCC_TRIPLE STREQUAL "riscv32-unknown-elf")
-	set(RISCV_ABI "-march=rv32imfd -mabi=ilp32d")
+	set(RISCV_ABI "-march=rv32gc -mabi=ilp32d")
 else()
-	set(RISCV_ABI "-march=rv64imfd -mabi=lp64d")
+	set(RISCV_ABI "-march=rv64gc -mabi=lp64d")
 endif()
 set(COMMON    "${COMMON} -flto=4")
 
@@ -58,7 +58,6 @@ add_subdirectory(libc)
 target_compile_definitions(libc PUBLIC
 	NATIVE_SYSCALLS_BASE=1
 	THREAD_SYSCALLS_BASE=21
-	USE_THREADCALLS=1
 )
 
 add_executable(rvbinary ${SOURCES})

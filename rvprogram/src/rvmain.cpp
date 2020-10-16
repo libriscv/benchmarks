@@ -25,27 +25,27 @@ extern "C" __attribute__((noreturn)) void fastexit(int);
 #include <include/syscall.hpp>
 inline long sys_print(const char* data, size_t len)
 {
-	return psyscall(30, data, len);
+	return psyscall(40, data, len);
 }
 inline long sys_longcall(const char* data, int b, int c, int d, int e, int f, int g)
 {
-	return syscall(31, (long) data, b, c, d, e, f, g);
+	return syscall(41, (long) data, b, c, d, e, f, g);
 }
 inline long sys_nada()
 {
-	return syscall(32);
+	return syscall(42);
 }
 inline float sys_fmod(float a1, float a2)
 {
-	return fsyscallf(33, a1, a2);
+	return fsyscallf(43, a1, a2);
 }
 inline float sys_powf(float a1, float a2)
 {
-	return fsyscallf(34, a1, a2);
+	return fsyscallf(44, a1, a2);
 }
 inline int sys_strcmp(const char* str1, size_t len1, const char* str2)
 {
-	return psyscall(35, str1, len1, str2);
+	return psyscall(45, str1, len1, str2);
 }
 
 PUBLIC_API long selftest(int i, float f, long long number)
@@ -62,10 +62,9 @@ PUBLIC_API long selftest(int i, float f, long long number)
 	static const uint64_t testvalue = 0x5678000012340000;
 	syscall(40, testvalue, testvalue >> 32);
 
-#ifdef USE_THREADCALLS
 	static int changeme = 444;
 	microthread::direct(
-		[] (auto&, int a, int b, int c, int d) {
+		[] (int a, int b, int c, int d) {
 			assert(a == 1);
 			assert(b == 2);
 			assert(c == 3);
@@ -80,9 +79,7 @@ PUBLIC_API long selftest(int i, float f, long long number)
 		abort();
 	}
 	microthread::direct(
-		[] (auto&) {
-		});
-#endif
+		[] { });
 
 	auto thread = microthread::create(
 		[] (int a, int b, long long c) -> long {
@@ -183,36 +180,21 @@ FAST_API void test_longcall()
 
 FAST_API void test_threads()
 {
-#ifdef USE_THREADCALLS
-	microthread::direct(
-		[] (auto&) {
-			microthread::yield();
-		});
-#else
 	microthread::direct(
 		[] () {
 			microthread::yield();
 		});
-#endif
 	microthread::yield();
 	FAST_RETURN();
 }
 static int ttvalue = 0;
 PUBLIC_API void test_threads_args1()
 {
-#ifdef USE_THREADCALLS
 	microthread::direct(
-		[] (auto&, int a, int b, int c, int d) {
-			microthread::yield();
-			ttvalue = a + b + c + d;
-		}, 1, 2, 3, 4);
-#else
-	microthread::oneshot(
 		[] (int a, int b, int c, int d) {
 			microthread::yield();
 			ttvalue = a + b + c + d;
 		}, 1, 2, 3, 4);
-#endif
 	microthread::yield();
 }
 PUBLIC_API long test_threads_args2()

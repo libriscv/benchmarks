@@ -94,7 +94,7 @@ void run_selftest()
 	}
 
 	// test event loop
-	machine.install_syscall_handler(20,
+	machine.install_syscall_handler(40,
 		[] (auto& machine) -> long {
 			auto [text] = machine.template sysargs<std::string> ();
 			printf("%s", text.c_str());

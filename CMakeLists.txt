@@ -36,7 +36,6 @@ add_subdirectory(ext/libriscv/lib libriscv)
 # NOTE: We have to enable exec traps to get a realistic picture
 # as they are used in the game engine these benchmarks are for.
 target_compile_definitions(riscv PUBLIC
-	RISCV_EXEC_TRAPS_ENABLED=1
 	RISCV_EBREAK_MEANS_STOP=1
 	RISCV_SYSCALLS_MAX=128)
 
