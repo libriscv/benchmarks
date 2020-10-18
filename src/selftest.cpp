@@ -26,8 +26,8 @@ void run_selftest()
 	machine.print_and_pause();
 #endif
 
-	printf("Self-test running ELF entry at 0x%X\n",
-			machine.memory.start_address());
+	printf("Self-test running ELF entry at 0x%lX\n",
+			(long) machine.memory.start_address());
 	machine.cpu.reg(10) = 666;
 	try {
 		// run until it stops
@@ -64,11 +64,9 @@ void run_selftest()
 	printf("Self-test running test function\n");
 	for (int i = 0; i < 10; i++)
 	{
-#ifndef RISCV_EXEC_SEGMENT_IS_CONSTANT
 		// verify serialization works
 		std::vector<uint8_t> mstate;
 		machine.serialize_to(mstate);
-#endif
 
 		try {
 			int ret = machine.vmcall("selftest", 1234, 5678.0, 5ull);
@@ -86,11 +84,9 @@ void run_selftest()
 #endif
 			exit(1);
 		}
-#ifndef RISCV_EXEC_SEGMENT_IS_CONSTANT
 		machine.deserialize_from(mstate);
 		// NOTE: This is a cheap hack to get the threadcall page trap back
 		setup_native_threads(machine, arena);
-#endif
 	}
 
 	// test event loop
