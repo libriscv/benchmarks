@@ -48,6 +48,18 @@ inline int sys_strcmp(const char* str1, size_t len1, const char* str2)
 	return psyscall(45, str1, len1, str2);
 }
 
+int test_main(int argc, char**)
+{
+	// This only gets run by the benchmarking machines
+	if (argc > 0)
+	{
+		static const char test_string[] = "1234";
+		int cmp = sys_strcmp(test_string, sizeof(test_string)-1, "1234");
+		assert(cmp == 0);
+	}
+	return 0;
+}
+
 PUBLIC_API long selftest(int i, float f, long long number)
 {
 	uint64_t value = 555ull / number;
@@ -60,7 +72,7 @@ PUBLIC_API long selftest(int i, float f, long long number)
 
 	// test sending a 64-bit integral value
 	static const uint64_t testvalue = 0x5678000012340000;
-	syscall(40, testvalue, testvalue >> 32);
+	assert(syscall(40, testvalue, testvalue >> 32) == 0);
 
 	static int changeme = 444;
 	microthread::direct(
@@ -217,18 +229,20 @@ FAST_API long test_memcpy()
 	const char* src = (const char*) src_array;
 	char* dest = (char*) dst_array;
 	char* dest_end = dest + sizeof(dst_array);
+	using T = uint64_t;
+	constexpr size_t S = sizeof(T);
 
-	if ((uintptr_t) dest % 4 == (uintptr_t) src % 4)
+	if ((uintptr_t) dest % S == (uintptr_t) src % S)
 	{
-		while ((uintptr_t) dest % 4 && dest < dest_end)
+		while ((uintptr_t) dest % S && dest < dest_end)
 			*dest++ = *src++;
 
-		while (dest + 16 <= dest_end) {
-			*(uint32_t*) &dest[0] = *(uint32_t*) &src[0];
-			*(uint32_t*) &dest[4] = *(uint32_t*) &src[4];
-			*(uint32_t*) &dest[8] = *(uint32_t*) &src[8];
-			*(uint32_t*) &dest[12] = *(uint32_t*) &src[12];
-			dest += 16; src += 16;
+		while (dest + 4*S <= dest_end) {
+			*(T*) &dest[0*S] = *(T*) &src[0*S];
+			*(T*) &dest[1*S] = *(T*) &src[1*S];
+			*(T*) &dest[2*S] = *(T*) &src[2*S];
+			*(T*) &dest[3*S] = *(T*) &src[3*S];
+			dest += 4*S; src += 4*S;
 		}
 
 		while (dest + 4 <= dest_end) {

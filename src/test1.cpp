@@ -27,57 +27,63 @@ extern const char* TEST_BINARY;
 static const std::string str("This is a string");
 
 template <int W>
-long syscall_print(Machine<W>& machine)
+void syscall_print(Machine<W>& machine)
 {
 	// get string directly from memory, with max-length
 	const auto rvs = machine.template sysarg<riscv::Buffer>(0);
-	if (str != rvs.to_string()) {
+	// for the sequential case just use compare against string_view
+	if (rvs.is_sequential()) {
+		if (str != rvs.strview())
+			abort();
+	}
+	else if (str != rvs.to_string()) {
 		abort();
 	}
-	return 0;
 }
 template <int W>
-long syscall_longcall(Machine<W>& machine)
+void syscall_longcall(Machine<W>& machine)
 {
 	const auto address = machine.template sysarg<address_type<W>>(0);
-	// get string directly from memory, with max-length
-	//if (str.compare(machine.memory.memstring(address))) {
-	if (machine.memory.memcmp(str.data(), address, str.size())) {
+	// compare using memcmp because we have a known length
+	if (UNLIKELY(machine.memory.memcmp(str.data(), address, str.size()))) {
 		abort();
 	}
-	return 0;
 }
 template <int W>
-long syscall_nothing(Machine<W>&)
+void syscall_nothing(Machine<W>&)
 {
-	return 0;
 }
 template <int W>
-long syscall_fmod(Machine<W>& machine)
+void syscall_fmod(Machine<W>& machine)
 {
 	auto& regs = machine.cpu.registers();
 	auto& f1 = regs.getfl(0).f32[0];
 	auto& f2 = regs.getfl(1).f32[0];
 	f1 = std::fmod(f1, f2);
-	return 0;
 }
 template <int W>
-long syscall_powf(Machine<W>& machine)
+void syscall_powf(Machine<W>& machine)
 {
 	auto& regs = machine.cpu.registers();
 	auto& f1 = regs.getfl(0).f32[0];
 	auto& f2 = regs.getfl(1).f32[0];
 	f1 = std::pow(f1, f2);
-	return 0;
 }
 template <int W>
-long syscall_strcmp(Machine<W>& machine)
+void syscall_strcmp(Machine<W>& machine)
 {
-	const auto a1 = machine.template sysarg<riscv::Buffer>(0);
-	const auto a2 = machine.template sysarg<address_type<W>>(2);
-	// this is slightly faster because we know one of the lengths
-	const std::string str1 = a1.to_string();
-	return machine.memory.memcmp(str1.c_str(), a2, str1.size());
+	const auto [a1, a2] =
+		machine.template sysargs <riscv::Buffer, address_type<W>> ();
+	if (a1.is_sequential()) {
+		// this is really fast because the whole thing is sequential
+		machine.set_result(
+			machine.memory.memcmp(a1.c_str(), a2, a1.size()));
+	} else {
+		// this is slightly fast because we know one of the lengths
+		const std::string str1 = a1.to_string();
+		machine.set_result(
+			machine.memory.memcmp(str1.c_str(), a2, str1.size()));
+	}
 }
 
 void test_setup()
@@ -148,28 +154,20 @@ void bench_install_syscall()
 {
 	machine->install_syscall_handlers({
 		{0,	[] (auto&) {
-			return 0L;
 		}},
 		{1,	[] (auto&) {
-			return 0L;
 		}},
 		{2,	[] (auto&) {
-			return 0L;
 		}},
 		{3,	[] (auto&) {
-			return 0L;
 		}},
 		{4,	[] (auto&) {
-			return 0L;
 		}},
 		{5,	[] (auto&) {
-			return 0L;
 		}},
 		{6,	[] (auto&) {
-			return 0L;
 		}},
 		{7,	[] (auto&) {
-			return 0L;
 		}}
 	});
 }

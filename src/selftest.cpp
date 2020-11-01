@@ -19,7 +19,7 @@ void run_selftest()
 	auto* arena = setup_native_heap_syscalls(machine, 8*1024*1024);
 	setup_native_memory_syscalls(machine, false);
 	setup_native_threads(machine, arena);
-	machine.setup_argv({"rvprogram"});
+	machine.setup_argv({});
 	machine.memory.set_exit_address(machine.address_of("fastexit"));
 #ifdef RISCV_DEBUG
 	machine.verbose_instructions = true;
@@ -51,14 +51,14 @@ void run_selftest()
 	}
 
 	machine.install_syscall_handler(40,
-		[] (auto& machine) -> long {
+		[] (auto& machine) {
 			auto [ll] = machine.template sysargs<uint64_t> ();
 			if (ll != 0x5678000012340000) {
 				printf("The self-test did not return the correct value\n");
 				printf("Got %#lX instead\n", ll);
 				exit(1);
 			}
-			return 0;
+			machine.set_result(0);
 		});
 
 	printf("Self-test running test function\n");
@@ -91,10 +91,10 @@ void run_selftest()
 
 	// test event loop
 	machine.install_syscall_handler(40,
-		[] (auto& machine) -> long {
+		[] (auto& machine) {
 			auto [text] = machine.template sysargs<std::string> ();
 			printf("%s", text.c_str());
-			return 0;
+			machine.set_result(0);
 		});
 	printf("Calling into event loop...!\n");
 	machine.vmcall("event_loop");
