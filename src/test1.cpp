@@ -12,6 +12,7 @@ static State<CPUBITS> state;
 static uint32_t test_1_empty_addr = 0x0;
 static uint32_t test_1_syscall_addr = 0x0;
 static uint32_t test_1_address = 0x0;
+static uint32_t test_3_fib_addr = 0x0;
 
 struct FunctionAddress {
 	riscv::address_type<CPUBITS> addr = 0;
@@ -135,6 +136,7 @@ void test_setup()
 	test_1_empty_addr = machine->address_of("empty_function");
 	test_1_address = machine->address_of("test");
 	test_1_syscall_addr = machine->address_of("test_syscall");
+	test_3_fib_addr = machine->address_of("test_fib");
 
 	delete luascript;
 	luascript = new Script("../luaprogram/script.lua");
@@ -267,17 +269,7 @@ void test_3_riscv_math3()
 }
 void test_3_riscv_fib()
 {
-	static FunctionAddress fa;
-	machine->vmcall(fa.get(machine, "test_fib"), 40, 0, 1);
-}
-void test_3_native_sieve()
-{
-	const long N = 100;
-	asm("" ::: "memory");
-	extern long test_sieve(long);
-	const long p = test_sieve(N);
-	asm("" ::: "memory");
-	//assert(p == 664579);
+	machine->vmcall(test_3_fib_addr, 40, 0, 1);
 }
 void test_3_riscv_sieve()
 {
@@ -366,12 +358,12 @@ void test_7_lua_2()
 void test_8_riscv()
 {
 	static FunctionAddress fa;
-	machine->vmcall<1'000'000>(fa.get(machine, "test_memcpy"));
+	machine->vmcall(fa.get(machine, "test_memcpy"));
 }
 void test_8_native_riscv()
 {
 	static FunctionAddress fa;
-	machine->vmcall<1'000'000>(fa.get(machine, "test_syscall_memcpy"));
+	machine->vmcall(fa.get(machine, "test_syscall_memcpy"));
 }
 void test_8_lua()
 {

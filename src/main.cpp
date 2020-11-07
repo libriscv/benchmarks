@@ -61,7 +61,6 @@ extern void test_3_riscv();
 extern void test_3_riscv_math2();
 extern void test_3_riscv_math3();
 extern void test_3_riscv_fib();
-extern void test_3_native_sieve();
 extern void test_3_riscv_sieve();
 extern void test_3_lua_math1();
 extern void test_3_lua_math2();
@@ -131,7 +130,6 @@ int main()
 		run_test(LUANAME ": many arguments", S, test_setup, test_2_lua);
 	}
 	printf("\n");
-	run_test("native: sieve(1000)", S, test_setup, test_3_native_sieve);
 	if constexpr (test_libriscv) {
 		run_test("libriscv: integer math", S, test_setup, test_3_riscv);
 		run_test("libriscv: fp math", S, test_setup, test_3_riscv_math2);
