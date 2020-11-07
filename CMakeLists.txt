@@ -37,7 +37,9 @@ add_subdirectory(ext/libriscv/lib libriscv)
 # as they are used in the game engine these benchmarks are for.
 target_compile_definitions(riscv PUBLIC
 	RISCV_EBREAK_MEANS_STOP=1
-	RISCV_SYSCALLS_MAX=128)
+	RISCV_SYSCALLS_MAX=128
+	RISCV_INBOUND_JUMPS_ONLY=1
+)
 
 set(SOURCES
 	src/main.cpp
