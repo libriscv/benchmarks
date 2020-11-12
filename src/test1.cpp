@@ -269,6 +269,10 @@ void test_3_riscv_math3()
 }
 void test_3_riscv_fib()
 {
+	machine->vmcall(test_3_fib_addr, 1, 0, 1);
+}
+void test_3_riscv_fib40()
+{
 	machine->vmcall(test_3_fib_addr, 40, 0, 1);
 }
 void test_3_riscv_sieve()
@@ -290,6 +294,10 @@ void test_3_lua_math3()
 	luascript->call("test_maffs3", 3.0, 3.0, 3.0);
 }
 void test_3_lua_fib()
+{
+	luascript->call("test_fib", 1, 0, 1);
+}
+void test_3_lua_fib40()
 {
 	luascript->call("test_fib", 40, 0, 1);
 }
