@@ -85,13 +85,18 @@ void run_selftest()
 			exit(1);
 		}
 		machine.deserialize_from(mstate);
-		// NOTE: This is a cheap hack to get the threadcall page trap back
-//		setup_native_threads(machine, arena);
 	}
 
 	long primes = machine.vmcall("test_sieve", 10000000);
 	if (primes != 664579) {
 		printf("Wrong number of primes from Sieve: %ld\n", primes);
+		exit(1);
+	}
+
+	machine.vmcall("test_taylor", 1000);
+	double taylor = machine.sysarg<double> (0);
+	if (taylor < 3.142591 || taylor > 3.142592) {
+		printf("Wrong taylor series number: %f\n", taylor);
 		exit(1);
 	}
 
