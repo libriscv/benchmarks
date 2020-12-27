@@ -89,57 +89,59 @@ void syscall_strcmp(Machine<W>& machine)
 
 void test_setup()
 {
-	if (rvbinary.empty()) rvbinary = load_file(TEST_BINARY);
-	delete machine;
-	machine = new machine_t {rvbinary, 16*1024*1024};
-	assert(machine->address_of("fastexit") != 0);
-	machine->memory.set_exit_address(machine->address_of("fastexit"));
+	if (rvbinary.empty()) {
+		rvbinary = load_file(TEST_BINARY);
+		delete machine;
+		machine = new machine_t {rvbinary, 16*1024*1024};
+		assert(machine->address_of("fastexit") != 0);
+		machine->memory.set_exit_address(machine->address_of("fastexit"));
 
-	// the minimum number of syscalls needed for malloc and C++ exceptions
-	setup_minimal_syscalls(state, *machine);
-	auto* arena = setup_native_heap_syscalls(*machine, 4*1024*1024);
-	setup_native_memory_syscalls(*machine, true);
-	auto* threads = setup_native_threads(*machine, arena);
-	machine->install_syscall_handler(40, syscall_print<CPUBITS>);
-	machine->install_syscall_handler(41, syscall_longcall<CPUBITS>);
-	machine->install_syscall_handler(42, syscall_nothing<CPUBITS>);
+		// the minimum number of syscalls needed for malloc and C++ exceptions
+		setup_minimal_syscalls(state, *machine);
+		auto* arena = setup_native_heap_syscalls(*machine, 4*1024*1024);
+		setup_native_memory_syscalls(*machine, true);
+		auto* threads = setup_native_threads(*machine, arena);
+		machine->install_syscall_handler(40, syscall_print<CPUBITS>);
+		machine->install_syscall_handler(41, syscall_longcall<CPUBITS>);
+		machine->install_syscall_handler(42, syscall_nothing<CPUBITS>);
 
-	machine->install_syscall_handler(43, syscall_fmod<CPUBITS>);
-	machine->install_syscall_handler(44, syscall_powf<CPUBITS>);
-	machine->install_syscall_handler(45, syscall_strcmp<CPUBITS>);
-	machine->setup_argv({"rvprogram"});
+		machine->install_syscall_handler(43, syscall_fmod<CPUBITS>);
+		machine->install_syscall_handler(44, syscall_powf<CPUBITS>);
+		machine->install_syscall_handler(45, syscall_strcmp<CPUBITS>);
+		machine->setup_argv({"rvprogram"});
 
-	try {
-		// run until it stops
-		machine->simulate();
-	} catch (riscv::MachineException& me) {
-		printf(">>> Machine exception %d: %s (data: %d)\n",
-				me.type(), me.what(), me.data());
-#ifdef RISCV_DEBUG
-		machine->print_and_pause();
-#endif
+		try {
+			// run until it stops
+			machine->simulate();
+		} catch (riscv::MachineException& me) {
+			printf(">>> Machine exception %d: %s (data: %d)\n",
+					me.type(), me.what(), me.data());
+	#ifdef RISCV_DEBUG
+			machine->print_and_pause();
+	#endif
+		}
+		assert(machine->cpu.reg(10) == 0);
+
+		assert(machine->address_of("fastexit") != 0);
+		assert(machine->address_of("empty_function") != 0);
+		assert(machine->address_of("test") != 0);
+		assert(machine->address_of("test_args") != 0);
+		assert(machine->address_of("test_maffs1") != 0);
+		assert(machine->address_of("test_maffs2") != 0);
+		assert(machine->address_of("test_maffs3") != 0);
+		assert(machine->address_of("test_fib") != 0);
+		assert(machine->address_of("test_print") != 0);
+		assert(machine->address_of("test_longcall") != 0);
+		assert(machine->address_of("test_memcpy") != 0);
+		assert(machine->address_of("test_syscall_memcpy") != 0);
+		test_1_empty_addr = machine->address_of("empty_function");
+		test_1_address = machine->address_of("test");
+		test_1_syscall_addr = machine->address_of("test_syscall");
+		test_3_fib_addr = machine->address_of("test_fib");
+
+		delete luascript;
+		luascript = new Script("../luaprogram/script.lua");
 	}
-	assert(machine->cpu.reg(10) == 0);
-
-	assert(machine->address_of("fastexit") != 0);
-	assert(machine->address_of("empty_function") != 0);
-	assert(machine->address_of("test") != 0);
-	assert(machine->address_of("test_args") != 0);
-	assert(machine->address_of("test_maffs1") != 0);
-	assert(machine->address_of("test_maffs2") != 0);
-	assert(machine->address_of("test_maffs3") != 0);
-	assert(machine->address_of("test_fib") != 0);
-	assert(machine->address_of("test_print") != 0);
-	assert(machine->address_of("test_longcall") != 0);
-	assert(machine->address_of("test_memcpy") != 0);
-	assert(machine->address_of("test_syscall_memcpy") != 0);
-	test_1_empty_addr = machine->address_of("empty_function");
-	test_1_address = machine->address_of("test");
-	test_1_syscall_addr = machine->address_of("test_syscall");
-	test_3_fib_addr = machine->address_of("test_fib");
-
-	delete luascript;
-	luascript = new Script("../luaprogram/script.lua");
 
 	extern void reset_native_tests();
 	reset_native_tests();
@@ -276,6 +278,11 @@ void test_3_riscv_sieve()
 	static FunctionAddress fa;
 	machine->vmcall(fa.get(machine, "test_sieve"), 10000000);
 }
+void test_3_riscv_taylor()
+{
+	static FunctionAddress fa;
+	machine->vmcall(fa.get(machine, "test_taylor"), 1000);
+}
 
 void test_3_lua_math1()
 {
@@ -292,6 +299,10 @@ void test_3_lua_math3()
 void test_3_lua_fib()
 {
 	luascript->call("test_fib", 40, 0, 1);
+}
+void test_3_lua_taylor()
+{
+	luascript->call("test_taylor", 1000);
 }
 void test_3_lua_sieve()
 {

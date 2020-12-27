@@ -62,11 +62,13 @@ extern void test_3_riscv_math2();
 extern void test_3_riscv_math3();
 extern void test_3_riscv_fib();
 extern void test_3_riscv_sieve();
+extern void test_3_riscv_taylor();
 extern void test_3_lua_math1();
 extern void test_3_lua_math2();
 extern void test_3_lua_math3();
 extern void test_3_lua_fib();
 extern void test_3_lua_sieve();
+extern void test_3_lua_taylor();
 extern void test_4_riscv_syscall();
 extern void test_4_riscv();
 extern void test_4_lua_syscall();
@@ -135,12 +137,14 @@ int main()
 		run_test("libriscv: fp math", S, test_setup, test_3_riscv_math2);
 		run_test("libriscv: exp math", S, test_setup, test_3_riscv_math3);
 		run_test("libriscv: fib(40)", S, test_setup, test_3_riscv_fib);
+		run_test("libriscv: taylor(1K)", S, test_setup, test_3_riscv_taylor);
 	}
 	if constexpr (test_lua) {
 		run_test(LUANAME ": integer math", S, test_setup, test_3_lua_math1);
 		run_test(LUANAME ": fp math", S, test_setup, test_3_lua_math2);
 		run_test(LUANAME ": exp math", S, test_setup, test_3_lua_math3);
 		run_test(LUANAME ": fib(40)", S, test_setup, test_3_lua_fib);
+		run_test(LUANAME ": taylor(1K)", S, test_setup, test_3_lua_taylor);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {

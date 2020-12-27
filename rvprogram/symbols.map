@@ -11,6 +11,7 @@ test_maffs2
 test_maffs3
 test_fib
 test_sieve
+test_taylor
 test_syscall
 test_print
 test_longcall

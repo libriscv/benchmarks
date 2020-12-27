@@ -156,16 +156,35 @@ PUBLIC_API int32_t test_fib(int32_t n, int32_t acc = 0, int32_t prev = 1)
 	else
 		return test_fib(n - 1, prev + acc, acc);
 }
+PUBLIC_API double test_taylor(int n)
+{
+	double sum = 1.0;
+	double sign = -1;
+	int i = 1;
+	while (i < n)
+	{
+		for (int I = i + 3; i < I; i++) {
+    		sum += sign / (2.0 * i + 1.0);
+    		sign = -sign;
+		}
+	}
+	for (; i < n; i++)
+	{
+    	sum += sign / (2.0 * i + 1.0);
+    	sign = -sign;
+	}
+	return 4.0 * sum;
+}
 PUBLIC_API long test_sieve(const long N)
 {
-	bool prime[N+1];
+	bool prime[N];
 	memset(prime, true, sizeof(prime));
 	long nprimes = 0;
-	for (long n = 2; n*n <= N; n++)
+	for (long n = 2; n < N; n++)
 	{
 		if (UNLIKELY(prime[n])) {
 			nprimes += 1;
-			for (long i = 2*n; i <= N; i += n)
+			for (long i = 2*n; i < N; i += n)
 				prime[i] = false;
 		}
 	}

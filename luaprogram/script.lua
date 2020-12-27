@@ -39,6 +39,15 @@ function test_fib(n, acc, prev)
 		return test_fib(n - 1, prev + acc, acc)
 	end
 end
+function test_taylor(n)
+	local sum = 1.0
+	local sign = -1
+	for i = 1, n do
+    	sum = sum + sign / (2.0 * i + 1.0)
+    	sign = -sign
+	end
+	return 4.0 * sum
+end
 
 function test_sieve(n)
 	local prime = {}
