@@ -87,6 +87,12 @@ void run_selftest()
 		machine.deserialize_from(mstate);
 	}
 
+	long fib = machine.vmcall("test_fib", 40, 0, 1);
+	if (fib != 102334155) {
+		printf("Wrong fibonacci sequence totals: %ld\n", fib);
+		exit(1);
+	}
+
 	long primes = machine.vmcall("test_sieve", 10000000);
 	if (primes != 664579) {
 		printf("Wrong number of primes from Sieve: %ld\n", primes);

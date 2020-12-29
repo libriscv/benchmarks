@@ -86,6 +86,7 @@ extern void test_7_lua_2();
 extern void test_8_riscv();
 extern void test_8_native_riscv();
 extern void test_8_lua();
+extern void test_9_native_sieve();
 
 //const char* TEST_BINARY = "../rvprogram/build_clang/rvbinary";
 #ifdef RUST_BINARY
@@ -189,6 +190,7 @@ int main()
 		run_test(LUANAME ": memcpy", S, test_setup, test_8_lua);
 	}
 	printf("\n");
+	slow_test<10>("native: sieve(10M)", 1, test_setup, test_9_native_sieve);
 	slow_test<10>("libriscv: sieve(10M)", 1, test_setup, test_3_riscv_sieve);
 	slow_test<10>(LUANAME ": sieve(10M)", 1, test_setup, test_3_lua_sieve);
 	printf("\n");
