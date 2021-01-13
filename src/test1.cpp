@@ -98,7 +98,7 @@ void test_setup()
 
 		// the minimum number of syscalls needed for malloc and C++ exceptions
 		setup_minimal_syscalls(state, *machine);
-		auto* arena = setup_native_heap_syscalls(*machine, 4*1024*1024);
+		auto* arena = setup_native_heap_syscalls(*machine, 0x40000000, 4*1024*1024);
 		setup_native_memory_syscalls(*machine, true);
 		auto* threads = setup_native_threads(*machine, arena);
 		machine->install_syscall_handler(40, syscall_print<CPUBITS>);
@@ -114,7 +114,7 @@ void test_setup()
 			// run until it stops
 			machine->simulate();
 		} catch (riscv::MachineException& me) {
-			printf(">>> Machine exception %d: %s (data: %d)\n",
+			printf(">>> Machine exception %d: %s (data: 0x%lX)\n",
 					me.type(), me.what(), me.data());
 	#ifdef RISCV_DEBUG
 			machine->print_and_pause();

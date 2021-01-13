@@ -16,7 +16,7 @@ void run_selftest()
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, machine);
-	auto* arena = setup_native_heap_syscalls(machine, 8*1024*1024);
+	auto* arena = setup_native_heap_syscalls(machine, 0x40000000, 8*1024*1024);
 	setup_native_memory_syscalls(machine, false);
 	setup_native_threads(machine, arena);
 	machine.setup_argv({});
