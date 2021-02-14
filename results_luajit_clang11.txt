@@ -13,7 +13,6 @@ RISC-V self-test OK
         libriscv: many arguments	median 96ns  		lowest: 94ns     	highest: 121ns
           luajit: many arguments	median 472ns  		lowest: 460ns     	highest: 541ns
 
-             native: sieve(1000)	median 0ns  		lowest: 0ns     	highest: 0ns
           libriscv: integer math	median 16ns  		lowest: 15ns     	highest: 43ns
                libriscv: fp math	median 30ns  		lowest: 29ns     	highest: 38ns
               libriscv: exp math	median 29ns  		lowest: 28ns     	highest: 60ns

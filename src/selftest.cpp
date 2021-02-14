@@ -101,7 +101,7 @@ void run_selftest()
 
 	machine.vmcall("test_taylor", 1000);
 	double taylor = machine.sysarg<double> (0);
-	if (taylor < 3.142591 || taylor > 3.142592) {
+	if (taylor < 3.14 || taylor > 3.15) {
 		printf("Wrong taylor series number: %f\n", taylor);
 		exit(1);
 	}

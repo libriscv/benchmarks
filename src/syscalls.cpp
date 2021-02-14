@@ -22,7 +22,7 @@ void syscall_write(Machine<W>& machine)
 	if (fd >= 0 && fd < 3) {
 		const size_t len_g = std::min((size_t) 1024u, (size_t) len);
 		machine.memory.memview(address, len_g,
-			[state] (auto* data, size_t len) {
+			[state] (auto&, auto* data, size_t len) {
 				state->output.append((char*) data, len);
 #ifdef RISCV_DEBUG
 				(void) write(0, data, len);
@@ -35,7 +35,7 @@ void syscall_write(Machine<W>& machine)
 }
 
 template <int W>
-void syscall_ebreak(riscv::Machine<W>& machine)
+void syscall_ebreak(Machine<W>& machine)
 {
 	printf("\n>>> EBREAK at %#X\n", machine.cpu.pc());
 #ifdef RISCV_DEBUG

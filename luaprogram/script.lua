@@ -41,10 +41,11 @@ function test_fib(n, acc, prev)
 end
 function test_taylor(n)
 	local sum = 1.0
-	local sign = -1
-	for i = 1, n do
-    	sum = sum + sign / (2.0 * i + 1.0)
-    	sign = -sign
+	for i = 1, n, 4 do
+		sum = sum + -1.0 / (2.0 * (i+0) + 1.0)
+		sum = sum +  1.0 / (2.0 * (i+1) + 1.0)
+		sum = sum + -1.0 / (2.0 * (i+2) + 1.0)
+		sum = sum +  1.0 / (2.0 * (i+3) + 1.0)
 	end
 	return 4.0 * sum
 end

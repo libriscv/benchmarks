@@ -92,7 +92,13 @@ void test_setup()
 	if (rvbinary.empty()) {
 		rvbinary = load_file(TEST_BINARY);
 		delete machine;
-		machine = new machine_t {rvbinary, 16*1024*1024};
+		machine = new machine_t {rvbinary, {
+			.memory_max = 16*1024*1024,
+#ifdef RISCV_BINARY_TRANSLATION
+			.block_size_treshold = 4,
+			.forward_jumps = true
+#endif
+		}};
 		assert(machine->address_of("fastexit") != 0);
 		machine->memory.set_exit_address(machine->address_of("fastexit"));
 

@@ -160,7 +160,9 @@ PUBLIC_API double test_taylor(int n)
 {
 	double sum = 1.0;
 	for (int i = 1; i < n;) {
-    	sum += -1.0 / (2.0 * (i++) + 1.0);
+		sum += -1.0 / (2.0 * (i++) + 1.0);
+		sum +=  1.0 / (2.0 * (i++) + 1.0);
+		sum += -1.0 / (2.0 * (i++) + 1.0);
 		sum +=  1.0 / (2.0 * (i++) + 1.0);
 	}
 	return 4.0 * sum;
