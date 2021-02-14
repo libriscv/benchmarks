@@ -95,7 +95,7 @@ void test_setup()
 		machine = new machine_t {rvbinary, {
 			.memory_max = 16*1024*1024,
 #ifdef RISCV_BINARY_TRANSLATION
-			.block_size_treshold = 4,
+			.block_size_treshold = 5,
 			.forward_jumps = true
 #endif
 		}};
