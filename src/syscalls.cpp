@@ -21,13 +21,11 @@ void syscall_write(Machine<W>& machine)
 	// we only accept standard pipes, for now :)
 	if (fd >= 0 && fd < 3) {
 		const size_t len_g = std::min((size_t) 1024u, (size_t) len);
-		machine.memory.memview(address, len_g,
-			[state] (auto&, auto* data, size_t len) {
-				state->output.append((char*) data, len);
+		auto sv = machine.memory.memview(address, len_g);
+		state->output.append(sv.begin(), sv.size());
 #ifdef RISCV_DEBUG
-				(void) write(0, data, len);
+		(void) write(0, sv.begin(), sv.size());
 #endif
-			});
 		machine.set_result(len_g);
 		return;
 	}

@@ -1,3 +1,4 @@
+#include <cmath>
 #include <include/syscall_helpers.hpp>
 #include "luascript.hpp"
 #include "testhelp.hpp"
@@ -31,15 +32,10 @@ template <int W>
 void syscall_print(Machine<W>& machine)
 {
 	// get string directly from memory, with max-length
-	const auto rvs = machine.template sysarg<riscv::Buffer>(0);
+	const auto rvs = machine.template sysarg<std::string_view>(0);
 	// for the sequential case just use compare against string_view
-	if (rvs.is_sequential()) {
-		if (str != rvs.strview())
-			abort();
-	}
-	else if (str != rvs.to_string()) {
+	if (str != rvs)
 		abort();
-	}
 }
 template <int W>
 void syscall_longcall(Machine<W>& machine)
@@ -74,17 +70,10 @@ template <int W>
 void syscall_strcmp(Machine<W>& machine)
 {
 	const auto [a1, a2] =
-		machine.template sysargs <riscv::Buffer, address_type<W>> ();
-	if (a1.is_sequential()) {
-		// this is really fast because the whole thing is sequential
-		machine.set_result(
-			machine.memory.memcmp(a1.c_str(), a2, a1.size()));
-	} else {
-		// this is slightly fast because we know one of the lengths
-		const std::string str1 = a1.to_string();
-		machine.set_result(
-			machine.memory.memcmp(str1.c_str(), a2, str1.size()));
-	}
+		machine.template sysargs <std::string_view, address_type<W>> ();
+	// this is really fast because the whole thing is sequential
+	machine.set_result(
+		machine.memory.memcmp(a1.begin(), a2, a1.size()));
 }
 
 void test_setup()
@@ -93,7 +82,8 @@ void test_setup()
 		rvbinary = load_file(TEST_BINARY);
 		delete machine;
 		machine = new machine_t {rvbinary, {
-			.memory_max = 16*1024*1024,
+			.memory_max = 32*1024*1024,
+			.stack_size = 10*1024*1024,
 #ifdef RISCV_BINARY_TRANSLATION
 			.block_size_treshold = 5,
 			.forward_jumps = true
@@ -104,7 +94,7 @@ void test_setup()
 
 		// the minimum number of syscalls needed for malloc and C++ exceptions
 		setup_minimal_syscalls(state, *machine);
-		auto* arena = setup_native_heap_syscalls(*machine, 0x40000000, 4*1024*1024);
+		auto* arena = setup_native_heap_syscalls(*machine, 0xA00000, 8*1024*1024);
 		setup_native_memory_syscalls(*machine, true);
 		auto* threads = setup_native_threads(*machine, arena);
 		machine->install_syscall_handler(40, syscall_print<CPUBITS>);
@@ -155,10 +145,7 @@ void test_setup()
 
 void bench_fork()
 {
-	riscv::MachineOptions<CPUBITS> options {
-		.owning_machine = machine
-	};
-	riscv::Machine<CPUBITS> other {rvbinary, options};
+	riscv::Machine<CPUBITS> other {*machine, {}};
 }
 void bench_install_syscall()
 {

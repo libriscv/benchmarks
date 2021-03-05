@@ -11,12 +11,15 @@ void run_selftest()
 {
 	auto rvbinary = load_file(TEST_BINARY);
 
-	machine_t machine {rvbinary, 16*1024*1024};
+	machine_t machine {rvbinary, {
+		.memory_max = 32*1024*1024,
+		.stack_size = 10*1024*1024
+	}};
 	State<CPUBITS> state;
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, machine);
-	auto* arena = setup_native_heap_syscalls(machine, 0x40000000, 8*1024*1024);
+	auto* arena = setup_native_heap_syscalls(machine, 0xA00000, 8*1024*1024);
 	setup_native_memory_syscalls(machine, false);
 	setup_native_threads(machine, arena);
 	machine.setup_argv({});
@@ -66,7 +69,7 @@ void run_selftest()
 	{
 		// verify serialization works
 		std::vector<uint8_t> mstate;
-		machine.serialize_to(mstate);
+		//machine.serialize_to(mstate);
 
 		try {
 			int ret = machine.vmcall("selftest", 1234, 5678.0, 5ull);
@@ -84,7 +87,7 @@ void run_selftest()
 #endif
 			exit(1);
 		}
-		machine.deserialize_from(mstate);
+		//machine.deserialize_from(mstate);
 	}
 
 	long fib = machine.vmcall("test_fib", 40, 0, 1);
