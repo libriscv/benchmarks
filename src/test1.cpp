@@ -2,6 +2,8 @@
 #include "luascript.hpp"
 #include "testhelp.hpp"
 #include "include/crc32.hpp"
+#include <libriscv/cached_address.hpp>
+#include <cmath>
 using namespace riscv;
 static constexpr int CPUBITS = riscv::RISCV32;
 using machine_t = Machine<CPUBITS>;
@@ -13,15 +15,6 @@ static uint32_t test_1_empty_addr = 0x0;
 static uint32_t test_1_syscall_addr = 0x0;
 static uint32_t test_1_address = 0x0;
 static uint32_t test_3_fib_addr = 0x0;
-
-struct FunctionAddress {
-	riscv::address_type<CPUBITS> addr = 0;
-
-	auto get(machine_t* m, const char* func) {
-		if (addr) return addr;
-		return (addr = m->address_of(func));
-	}
-};
 
 static Script* luascript = nullptr;
 extern const char* TEST_BINARY;
@@ -155,10 +148,9 @@ void test_setup()
 
 void bench_fork()
 {
-	riscv::MachineOptions<CPUBITS> options {
-		.owning_machine = machine
-	};
-	riscv::Machine<CPUBITS> other {rvbinary, options};
+	riscv::Machine<CPUBITS> other {*machine, {
+
+	}};
 }
 void bench_install_syscall()
 {
@@ -216,7 +208,7 @@ void test_1_lua()
 
 void test_2_riscv()
 {
-	static FunctionAddress fa;
+	static CachedAddress<CPUBITS> fa;
 	const struct Test {
 		int32_t a = 222;
 		int64_t b = 666;
@@ -224,7 +216,7 @@ void test_2_riscv()
 #ifdef RISCV_DEBUG
 	try {
 		int ret =
-		machine->vmcall(fa.get(machine, "test_args"), "This is a string", test,
+		machine->vmcall(fa.get(*machine, "test_args"), "This is a string", test,
 									333, 444, 555, 666, 777, 888);
 		if (ret != 666) abort();
 	} catch (riscv::MachineException& me) {
@@ -234,7 +226,7 @@ void test_2_riscv()
 	}
 #else
 	int ret =
-	machine->vmcall(fa.get(machine, "test_args"), "This is a string", test,
+	machine->vmcall(fa.get(*machine, "test_args"), "This is a string", test,
 								333, 444, 555, 666, 777, 888);
 	if (ret != 666) abort();
 #endif
@@ -252,28 +244,28 @@ void test_2_lua()
 
 void test_3_riscv()
 {
-	static FunctionAddress fa;
+	static CachedAddress<CPUBITS> fa;
 #ifdef RISCV_DEBUG
 	try {
-		machine->vmcall<0>(fa.get(machine, "test_maffs1"), 111, 222);
+		machine->vmcall<0>(fa.get(*machine, "test_maffs1"), 111, 222);
 	} catch (riscv::MachineException& me) {
 		printf(">>> test_3 Machine exception %d: %s (data: %d)\n",
 				me.type(), me.what(), me.data());
 		machine->print_and_pause();
 	}
 #else
-	machine->vmcall(fa.get(machine, "test_maffs1"), 111, 222);
+	machine->vmcall(fa.get(*machine, "test_maffs1"), 111, 222);
 #endif
 }
 void test_3_riscv_math2()
 {
-	static FunctionAddress fa;
-	machine->vmcall(fa.get(machine, "test_maffs2"), 3.0, 3.0, 3.0);
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_maffs2"), 3.0, 3.0, 3.0);
 }
 void test_3_riscv_math3()
 {
-	static FunctionAddress fa;
-	machine->vmcall(fa.get(machine, "test_maffs3"), 3.0, 3.0, 3.0);
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_maffs3"), 3.0, 3.0, 3.0);
 }
 void test_3_riscv_fib()
 {
@@ -281,13 +273,13 @@ void test_3_riscv_fib()
 }
 void test_3_riscv_sieve()
 {
-	static FunctionAddress fa;
-	machine->vmcall(fa.get(machine, "test_sieve"), 10000000);
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_sieve"), 10000000);
 }
 void test_3_riscv_taylor()
 {
-	static FunctionAddress fa;
-	machine->vmcall(fa.get(machine, "test_taylor"), 1000);
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_taylor"), 1000);
 }
 
 void test_3_lua_math1()
@@ -321,8 +313,8 @@ void test_4_riscv_syscall()
 }
 void test_4_riscv()
 {
-	static FunctionAddress fa;
-	machine->vmcall(fa.get(machine, "test_print"));
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_print"));
 }
 void test_4_lua()
 {
@@ -335,8 +327,8 @@ void test_4_lua_syscall()
 
 void test_5_riscv()
 {
-	static FunctionAddress fa;
-	machine->vmcall(fa.get(machine, "test_longcall"));
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_longcall"));
 }
 void test_5_lua()
 {
@@ -345,8 +337,8 @@ void test_5_lua()
 
 void test_6_riscv()
 {
-	static FunctionAddress fa;
-	machine->vmcall(fa.get(machine, "test_threads"));
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_threads"));
 }
 void test_6_lua()
 {
@@ -355,13 +347,13 @@ void test_6_lua()
 
 void test_7_riscv_1()
 {
-	static FunctionAddress fa;
-	machine->vmcall(fa.get(machine, "test_threads_args1"));
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_threads_args1"));
 }
 void test_7_riscv_2()
 {
-	static FunctionAddress fa;
-	machine->vmcall(fa.get(machine, "test_threads_args2"));
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_threads_args2"));
 }
 void test_7_lua_1()
 {
@@ -374,13 +366,13 @@ void test_7_lua_2()
 
 void test_8_riscv()
 {
-	static FunctionAddress fa;
-	machine->vmcall(fa.get(machine, "test_memcpy"));
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_memcpy"));
 }
 void test_8_native_riscv()
 {
-	static FunctionAddress fa;
-	machine->vmcall(fa.get(machine, "test_syscall_memcpy"));
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_syscall_memcpy"));
 }
 void test_8_lua()
 {

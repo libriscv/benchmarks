@@ -11,7 +11,7 @@ void run_selftest()
 {
 	auto rvbinary = load_file(TEST_BINARY);
 
-	machine_t machine {rvbinary, 16*1024*1024};
+	machine_t machine {rvbinary, { .memory_max = 16*1024*1024 }};
 	State<CPUBITS> state;
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
