@@ -7,13 +7,8 @@ using machine_t = Machine<CPUBITS>;
 //static const char* TEST_BINARY = "../rvprogram/rustbin/target/CPUBITSimac-unknown-none-elf/debug/rustbin";
 static const char* TEST_BINARY = "../rvprogram/build/rvbinary";
 
-void run_selftest()
+static void setup_selftest_machine(machine_t& machine, State<CPUBITS>& state)
 {
-	auto rvbinary = load_file(TEST_BINARY);
-
-	machine_t machine {rvbinary, { .memory_max = 16*1024*1024 }};
-	State<CPUBITS> state;
-
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, machine);
 	auto* arena = setup_native_heap_syscalls(machine, 0x40000000, 8*1024*1024);
@@ -21,6 +16,16 @@ void run_selftest()
 	setup_native_threads(machine, arena);
 	machine.setup_argv({});
 	machine.memory.set_exit_address(machine.address_of("fastexit"));
+}
+
+void run_selftest()
+{
+	auto rvbinary = load_file(TEST_BINARY);
+	State<CPUBITS> state;
+
+	machine_t machine {rvbinary, { .memory_max = 16*1024*1024 }};
+	setup_selftest_machine(machine, state);
+
 #ifdef RISCV_DEBUG
 	machine.verbose_instructions = true;
 	machine.print_and_pause();
@@ -68,8 +73,14 @@ void run_selftest()
 		std::vector<uint8_t> mstate;
 		machine.serialize_to(mstate);
 
+		// create new blank machine
+		machine_t other {rvbinary, { .memory_max = 16*1024*1024 }};
+		setup_selftest_machine(other, state);
+		// deserialize into new machine (which needs setting up first)
+		other.deserialize_from(mstate);
+
 		try {
-			int ret = machine.vmcall("selftest", 1234, 5678.0, 5ull);
+			int ret = other.vmcall("selftest", 1234, 5678.0, 5ull);
 			if (ret != 666) {
 				printf("The self-test did not return the correct value\n");
 				printf("Got %d instead\n", ret);
@@ -80,11 +91,10 @@ void run_selftest()
 			printf(">>> Machine exception %d: %s (data: %d)\n",
 					me.type(), me.what(), me.data());
 #ifdef RISCV_DEBUG
-			machine.print_and_pause();
+			other.print_and_pause();
 #endif
 			exit(1);
 		}
-		machine.deserialize_from(mstate);
 	}
 
 	long fib = machine.vmcall("test_fib", 40, 0, 1);
