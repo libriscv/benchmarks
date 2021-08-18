@@ -7,9 +7,9 @@ extern "C" {
 #include <luajit-2.1/lua.h>
 #include <luajit-2.1/lualib.h>
 #else
-#include <lauxlib.h>
-#include <lua.h>
-#include <lualib.h>
+#include <lua5.3/lauxlib.h>
+#include <lua5.3/lua.h>
+#include <lua5.3/lualib.h>
 #endif
 }
 #include <LuaBridge.h>

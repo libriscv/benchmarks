@@ -7,7 +7,7 @@ option(SANITIZE    "Enable sanitizers" OFF)
 option(PGO         "Generate PGO binary" OFF)
 option(PROFILING   "Profiling mode" OFF)
 option(RUST_BINARY "Benchmark with Rust binary" OFF)
-option(USE_LUAJIT  "Benchmark using LuaJIT" OFF)
+option(USE_LUAJIT  "Benchmark using LuaJIT" ON)
 
 set(OPTIMIZE  "-O2")
 set(COMMON    "-Wall -Wextra")
@@ -40,7 +40,6 @@ add_subdirectory(ext/libriscv/lib libriscv)
 # NOTE: We have to enable exec traps to get a realistic picture
 # as they are used in the game engine these benchmarks are for.
 target_compile_definitions(riscv PUBLIC
-	RISCV_EBREAK_MEANS_STOP=1
 	RISCV_SYSCALLS_MAX=128
 )
 
@@ -51,8 +50,6 @@ set(SOURCES
 	src/selftest.cpp
 	src/syscalls.cpp
 	src/test1.cpp
-	ext/libriscv/emulator/syscalls/src/native_libc.cpp
-	ext/libriscv/emulator/syscalls/src/native_threads.cpp
 )
 
 
@@ -62,10 +59,6 @@ target_include_directories(bench PRIVATE ext/libriscv/emulator/syscalls)
 target_link_libraries(bench riscv)
 # for some reason this causes -std=gnu++1z
 #set_target_properties(bench PROPERTIES CXX_STANDARD 17)
-target_compile_definitions(bench PRIVATE
-		NATIVE_SYSCALLS_BASE=1
-		THREADS_SYSCALL_BASE=21)
-
 
 if (USE_LUAJIT)
 	find_library(LUAJIT luajit-5.1 REQUIRED)
@@ -73,15 +66,9 @@ if (USE_LUAJIT)
 	target_include_directories(bench PRIVATE ${LUAJIT_INCLUDE_DIRS})
 	target_compile_definitions(bench PRIVATE LUAJIT=1)
 else()
-	set (LUAPATH "/home/gonzo/github/lua")
-
-	add_library(lua54 STATIC IMPORTED)
-	set_target_properties(lua54 PROPERTIES IMPORTED_LOCATION "${LUAPATH}/liblua.a")
-	set_target_properties(lua54 PROPERTIES LINKER_LANGUAGE C)
-	target_link_libraries(lua54 INTERFACE dl)
-	target_include_directories(lua54 INTERFACE ${LUAPATH})
-
-	target_link_libraries(bench lua54)
+	find_library(LUA lua5.3 REQUIRED)
+	target_link_libraries(bench ${LUA})
+	target_include_directories(bench PRIVATE ${LUA_INCLUDE_DIRS})
 endif()
 
 

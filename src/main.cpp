@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <vector>
 
-template <size_t TIMES = 2000>
+template <size_t TIMES = 1000>
 static long
 run_test(const char* name, int samples, test_func setup, test_func execone)
 {
@@ -96,7 +96,7 @@ const char* TEST_BINARY = "../rvprogram/build/rvbinary";
 #endif
 
 static constexpr bool test_libriscv = true;
-static constexpr bool test_lua = true;
+static constexpr bool test_lua = false;
 #ifdef LUAJIT
 #define LUANAME "luajit"
 #else
@@ -191,8 +191,12 @@ int main()
 	}
 	printf("\n");
 	//slow_test<10>("native: sieve(10M)", 1, test_setup, test_9_native_sieve);
-	slow_test<10>("libriscv: sieve(10M)", 1, test_setup, test_3_riscv_sieve);
-	slow_test<10>(LUANAME ": sieve(10M)", 1, test_setup, test_3_lua_sieve);
+	if constexpr (test_libriscv) {
+		slow_test<10>("libriscv: sieve(10M)", 1, test_setup, test_3_riscv_sieve);
+	}
+	if constexpr (test_lua) {
+		slow_test<10>(LUANAME ": sieve(10M)", 1, test_setup, test_3_lua_sieve);
+	}
 	printf("\n");
 	return 0;
 }

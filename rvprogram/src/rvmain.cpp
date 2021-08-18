@@ -111,11 +111,11 @@ static const char str[] = "This is a string";
 static std::array<int, 2048> array;
 static int counter = 0;
 
-FAST_API void test(int arg1)
+PUBLIC_API void test(int arg1)
 {
 	array[counter++] = arg1;
+	counter %= 2048;
 	//array.at(counter++) = arg1;
-	FAST_RETURN();
 }
 
 struct Test {
@@ -169,7 +169,7 @@ PUBLIC_API double test_taylor(int n)
 }
 PUBLIC_API long test_sieve(const long N)
 {
-	bool prime[N];
+	bool prime[10'000'000];
 	memset(prime, true, sizeof(prime));
 	long nprimes = 0;
 	for (long n = 2; n < N; n++)

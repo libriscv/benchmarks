@@ -11,9 +11,9 @@ static void setup_selftest_machine(machine_t& machine, State<CPUBITS>& state)
 {
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	setup_minimal_syscalls(state, machine);
-	auto* arena = setup_native_heap_syscalls(machine, 0x40000000, 8*1024*1024);
-	setup_native_memory_syscalls(machine, false);
-	setup_native_threads(machine, arena);
+	machine.setup_native_heap(1, 0x40000000, 8*1024*1024);
+	machine.setup_native_memory(6, false);
+	machine.setup_native_threads(21);
 	machine.setup_argv({});
 	machine.memory.set_exit_address(machine.address_of("fastexit"));
 }
