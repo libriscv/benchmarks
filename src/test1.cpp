@@ -10,7 +10,6 @@ using machine_t = Machine<CPUBITS>;
 
 static std::vector<uint8_t> rvbinary;
 static machine_t* machine = nullptr;
-static State<CPUBITS> state;
 static uint32_t test_1_empty_addr = 0x0;
 static uint32_t test_1_syscall_addr = 0x0;
 static uint32_t test_1_address = 0x0;
@@ -93,11 +92,9 @@ void test_setup()
 		.forward_jumps = true
 #endif
 	}};
-	assert(machine->address_of("fastexit") != 0);
-	machine->memory.set_exit_address(machine->address_of("fastexit"));
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
-	setup_minimal_syscalls(state, *machine);
+	setup_minimal_syscalls(*machine);
 
 	machine->setup_native_heap(1, 0x40000000, 8*1024*1024);
 	machine->setup_native_memory(6, false);
@@ -124,7 +121,6 @@ void test_setup()
 	}
 	assert(machine->cpu.reg(10) == 0);
 
-	assert(machine->address_of("fastexit") != 0);
 	assert(machine->address_of("empty_function") != 0);
 	assert(machine->address_of("test") != 0);
 	assert(machine->address_of("test_args") != 0);

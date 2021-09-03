@@ -10,11 +10,4 @@ static constexpr bool verbose_syscalls = false;
 #endif
 
 template <int W>
-struct State
-{
-	int exit_code = 0;
-	std::string output;
-};
-
-template <int W>
-void setup_minimal_syscalls(State<W>&, riscv::Machine<W>&);
+void setup_minimal_syscalls(riscv::Machine<W>&);

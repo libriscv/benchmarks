@@ -7,24 +7,22 @@ using machine_t = Machine<CPUBITS>;
 //static const char* TEST_BINARY = "../rvprogram/rustbin/target/CPUBITSimac-unknown-none-elf/debug/rustbin";
 static const char* TEST_BINARY = "../rvprogram/build/rvbinary";
 
-static void setup_selftest_machine(machine_t& machine, State<CPUBITS>& state)
+static void setup_selftest_machine(machine_t& machine)
 {
 	// the minimum number of syscalls needed for malloc and C++ exceptions
-	setup_minimal_syscalls(state, machine);
+	setup_minimal_syscalls(machine);
 	machine.setup_native_heap(1, 0x40000000, 8*1024*1024);
 	machine.setup_native_memory(6, false);
 	machine.setup_native_threads(21);
 	machine.setup_argv({});
-	machine.memory.set_exit_address(machine.address_of("fastexit"));
 }
 
 void run_selftest()
 {
 	auto rvbinary = load_file(TEST_BINARY);
-	State<CPUBITS> state;
 
 	machine_t machine {rvbinary, { .memory_max = 16*1024*1024 }};
-	setup_selftest_machine(machine, state);
+	setup_selftest_machine(machine);
 
 #ifdef RISCV_DEBUG
 	machine.verbose_instructions = true;
@@ -47,7 +45,7 @@ void run_selftest()
 	}
 	if (machine.cpu.reg(10) != 0) {
 		printf(">>> The selftest main function did not return correctly\n");
-		printf(">>> The return value was: %d\n", state.exit_code);
+		printf(">>> The return value was: %d\n", machine.return_value<int>());
 		exit(1);
 	}
 	if (machine.address_of("selftest") == 0) {
@@ -75,7 +73,7 @@ void run_selftest()
 
 		// create new blank machine
 		machine_t other {rvbinary, { .memory_max = 16*1024*1024 }};
-		setup_selftest_machine(other, state);
+		setup_selftest_machine(other);
 		// deserialize into new machine (which needs setting up first)
 		other.deserialize_from(mstate);
 
@@ -84,7 +82,6 @@ void run_selftest()
 			if (ret != 666) {
 				printf("The self-test did not return the correct value\n");
 				printf("Got %d instead\n", ret);
-				printf("Output: %s\n", state.output.c_str());
 				exit(1);
 			}
 		} catch (riscv::MachineException& me) {
