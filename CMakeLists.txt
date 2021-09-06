@@ -32,10 +32,9 @@ if (PGO)
 	endif()
 endif()
 
-option(RISCV_BINARY_TRANSLATION "" ON)
+option(RISCV_BINARY_TRANSLATION "" OFF)
 option(RISCV_EXPERIMENTAL "" ON)
 option(RISCV_EXT_C "" OFF)
-option(RISCV_EXT_A "" OFF)
 add_subdirectory(ext/libriscv/lib libriscv)
 # NOTE: We have to enable exec traps to get a realistic picture
 # as they are used in the game engine these benchmarks are for.
