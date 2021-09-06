@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.9.4)
+cmake_policy(SET CMP0069 NEW)
 project(script_bench CXX)
 
 option(DEBUGGING   "Debugging build" OFF)
@@ -21,6 +22,12 @@ endif()
 
 if (SANITIZE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -ggdb3 -fsanitize=address,undefined")
+endif()
+
+if (LTO)
+	include(CheckIPOSupported)
+	check_ipo_supported()
+	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
 if (PGO)
@@ -72,8 +79,6 @@ endif()
 
 
 if (LTO)
-	set_target_properties(riscv PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-	set_property(TARGET bench PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld")
 	endif()
