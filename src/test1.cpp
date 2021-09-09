@@ -174,7 +174,7 @@ void bench_install_syscall()
 
 void test_1_riscv_empty()
 {
-	machine->vmcall<0>(test_1_empty_addr);
+	machine->vmcall(test_1_empty_addr);
 }
 void test_1_lua_empty()
 {
@@ -185,19 +185,19 @@ void test_1_riscv()
 {
 #ifdef RISCV_DEBUG
 	try {
-		machine->vmcall<0>("test", 555);
+		machine->vmcall("test", 555);
 	} catch (riscv::MachineException& me) {
 		printf(">>> test_1 Machine exception %d: %s (data: %d)\n",
 				me.type(), me.what(), me.data());
 		machine->print_and_pause();
 	}
 #else
-	machine->vmcall<0>("test", 555);
+	machine->vmcall("test", 555);
 #endif
 }
 void test_1_riscv_direct()
 {
-	machine->vmcall<0>(test_1_address, 555);
+	machine->vmcall(test_1_address, 555);
 }
 void test_1_lua()
 {
@@ -245,7 +245,7 @@ void test_3_riscv()
 	static CachedAddress<CPUBITS> fa;
 #ifdef RISCV_DEBUG
 	try {
-		machine->vmcall<0>(fa.get(*machine, "test_maffs1"), 111, 222);
+		machine->vmcall(fa.get(*machine, "test_maffs1"), 111, 222);
 	} catch (riscv::MachineException& me) {
 		printf(">>> test_3 Machine exception %d: %s (data: %d)\n",
 				me.type(), me.what(), me.data());
