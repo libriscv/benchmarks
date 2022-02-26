@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#export CXX=clang++-11
+export CXX=clang++-12
 set -e
 mkdir -p $HOME/pgo
 
@@ -10,7 +10,7 @@ make -j16
 ./bench
 popd
 
-llvm-profdata-11 merge -output=$HOME/pgo/default.profdata $HOME/pgo/*.profraw
+llvm-profdata-12 merge -output=$HOME/pgo/default.profdata $HOME/pgo/*.profraw
 
 mkdir -p build_clang
 pushd build_clang

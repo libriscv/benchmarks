@@ -26,8 +26,14 @@ endif()
 
 if (LTO)
 	include(CheckIPOSupported)
-	check_ipo_supported()
-	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+	check_ipo_supported(RESULT supported OUTPUT error)
+	if (supported)
+		message(STATUS "IPO / LTO enabled")
+		set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+	else()
+		message(STATUS "IPO / LTO not supported: <${error}>")
+	endif()
+	#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto -fuse-ld=lld")
 endif()
 
 if (PGO)
@@ -40,14 +46,11 @@ if (PGO)
 endif()
 
 option(RISCV_BINARY_TRANSLATION "" OFF)
+option(RISCV_USE_RH_HASH "" ON)
 option(RISCV_EXPERIMENTAL "" ON)
 option(RISCV_EXT_C "" OFF)
 add_subdirectory(ext/libriscv/lib libriscv)
-# NOTE: We have to enable exec traps to get a realistic picture
-# as they are used in the game engine these benchmarks are for.
-target_compile_definitions(riscv PUBLIC
-	RISCV_SYSCALLS_MAX=128
-)
+target_compile_definitions(riscv PUBLIC RISCV_INSTRUCTION_FUSING=1)
 
 set(SOURCES
 	src/main.cpp

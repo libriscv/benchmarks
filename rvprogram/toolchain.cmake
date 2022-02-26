@@ -7,7 +7,7 @@ message(STATUS ${CMAKE_SOURCE_DIR}/libc/override)
 if (NOT GCC_TRIPLE)
 	set(GCC_TRIPLE "riscv64-unknown-elf")
 endif()
-set(GCC_VERSION 10.2.0)
+set(GCC_VERSION 11.1.0)
 set(COMPILER_DIR $ENV{HOME}/riscv/${GCC_TRIPLE})
 set(LIBRARY_DIR $ENV{HOME}/riscv/lib/gcc/${GCC_TRIPLE}/${GCC_VERSION} CACHE STRING "GCC libraries")
 

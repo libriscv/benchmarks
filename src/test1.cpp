@@ -1,7 +1,7 @@
-#include <include/syscall_helpers.hpp>
 #include "luascript.hpp"
 #include "testhelp.hpp"
 #include "include/crc32.hpp"
+#include <libriscv/machine.hpp>
 #include <libriscv/cached_address.hpp>
 #include <cmath>
 using namespace riscv;
@@ -94,7 +94,7 @@ void test_setup()
 	}};
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
-	setup_minimal_syscalls(*machine);
+	machine->setup_minimal_syscalls();
 
 	machine->setup_native_heap(1, 0x40000000, 8*1024*1024);
 	machine->setup_native_memory(6, false);

@@ -3,11 +3,15 @@
 #include <crc32.hpp>
 #include <microthread.hpp>
 #include <stdio.h>
-extern "C" __attribute__((noreturn)) void fastexit(int);
-#define FAST_RETURN() { asm volatile("ebreak"); __builtin_unreachable(); }
+__attribute__((noreturn)) inline void halt() {
+	asm (".insn i SYSTEM, 0, x0, x0, 0x7ff" ::: "memory");
+	__builtin_unreachable();
+}
+
+#define FAST_RETURN() { halt(); }
 #define FAST_RETVAL(x) \
 		{register long __a0 asm("a0") = (long) (x); \
-		asm volatile("ebreak" :: "r"(__a0)); __builtin_unreachable(); }
+		asm volatile(".insn i SYSTEM, 0, x0, x0, 0x7ff" :: "r"(__a0)); __builtin_unreachable(); }
 
 #if defined(__clang__)
 #define NORMAL_FUNCTIONS
@@ -282,7 +286,7 @@ PUBLIC_API void event_loop()
 		PRINT("event_loop: Checking for work\n");
 		for (auto& ev : events) ev.handle();
 		PRINT("event_loop: Going to sleep!\n");
-		asm volatile("ebreak" ::: "memory");
+		halt();
 	}
 }
 

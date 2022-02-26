@@ -1,4 +1,4 @@
-#include <include/syscall_helpers.hpp>
+#include <libriscv/machine.hpp>
 #include "testhelp.hpp"
 using namespace riscv;
 static constexpr int CPUBITS = riscv::RISCV32;
@@ -10,7 +10,7 @@ static const char* TEST_BINARY = "../rvprogram/build/rvbinary";
 static void setup_selftest_machine(machine_t& machine)
 {
 	// the minimum number of syscalls needed for malloc and C++ exceptions
-	setup_minimal_syscalls(machine);
+	machine.setup_minimal_syscalls();
 	machine.setup_native_heap(1, 0x40000000, 8*1024*1024);
 	machine.setup_native_memory(6, false);
 	machine.setup_native_threads(21);
