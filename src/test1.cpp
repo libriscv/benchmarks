@@ -176,25 +176,15 @@ void test_1_riscv_empty()
 {
 	machine->vmcall(test_1_empty_addr);
 }
+void test_1_riscv_lookup()
+{
+	machine->vmcall("empty_function");
+}
 void test_1_lua_empty()
 {
 	luascript->call("empty_function");
 }
 
-void test_1_riscv()
-{
-#ifdef RISCV_DEBUG
-	try {
-		machine->vmcall("test", 555);
-	} catch (riscv::MachineException& me) {
-		printf(">>> test_1 Machine exception %d: %s (data: %d)\n",
-				me.type(), me.what(), me.data());
-		machine->print_and_pause();
-	}
-#else
-	machine->vmcall("test", 555);
-#endif
-}
 void test_1_riscv_direct()
 {
 	machine->vmcall(test_1_address, 555);

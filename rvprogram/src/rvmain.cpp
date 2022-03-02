@@ -3,15 +3,15 @@
 #include <crc32.hpp>
 #include <microthread.hpp>
 #include <stdio.h>
-__attribute__((noreturn)) inline void halt() {
+inline void stop() {
 	asm (".insn i SYSTEM, 0, x0, x0, 0x7ff" ::: "memory");
 	__builtin_unreachable();
 }
-
-#define FAST_RETURN() { halt(); }
-#define FAST_RETVAL(x) \
-		{register long __a0 asm("a0") = (long) (x); \
-		asm volatile(".insn i SYSTEM, 0, x0, x0, 0x7ff" :: "r"(__a0)); __builtin_unreachable(); }
+template <typename T> inline void stop_with_value(T x) {
+	register long __a0 asm("a0") = (long) x;
+	asm volatile(".insn i SYSTEM, 0, x0, x0, 0x7ff" :: "r"(__a0));
+	__builtin_unreachable();
+}
 
 #if defined(__clang__)
 #define NORMAL_FUNCTIONS
@@ -104,22 +104,20 @@ PUBLIC_API long selftest(int i, float f, long long number)
 	return microthread::join(thread);
 }
 
-FAST_API void empty_function()
+PUBLIC_API void empty_function()
 {
-	FAST_RETURN();
 }
 
 static const char str[] = "This is a string";
 
 #include <array>
 static std::array<int, 2048> array;
-static int counter = 0;
+static unsigned counter = 0;
 
 PUBLIC_API void test(int arg1)
 {
-	array[counter++] = arg1;
-	counter %= 2048;
-	//array.at(counter++) = arg1;
+	// Bounds-check not strictly necessary, as test is run 2000 times.
+	array.at(counter++) = arg1;
 }
 
 struct Test {
@@ -137,21 +135,21 @@ test_args(const char* a1, Test& a2, int a3, int a4, int a5, int a6, int a7, int 
 }
 
 #include <cmath>
-FAST_API long test_maffs1(int a1, int a2)
+PUBLIC_API long test_maffs1(int a1, int a2)
 {
 	int a = a1 + a2;
 	int b = a1 - a2;
 	int c = a1 * a2;
 	int d = a1 / a2;
-	FAST_RETVAL(a + b + c + d);
+	return a + b + c + d;
 }
-FAST_API float test_maffs2(float arg1, float arg2, float arg3)
+PUBLIC_API float test_maffs2(float arg1, float arg2, float arg3)
 {
-	FAST_RETVAL((arg1 * arg1 * arg3) / (arg2 * arg2 * arg3) + sys_fmod(arg1, arg3));
+	return (arg1 * arg1 * arg3) / (arg2 * arg2 * arg3) + sys_fmod(arg1, arg3);
 }
-FAST_API float test_maffs3(float arg1, float arg2, float arg3)
+PUBLIC_API float test_maffs3(float arg1, float arg2, float arg3)
 {
-	FAST_RETVAL(sys_powf(sys_powf(sys_powf(arg1, arg2), 1.0 / arg3), 1.0 / arg3));
+	return sys_powf(sys_powf(sys_powf(arg1, arg2), 1.0 / arg3), 1.0 / arg3);
 }
 PUBLIC_API int32_t test_fib(int32_t n, int32_t acc = 0, int32_t prev = 1)
 {
@@ -187,32 +185,28 @@ PUBLIC_API long test_sieve(const long N)
 	return nprimes;
 }
 
-FAST_API void test_syscall()
+PUBLIC_API void test_syscall()
 {
 	sys_nada();
-	FAST_RETURN();
 }
-FAST_API void test_print()
+PUBLIC_API void test_print()
 {
 	PRINT("This is a string");
-	FAST_RETURN();
 }
 
-FAST_API void test_longcall()
+PUBLIC_API void test_longcall()
 {
 	for (int i = 0; i < 10; i++)
 		sys_longcall("This is a string", 2, 3, 4, 5, 6, 7);
-	FAST_RETURN();
 }
 
-FAST_API void test_threads()
+PUBLIC_API void test_threads()
 {
 	microthread::direct(
 		[] () {
 			microthread::yield();
 		});
 	microthread::yield();
-	FAST_RETURN();
 }
 static int ttvalue = 0;
 PUBLIC_API void test_threads_args1()
@@ -232,14 +226,14 @@ PUBLIC_API long test_threads_args2()
 			return a + b + c + d;
 		}, 1, 2, 3, 4);
 	microthread::yield();
-	FAST_RETVAL(microthread::join(thread));
+	return microthread::join(thread);
 }
 
 static uint8_t src_array[300] __attribute__((aligned(16)));
 static uint8_t dst_array[300] __attribute__((aligned(16)));
 static_assert(sizeof(src_array) == sizeof(dst_array), "!");
 
-FAST_API long test_memcpy()
+PUBLIC_API void* test_memcpy()
 {
 	const char* src = (const char*) src_array;
 	char* dest = (char*) dst_array;
@@ -268,12 +262,12 @@ FAST_API long test_memcpy()
 
 	while (dest < dest_end)
 		*dest++ = *src++;
-	FAST_RETVAL(dest);
+	return dest;
 }
 
-FAST_API long test_syscall_memcpy()
+PUBLIC_API void* test_syscall_memcpy()
 {
-	FAST_RETVAL(memcpy(dst_array, src_array, sizeof(dst_array)));
+	return memcpy(dst_array, src_array, sizeof(dst_array));
 }
 
 
@@ -286,7 +280,7 @@ PUBLIC_API void event_loop()
 		PRINT("event_loop: Checking for work\n");
 		for (auto& ev : events) ev.handle();
 		PRINT("event_loop: Going to sleep!\n");
-		halt();
+		stop();
 	}
 }
 
@@ -299,7 +293,7 @@ PUBLIC_API bool add_work()
 	};
 	PRINT("add_work: Adding work\n");
 	for (auto& ev : events)
-		if (ev.delegate(work)) FAST_RETVAL(true);
+		if (ev.delegate(work)) stop_with_value<bool> (true);
 	PRINT("add_work: Not adding work this time\n");
-	FAST_RETVAL(false);
+	stop_with_value<bool> (false);
 }

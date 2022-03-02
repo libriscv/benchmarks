@@ -4,7 +4,7 @@
 
 template <size_t TIMES = 1000>
 static long
-run_test(const char* name, int samples, test_func setup, test_func execone)
+run_test(const char* name, long overhead, int samples, test_func setup, test_func execone)
 {
 	std::vector<test_result> results;
 	for (int i = 0; i < samples; i++)
@@ -19,8 +19,8 @@ run_test(const char* name, int samples, test_func setup, test_func execone)
 	long highest = results[results.size()-1] / TIMES;
 
 	printf("%32s\tmedian %ldns  \t\tlowest: %ldns     \thighest: %ldns\n",
-			name, median, lowest, highest);
-	return median;
+			name, median - overhead, lowest - overhead, highest - overhead);
+	return median - overhead;
 }
 
 template <size_t TIMES = 50>
@@ -50,9 +50,9 @@ extern void test_setup();
 extern void bench_fork();
 extern void bench_install_syscall();
 extern void test_1_riscv_empty();
+extern void test_1_riscv_lookup();
 extern void test_1_lua_empty();
 extern void test_1_native();
-extern void test_1_riscv();
 extern void test_1_riscv_direct();
 extern void test_1_lua();
 extern void test_2_riscv();
@@ -96,7 +96,7 @@ const char* TEST_BINARY = "../rvprogram/build/rvbinary";
 #endif
 
 static constexpr bool test_libriscv = true;
-static constexpr bool test_lua = false;
+static constexpr bool test_lua = true;
 #ifdef LUAJIT
 #define LUANAME "luajit"
 #else
@@ -107,87 +107,93 @@ int main()
 {
 	const int S = 200;
 	printf("* All benchmark results are measured in %dx2000 samples\n", S);
+	long riscv_overhead = 0;
+	long lua_overhead = 0;
 
 	if constexpr (test_libriscv) {
 		run_selftest();
 		printf("RISC-V self-test OK\n");
-		run_test("libriscv: fork", S, test_setup, bench_fork);
-		run_test("libriscv: install syscall", S, test_setup, bench_install_syscall);
-		run_test("libriscv: function call", S, test_setup, test_1_riscv_empty);
+		run_test("libriscv: fork", 0, S, test_setup, bench_fork);
+		run_test("libriscv: install syscall", 0, S, test_setup, bench_install_syscall);
+		riscv_overhead =
+			run_test("libriscv: call overhead", 0, S, test_setup, test_1_riscv_empty);
+		run_test("libriscv: lookup overhead", 0, S, test_setup, test_1_riscv_lookup);
 	}
 	if constexpr (test_lua) {
-		run_test(LUANAME ": function call", S, test_setup, test_1_lua_empty);
+		lua_overhead =
+			run_test(LUANAME ": call overhead", 0, S, test_setup, test_1_lua_empty);
 	}
+	const long ROH = riscv_overhead;
+	const long LOH = lua_overhead;
 	printf("\n");
-	run_test("native: array append", S, test_setup, test_1_native);
+	run_test("native: array append", 0, S, test_setup, test_1_native);
 	if constexpr (test_libriscv) {
-		run_test("libriscv: array append", S, test_setup, test_1_riscv);
-		run_test("libriscv: array app. direct", S, test_setup, test_1_riscv_direct);
+		run_test("libriscv: array append", ROH, S, test_setup, test_1_riscv_direct);
 	}
 	if constexpr (test_lua) {
-		run_test(LUANAME ": table append", S, test_setup, test_1_lua);
-	}
-	printf("\n");
-	if constexpr (test_libriscv) {
-		run_test("libriscv: many arguments", S, test_setup, test_2_riscv);
-	}
-	if constexpr (test_lua) {
-		run_test(LUANAME ": many arguments", S, test_setup, test_2_lua);
+		run_test(LUANAME ": table append", LOH, S, test_setup, test_1_lua);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
-		run_test("libriscv: integer math", S, test_setup, test_3_riscv);
-		run_test("libriscv: fp math", S, test_setup, test_3_riscv_math2);
-		run_test("libriscv: exp math", S, test_setup, test_3_riscv_math3);
-		run_test("libriscv: fib(40)", S, test_setup, test_3_riscv_fib);
-		run_test("libriscv: taylor(1K)", S, test_setup, test_3_riscv_taylor);
+		run_test("libriscv: many arguments", ROH, S, test_setup, test_2_riscv);
 	}
 	if constexpr (test_lua) {
-		run_test(LUANAME ": integer math", S, test_setup, test_3_lua_math1);
-		run_test(LUANAME ": fp math", S, test_setup, test_3_lua_math2);
-		run_test(LUANAME ": exp math", S, test_setup, test_3_lua_math3);
-		run_test(LUANAME ": fib(40)", S, test_setup, test_3_lua_fib);
-		run_test(LUANAME ": taylor(1K)", S, test_setup, test_3_lua_taylor);
+		run_test(LUANAME ": many arguments", LOH, S, test_setup, test_2_lua);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
-		run_test("libriscv: syscall overhead", S, test_setup, test_4_riscv_syscall);
-		run_test("libriscv: syscall print", S, test_setup, test_4_riscv);
+		run_test("libriscv: integer math", ROH, S, test_setup, test_3_riscv);
+		run_test("libriscv: fp math", ROH, S, test_setup, test_3_riscv_math2);
+		run_test("libriscv: exp math", ROH, S, test_setup, test_3_riscv_math3);
+		run_test("libriscv: fib(40)", ROH, S, test_setup, test_3_riscv_fib);
+		run_test("libriscv: taylor(1K)", ROH, S, test_setup, test_3_riscv_taylor);
 	}
 	if constexpr (test_lua) {
-		run_test(LUANAME ": syscall overhead", S, test_setup, test_4_lua_syscall);
-		run_test(LUANAME ": syscall print", S, test_setup, test_4_lua);
+		run_test(LUANAME ": integer math", LOH, S, test_setup, test_3_lua_math1);
+		run_test(LUANAME ": fp math", LOH, S, test_setup, test_3_lua_math2);
+		run_test(LUANAME ": exp math", LOH, S, test_setup, test_3_lua_math3);
+		run_test(LUANAME ": fib(40)", LOH, S, test_setup, test_3_lua_fib);
+		run_test(LUANAME ": taylor(1K)", LOH, S, test_setup, test_3_lua_taylor);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
-		run_test("libriscv: complex syscall", S, test_setup, test_5_riscv);
+		run_test("libriscv: syscall overhead", ROH, S, test_setup, test_4_riscv_syscall);
+		run_test("libriscv: syscall print", ROH, S, test_setup, test_4_riscv);
 	}
 	if constexpr (test_lua) {
-		run_test(LUANAME ": complex syscall", S, test_setup, test_5_lua);
+		run_test(LUANAME ": syscall overhead", LOH, S, test_setup, test_4_lua_syscall);
+		run_test(LUANAME ": syscall print", LOH, S, test_setup, test_4_lua);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
-		run_test("libriscv: micro threads", S, test_setup, test_6_riscv);
+		run_test("libriscv: complex syscall", ROH, S, test_setup, test_5_riscv);
 	}
 	if constexpr (test_lua) {
-		run_test(LUANAME ": coroutines", S, test_setup, test_6_lua);
+		run_test(LUANAME ": complex syscall", LOH, S, test_setup, test_5_lua);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
-		run_test("libriscv: micro thread args", S, test_setup, test_7_riscv_1);
-		run_test("libriscv: full thread args", S, test_setup, test_7_riscv_2);
+		run_test("libriscv: micro threads", ROH, S, test_setup, test_6_riscv);
 	}
 	if constexpr (test_lua) {
-		run_test(LUANAME ": coroutine args", S, test_setup, test_7_lua_1);
-		run_test(LUANAME ": coroutine args", S, test_setup, test_7_lua_2);
+		run_test(LUANAME ": coroutines", LOH, S, test_setup, test_6_lua);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
-		run_test("libriscv: naive memcpy", S, test_setup, test_8_riscv);
-		run_test("libriscv: syscall memcpy", S, test_setup, test_8_native_riscv);
+		run_test("libriscv: micro thread args", ROH, S, test_setup, test_7_riscv_1);
+		run_test("libriscv: full thread args", ROH, S, test_setup, test_7_riscv_2);
 	}
 	if constexpr (test_lua) {
-		run_test(LUANAME ": memcpy", S, test_setup, test_8_lua);
+		run_test(LUANAME ": coroutine args", LOH, S, test_setup, test_7_lua_1);
+		run_test(LUANAME ": coroutine args", LOH, S, test_setup, test_7_lua_2);
+	}
+	printf("\n");
+	if constexpr (test_libriscv) {
+		run_test("libriscv: naive memcpy", ROH, S, test_setup, test_8_riscv);
+		run_test("libriscv: syscall memcpy", ROH, S, test_setup, test_8_native_riscv);
+	}
+	if constexpr (test_lua) {
+		run_test(LUANAME ": memcpy", LOH, S, test_setup, test_8_lua);
 	}
 	printf("\n");
 	//slow_test<10>("native: sieve(10M)", 1, test_setup, test_9_native_sieve);
