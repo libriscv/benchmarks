@@ -79,7 +79,7 @@ PUBLIC_API long selftest(int i, float f, long long number)
 	assert(syscall(40, testvalue, testvalue >> 32) == 0);
 
 	static int changeme = 444;
-	microthread::direct(
+	microthread::oneshot(
 		[] (int a, int b, int c, int d) {
 			assert(a == 1);
 			assert(b == 2);
@@ -103,6 +103,8 @@ PUBLIC_API long selftest(int i, float f, long long number)
 		}, 111, 222, 333);
 	return microthread::join(thread);
 }
+
+int main(int, char**, char**) {}
 
 PUBLIC_API void empty_function()
 {
@@ -211,7 +213,7 @@ PUBLIC_API void test_threads()
 static int ttvalue = 0;
 PUBLIC_API void test_threads_args1()
 {
-	microthread::direct(
+	microthread::oneshot(
 		[] (int a, int b, int c, int d) {
 			microthread::yield();
 			ttvalue = a + b + c + d;
@@ -284,7 +286,7 @@ PUBLIC_API void event_loop()
 	}
 }
 
-PUBLIC_API bool add_work()
+PUBLIC_API void add_work()
 {
 	Events::Work work {
 		[] {

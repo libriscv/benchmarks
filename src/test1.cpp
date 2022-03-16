@@ -87,6 +87,7 @@ void test_setup()
 	delete machine;
 	machine = new machine_t {rvbinary, {
 		.memory_max = 16*1024*1024,
+		.instruction_fusing = true,
 #ifdef RISCV_BINARY_TRANSLATION
 		.block_size_treshold = 5,
 		.forward_jumps = true
@@ -97,7 +98,7 @@ void test_setup()
 	machine->setup_minimal_syscalls();
 
 	machine->setup_native_heap(1, 0x40000000, 8*1024*1024);
-	machine->setup_native_memory(6, false);
+	machine->setup_native_memory(6);
 	machine->setup_native_threads(21);
 
 	machine->install_syscall_handler(40, syscall_print<CPUBITS>);

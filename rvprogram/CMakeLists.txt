@@ -53,6 +53,8 @@ unset(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES)
 # this fixes a bug where CMake adds -rdynamic to literally everything
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
+option(LIBC_USE_STDLIB "" OFF)
+option(LIBC_WRAP_NATIVE "" OFF)
 add_subdirectory(ext)
 add_subdirectory(libc)
 target_compile_definitions(libc PUBLIC

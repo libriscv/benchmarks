@@ -12,7 +12,7 @@ static void setup_selftest_machine(machine_t& machine)
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	machine.setup_minimal_syscalls();
 	machine.setup_native_heap(1, 0x40000000, 8*1024*1024);
-	machine.setup_native_memory(6, false);
+	machine.setup_native_memory(6);
 	machine.setup_native_threads(21);
 	machine.setup_argv({});
 }
@@ -64,7 +64,6 @@ void run_selftest()
 			machine.set_result(0);
 		});
 
-	printf("Self-test running test function\n");
 	for (int i = 0; i < 10; i++)
 	{
 		// verify serialization works
@@ -77,10 +76,13 @@ void run_selftest()
 		// deserialize into new machine (which needs setting up first)
 		other.deserialize_from(mstate);
 
+	#ifdef RISCV_DEBUG
+		other.verbose_instructions = true;
+	#endif
 		try {
 			int ret = other.vmcall("selftest", 1234, 5678.0, 5ull);
 			if (ret != 666) {
-				printf("The self-test did not return the correct value\n");
+				printf("Deserialized self-test did not return the correct value\n");
 				printf("Got %d instead\n", ret);
 				exit(1);
 			}
