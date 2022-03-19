@@ -86,7 +86,7 @@ void test_setup()
 	}
 	delete machine;
 	machine = new machine_t {rvbinary, {
-		.memory_max = 16*1024*1024,
+		.memory_max = 32*1024*1024,
 		.instruction_fusing = true,
 #ifdef RISCV_BINARY_TRANSLATION
 		.block_size_treshold = 5,
@@ -97,7 +97,7 @@ void test_setup()
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	machine->setup_minimal_syscalls();
 
-	machine->setup_native_heap(1, 0x40000000, 8*1024*1024);
+	machine->setup_native_heap(1, 0x40000000, 32*1024*1024);
 	machine->setup_native_memory(6);
 	machine->setup_native_threads(21);
 
@@ -353,17 +353,32 @@ void test_7_lua_2()
 	luascript->call("test_threads_args2");
 }
 
-void test_8_riscv()
+void test_8_memcpy_riscv()
 {
 	static CachedAddress<CPUBITS> fa;
 	machine->vmcall(fa.get(*machine, "test_memcpy"));
 }
-void test_8_native_riscv()
+void test_8_memcpy_native_riscv()
 {
 	static CachedAddress<CPUBITS> fa;
 	machine->vmcall(fa.get(*machine, "test_syscall_memcpy"));
 }
-void test_8_lua()
+void test_8_memcpy_lua()
 {
 	luascript->call("test_memcpy");
+}
+
+void test_9_memset_riscv()
+{
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_memset"));
+}
+void test_9_memset_native_riscv()
+{
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_syscall_memset"));
+}
+void test_9_memset_lua()
+{
+	luascript->call("test_memset");
 }

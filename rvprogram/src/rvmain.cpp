@@ -2,7 +2,8 @@
 #include <include/libc.hpp>
 #include <crc32.hpp>
 #include <microthread.hpp>
-#include <stdio.h>
+#include <cstdio>
+#include <climits>
 inline void stop() {
 	asm (".insn i SYSTEM, 0, x0, x0, 0x7ff" ::: "memory");
 	__builtin_unreachable();
@@ -231,8 +232,8 @@ PUBLIC_API long test_threads_args2()
 	return microthread::join(thread);
 }
 
-static uint8_t src_array[300] __attribute__((aligned(16)));
-static uint8_t dst_array[300] __attribute__((aligned(16)));
+static uint8_t src_array[600] __attribute__((aligned(16)));
+static uint8_t dst_array[600] __attribute__((aligned(16)));
 static_assert(sizeof(src_array) == sizeof(dst_array), "!");
 
 PUBLIC_API void* test_memcpy()
@@ -272,6 +273,54 @@ PUBLIC_API void* test_syscall_memcpy()
 	return memcpy(dst_array, src_array, sizeof(dst_array));
 }
 
+void *MemSet(void *dest, int c, size_t n)
+{
+    if (dest != NULL) {
+        uint8_t *p = (uint8_t *)dest;
+        if (n >= sizeof(uintptr_t)) {
+            // align destination pointer
+            // this test is not fully defined but works on all classic targets
+            while ((uintptr_t)p & (sizeof(uintptr_t) - 1)) {
+                *p++ = (unsigned char)c;
+                n--;
+            }
+            // compute word value (generalized chux formula)
+            uintptr_t w = UINTPTR_MAX / UCHAR_MAX * (unsigned char)c;
+            // added a redundant (void *) cast to prevent compiler warning
+            uintptr_t *pw = (uintptr_t *)(void *)p;
+            // set 16 or 32 bytes at a time
+            while (n >= 4 * sizeof(uintptr_t)) {
+                pw[0] = w;
+                pw[1] = w;
+                pw[2] = w;
+                pw[3] = w;
+                pw += 4;
+                n -= 4 * sizeof(uintptr_t);
+            }
+            // set the remaining 0 to 3 words
+            while (n >= sizeof(uintptr_t)) {
+                *pw++ = w;
+                n -= sizeof(uintptr_t);
+            }
+            p = (unsigned char *)pw;
+        }
+        // set the trailing bytes
+        while (n --> 0) {
+            *p++ = (unsigned char)c;
+        }
+    }
+    return dest;
+}
+
+static char memset_array[600];
+PUBLIC_API void test_memset()
+{
+	MemSet(memset_array, 0, sizeof(memset_array));
+}
+PUBLIC_API void test_syscall_memset()
+{
+	memset(memset_array, 0, sizeof(memset_array));
+}
 
 #include <include/event_loop.hpp>
 static std::array<Events, 2> events;

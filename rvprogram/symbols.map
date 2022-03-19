@@ -20,6 +20,8 @@ test_threads_args1
 test_threads_args2
 test_memcpy
 test_syscall_memcpy
+test_memset
+test_syscall_memset
 
 event_loop
 add_work

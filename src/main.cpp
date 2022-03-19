@@ -83,10 +83,12 @@ extern void test_7_riscv_1();
 extern void test_7_riscv_2();
 extern void test_7_lua_1();
 extern void test_7_lua_2();
-extern void test_8_riscv();
-extern void test_8_native_riscv();
-extern void test_8_lua();
-extern void test_9_native_sieve();
+extern void test_8_memcpy_riscv();
+extern void test_8_memcpy_native_riscv();
+extern void test_8_memcpy_lua();
+extern void test_9_memset_riscv();
+extern void test_9_memset_native_riscv();
+extern void test_9_memset_lua();
 
 //const char* TEST_BINARY = "../rvprogram/build_clang/rvbinary";
 #ifdef RUST_BINARY
@@ -96,7 +98,7 @@ const char* TEST_BINARY = "../rvprogram/build/rvbinary";
 #endif
 
 static constexpr bool test_libriscv = true;
-static constexpr bool test_lua = true;
+static constexpr bool test_lua = false;
 #ifdef LUAJIT
 #define LUANAME "luajit"
 #else
@@ -146,7 +148,7 @@ int main()
 		run_test("libriscv: fp math", ROH, S, test_setup, test_3_riscv_math2);
 		run_test("libriscv: exp math", ROH, S, test_setup, test_3_riscv_math3);
 		run_test("libriscv: fib(40)", ROH, S, test_setup, test_3_riscv_fib);
-		run_test("libriscv: taylor(1K)", ROH, S, test_setup, test_3_riscv_taylor);
+		//run_test("libriscv: taylor(1K)", ROH, S, test_setup, test_3_riscv_taylor);
 	}
 	if constexpr (test_lua) {
 		run_test(LUANAME ": integer math", LOH, S, test_setup, test_3_lua_math1);
@@ -189,16 +191,22 @@ int main()
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
-		run_test("libriscv: naive memcpy", ROH, S, test_setup, test_8_riscv);
-		run_test("libriscv: syscall memcpy", ROH, S, test_setup, test_8_native_riscv);
+		run_test("libriscv: naive memcpy", ROH, S, test_setup, test_8_memcpy_riscv);
+		run_test("libriscv: syscall memcpy", ROH, S, test_setup, test_8_memcpy_native_riscv);
 	}
 	if constexpr (test_lua) {
-		run_test(LUANAME ": memcpy", LOH, S, test_setup, test_8_lua);
+		run_test(LUANAME ": memcpy", LOH, S, test_setup, test_8_memcpy_lua);
+	}
+	if constexpr (test_libriscv) {
+		run_test("libriscv: syscall memset", ROH, S, test_setup, test_9_memset_native_riscv);
+		run_test("libriscv: naive memset", ROH, S, test_setup, test_9_memset_riscv);
+	}
+	if constexpr (test_lua) {
+		run_test(LUANAME ": memset", LOH, S, test_setup, test_9_memset_lua);
 	}
 	printf("\n");
-	//slow_test<10>("native: sieve(10M)", 1, test_setup, test_9_native_sieve);
 	if constexpr (test_libriscv) {
-		slow_test<10>("libriscv: sieve(10M)", 1, test_setup, test_3_riscv_sieve);
+		//slow_test<10>("libriscv: sieve(10M)", 1, test_setup, test_3_riscv_sieve);
 	}
 	if constexpr (test_lua) {
 		slow_test<10>(LUANAME ": sieve(10M)", 1, test_setup, test_3_lua_sieve);
