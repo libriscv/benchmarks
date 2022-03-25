@@ -148,7 +148,7 @@ int main()
 		run_test("libriscv: fp math", ROH, S, test_setup, test_3_riscv_math2);
 		run_test("libriscv: exp math", ROH, S, test_setup, test_3_riscv_math3);
 		run_test("libriscv: fib(40)", ROH, S, test_setup, test_3_riscv_fib);
-		//run_test("libriscv: taylor(1K)", ROH, S, test_setup, test_3_riscv_taylor);
+		run_test("libriscv: taylor(1K)", ROH, S, test_setup, test_3_riscv_taylor);
 	}
 	if constexpr (test_lua) {
 		run_test(LUANAME ": integer math", LOH, S, test_setup, test_3_lua_math1);
