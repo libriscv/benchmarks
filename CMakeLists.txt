@@ -49,7 +49,7 @@ if (PGO)
 endif()
 
 option(RISCV_BINARY_TRANSLATION "" OFF)
-option(RISCV_USE_RH_HASH "" ON)
+#option(RISCV_USE_RH_HASH "" ON)
 option(RISCV_EXPERIMENTAL "" ON)
 option(RISCV_EXT_C "" OFF)
 add_subdirectory(ext/libriscv/lib libriscv)

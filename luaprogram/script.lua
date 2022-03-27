@@ -126,3 +126,12 @@ function test_memcpy()
 		dst[i] = src[i]
 	end
 end
+
+# Not sure if we should reset the array on each
+# benchmark iteration, but for now make it look good
+msrc = {}    -- new array
+function test_memset()
+	for i=1, 300 do
+		msrc[i] = 0
+	end
+end
