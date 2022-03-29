@@ -128,8 +128,8 @@ void run_selftest()
 	machine.preempt(machine.address_of("add_work"));
 
 	printf("Resuming event loop...!\n");
-	machine.simulate(1000);
-	machine.simulate(1000);
+	machine.simulate<false>(1000);
+	machine.simulate<false>(1000);
 	machine.preempt(machine.address_of("add_work"));
-	machine.simulate(1000);
+	machine.simulate<false>(1000);
 }
