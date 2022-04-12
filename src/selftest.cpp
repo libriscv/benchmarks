@@ -14,6 +14,7 @@ static void setup_selftest_machine(machine_t& machine)
 	machine.setup_native_heap(1, 0x40000000, 8*1024*1024);
 	machine.setup_native_memory(6);
 	machine.setup_native_threads(21);
+	machine.cpu.reset_stack_pointer();
 	machine.setup_argv({});
 }
 
@@ -102,7 +103,7 @@ void run_selftest()
 		exit(1);
 	}
 
-	long primes = machine.vmcall("test_sieve", 10000000);
+	long primes = machine.vmcall("test_sieve", 10'000'000);
 	if (primes != 664579) {
 		printf("Wrong number of primes from Sieve: %ld\n", primes);
 		exit(1);

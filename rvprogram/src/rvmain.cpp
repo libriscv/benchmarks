@@ -4,26 +4,15 @@
 #include <microthread.hpp>
 #include <cstdio>
 #include <climits>
-inline void stop() {
+inline void halt() {
+	// Clobber memory because wake-ups can have things changed
 	asm (".insn i SYSTEM, 0, x0, x0, 0x7ff" ::: "memory");
-	__builtin_unreachable();
 }
 template <typename T> inline void stop_with_value(T x) {
 	register long __a0 asm("a0") = (long) x;
-	asm volatile(".insn i SYSTEM, 0, x0, x0, 0x7ff" :: "r"(__a0));
-	__builtin_unreachable();
+	asm (".insn i SYSTEM, 0, x0, x0, 0x7ff" :: "r"(__a0));
 }
-
-#if defined(__clang__)
-#define NORMAL_FUNCTIONS
-#endif
-#define PUBLIC_API extern "C" __attribute__((used))
-
-#ifdef NORMAL_FUNCTIONS
-#define FAST_API extern "C" __attribute__((used))
-#else
-#define FAST_API extern "C" __attribute__((used, naked))
-#endif
+#define PUBLIC_API extern "C" __attribute__((used, retain))
 
 #define PRINT(x) sys_print(x, __builtin_strlen(x))
 
@@ -181,7 +170,19 @@ PUBLIC_API long test_sieve(const long N)
 	{
 		if (UNLIKELY(prime[n])) {
 			nprimes += 1;
-			for (long i = 2*n; i < N; i += n)
+			long i = 2*n;
+			// Slight unroll, branches are expensive
+			while (i + n*4 < N) {
+				prime[i] = false;
+				i += n;
+				prime[i] = false;
+				i += n;
+				prime[i] = false;
+				i += n;
+				prime[i] = false;
+				i += n;
+			}
+			for (; i < N; i += n)
 				prime[i] = false;
 		}
 	}
@@ -331,7 +332,7 @@ PUBLIC_API void event_loop()
 		PRINT("event_loop: Checking for work\n");
 		for (auto& ev : events) ev.handle();
 		PRINT("event_loop: Going to sleep!\n");
-		stop();
+		halt();
 	}
 }
 

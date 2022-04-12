@@ -113,9 +113,11 @@ int main()
 	long riscv_overhead = 0;
 	long lua_overhead = 0;
 
-	if constexpr (test_libriscv) {
+	if constexpr (test_libriscv || test_sieve) {
 		run_selftest();
 		printf("RISC-V self-test OK\n");
+	}
+	if constexpr (test_libriscv) {
 		run_test("libriscv: fork", 0, S, test_setup, bench_fork);
 		run_test("libriscv: install syscall", 0, S, test_setup, bench_install_syscall);
 		riscv_overhead =
@@ -206,10 +208,10 @@ int main()
 		run_test(LUANAME ": memset", LOH, S, test_setup, test_9_memset_lua);
 	}
 	printf("\n");
-	if constexpr (test_libriscv && test_sieve) {
+	if constexpr (test_sieve) {
 		slow_test<10>("libriscv: sieve(10M)", 1, test_setup, test_3_riscv_sieve);
 	}
-	if constexpr (test_lua && test_sieve) {
+	if constexpr (test_sieve) {
 		slow_test<10>(LUANAME ": sieve(10M)", 1, test_setup, test_3_lua_sieve);
 	}
 	printf("\n");
