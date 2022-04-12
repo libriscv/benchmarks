@@ -3,7 +3,7 @@
 #include <vector>
 static constexpr bool test_libriscv = true;
 static constexpr bool test_lua = true;
-static constexpr bool test_sieve = false;
+static constexpr bool test_sieve = true;
 
 template <size_t TIMES = 1000>
 static long
