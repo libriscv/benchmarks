@@ -5,6 +5,7 @@
 #include <vector>
 
 using test_func = void(*)();
+using mips_func = uint64_t(*)();
 using test_result = long;
 
 inline timespec time_now();
@@ -24,6 +25,30 @@ perform_test(test_func func)
 	auto t1 = time_now();
 	asm("" : : : "memory");
 	return nanodiff(t0, t1);
+}
+
+template <int ROUNDS = 2000> inline float
+measure_mips(const char* name, test_func setup, mips_func func)
+{
+	setup();
+	func();
+
+	uint64_t instructions = 0;
+	asm("" : : : "memory");
+	auto t0 = time_now();
+	asm("" : : : "memory");
+	for (int i = 0; i < ROUNDS; i++) {
+		instructions += func();
+	}
+	asm("" : : : "memory");
+	auto t1 = time_now();
+	asm("" : : : "memory");
+
+	double ts = nanodiff(t0, t1) / 1.0e9;
+	double mips = instructions / ts / 1e6;
+
+	printf("%32s\tinstr %lu, time %f, %f mip/s\n", name, instructions, ts, mips);
+	return mips;
 }
 
 inline std::vector<uint8_t> load_file(const std::string& filename)

@@ -50,6 +50,7 @@ slow_test(const char* name, int samples, test_func setup, test_func execone)
 /* TESTS */
 extern void run_selftest();
 extern void test_setup();
+extern uint64_t riscv_measure_mips();
 extern void bench_fork();
 extern void bench_install_syscall();
 extern void test_1_riscv_empty();
@@ -116,6 +117,13 @@ int main()
 	if constexpr (test_libriscv || test_sieve) {
 		run_selftest();
 		printf("RISC-V self-test OK\n");
+	}
+	if constexpr (test_libriscv) {
+		measure_mips("libriscv: mips", test_setup, riscv_measure_mips);
+		run_test("libriscv: install syscall", 0, S, test_setup, bench_install_syscall);
+		riscv_overhead =
+			run_test("libriscv: call overhead", 0, S, test_setup, test_1_riscv_empty);
+		run_test("libriscv: lookup overhead", 0, S, test_setup, test_1_riscv_lookup);
 	}
 	if constexpr (test_libriscv) {
 		run_test("libriscv: fork", 0, S, test_setup, bench_fork);

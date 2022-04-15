@@ -323,6 +323,19 @@ PUBLIC_API void test_syscall_memset()
 	memset(memset_array, 0, sizeof(memset_array));
 }
 
+PUBLIC_API long measure_mips(int n)
+{
+	auto func = [] (int n, int acc = 0, int prev = 1, auto& self)
+	{
+		if (n < 1)
+			return acc;
+		else
+			return self(n - 1, prev + acc, acc, self);
+	};
+
+	return func(n, 0, 1, func);
+}
+
 #include <include/event_loop.hpp>
 static std::array<Events, 2> events;
 

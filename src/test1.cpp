@@ -145,6 +145,13 @@ void test_setup()
 	reset_native_tests();
 }
 
+uint64_t riscv_measure_mips()
+{
+	machine->reset_instruction_counter();
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "measure_mips"), 64000);
+	return machine->instruction_counter();
+}
 void bench_fork()
 {
 	riscv::Machine<CPUBITS> other {*machine, {

@@ -3,6 +3,7 @@ fastexit
 
 selftest
 
+measure_mips
 empty_function
 test
 test_args
