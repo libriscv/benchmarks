@@ -85,9 +85,8 @@ void test_setup()
 		rvbinary = load_file(TEST_BINARY);
 	}
 	delete machine;
-	machine = new machine_t {rvbinary, {
+	machine = new machine_t {rvbinary, MachineOptions<CPUBITS>{
 		.memory_max = 32*1024*1024,
-		.instruction_fusing = true,
 #ifdef RISCV_BINARY_TRANSLATION
 		.block_size_treshold = 5,
 		.forward_jumps = true
