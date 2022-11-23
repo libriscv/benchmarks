@@ -104,7 +104,7 @@ const char* TEST_BINARY = "../rvprogram/build/rvbinary";
 #ifdef LUAJIT
 #define LUANAME "luajit"
 #else
-#define LUANAME "lua5.4"
+#define LUANAME "lua5.3"
 #endif
 
 int main()
@@ -124,13 +124,7 @@ int main()
 		riscv_overhead =
 			run_test("libriscv: call overhead", 0, S, test_setup, test_1_riscv_empty);
 		run_test("libriscv: lookup overhead", 0, S, test_setup, test_1_riscv_lookup);
-	}
-	if constexpr (test_libriscv) {
 		run_test("libriscv: fork", 0, S, test_setup, bench_fork);
-		run_test("libriscv: install syscall", 0, S, test_setup, bench_install_syscall);
-		riscv_overhead =
-			run_test("libriscv: call overhead", 0, S, test_setup, test_1_riscv_empty);
-		run_test("libriscv: lookup overhead", 0, S, test_setup, test_1_riscv_lookup);
 	}
 	if constexpr (test_lua) {
 		lua_overhead =
