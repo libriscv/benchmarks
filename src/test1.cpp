@@ -89,7 +89,6 @@ void test_setup()
 		.memory_max = 32*1024*1024,
 #ifdef RISCV_BINARY_TRANSLATION
 		.block_size_treshold = 5,
-		.forward_jumps = true
 #endif
 	}};
 

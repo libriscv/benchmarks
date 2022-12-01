@@ -123,7 +123,7 @@ int main()
 		run_test("libriscv: install syscall", 0, S, test_setup, bench_install_syscall);
 		riscv_overhead =
 			run_test("libriscv: call overhead", 0, S, test_setup, test_1_riscv_empty);
-		run_test("libriscv: lookup overhead", 0, S, test_setup, test_1_riscv_lookup);
+		//run_test("libriscv: lookup overhead", 0, S, test_setup, test_1_riscv_lookup);
 		run_test("libriscv: fork", 0, S, test_setup, bench_fork);
 	}
 	if constexpr (test_lua) {
