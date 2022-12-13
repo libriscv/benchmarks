@@ -65,40 +65,6 @@ void run_selftest()
 			machine.set_result(0);
 		});
 
-	return;
-	printf("Testing serialization\n");
-	for (int i = 0; i < 10; i++)
-	{
-		// verify serialization works
-		std::vector<uint8_t> mstate;
-		machine.serialize_to(mstate);
-
-		// create new blank machine
-		machine_t other {rvbinary, { .memory_max = 16*1024*1024 }};
-		setup_selftest_machine(other);
-		// deserialize into new machine (which needs setting up first)
-		other.deserialize_from(mstate);
-
-	#ifdef RISCV_DEBUG
-		other.verbose_instructions = true;
-	#endif
-		try {
-			int ret = other.vmcall("selftest", 1234, 5678.0, 5ull);
-			if (ret != 666) {
-				printf("Deserialized self-test did not return the correct value\n");
-				printf("Got %d instead\n", ret);
-				exit(1);
-			}
-		} catch (riscv::MachineException& me) {
-			printf(">>> Machine exception %d: %s (data: 0x%lX)\n",
-					me.type(), me.what(), me.data());
-#ifdef RISCV_DEBUG
-			other.print_and_pause();
-#endif
-			exit(1);
-		}
-	}
-
 	long fib = machine.vmcall("test_fib", 40, 0, 1);
 	if (fib != 102334155) {
 		printf("Wrong fibonacci sequence totals: %ld\n", fib);

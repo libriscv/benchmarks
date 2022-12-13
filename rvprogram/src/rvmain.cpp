@@ -145,7 +145,7 @@ PUBLIC_API float test_maffs3(float arg1, float arg2, float arg3)
 }
 PUBLIC_API int32_t test_fib(int32_t n, int32_t acc = 0, int32_t prev = 1)
 {
-	if (n < 1)
+	if (n == 0)
 		return acc;
 	else
 		return test_fib(n - 1, prev + acc, acc);
@@ -325,15 +325,7 @@ PUBLIC_API void test_syscall_memset()
 
 PUBLIC_API long measure_mips(int n)
 {
-	auto func = [] (int n, int acc = 0, int prev = 1, auto& self)
-	{
-		if (n < 1)
-			return acc;
-		else
-			return self(n - 1, prev + acc, acc, self);
-	};
-
-	return func(n, 0, 1, func);
+	return test_fib(n, 0, 1);
 }
 
 #include <include/event_loop.hpp>
