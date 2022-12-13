@@ -136,6 +136,11 @@ void test_setup()
 	test_1_syscall_addr = machine->address_of("test_syscall");
 	test_3_fib_addr = machine->address_of("test_fib");
 
+	auto fast_exit = machine->address_of("fast_exit");
+	if (fast_exit != 0x0) {
+		machine->memory.set_exit_address(fast_exit);
+	}
+
 	delete luascript;
 	luascript = new Script("../luaprogram/script.lua");
 

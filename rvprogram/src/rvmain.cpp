@@ -354,3 +354,8 @@ PUBLIC_API void add_work()
 	PRINT("add_work: Not adding work this time\n");
 	stop_with_value<bool> (false);
 }
+
+PUBLIC_API long fast_exit(long code)
+{
+	halt();
+}
