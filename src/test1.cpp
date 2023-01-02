@@ -3,6 +3,7 @@
 #include "include/crc32.hpp"
 #include <libriscv/machine.hpp>
 #include <libriscv/cached_address.hpp>
+#include <libriscv/prepared_call.hpp>
 #include <cmath>
 using namespace riscv;
 static constexpr int CPUBITS = riscv::RISCV32;
@@ -10,6 +11,9 @@ using machine_t = Machine<CPUBITS>;
 
 static std::vector<uint8_t> rvbinary;
 static machine_t* machine = nullptr;
+static uint32_t generation = 0;
+static riscv::PreparedCall<CPUBITS> prepper;
+
 static uint32_t test_1_empty_addr = 0x0;
 static uint32_t test_1_syscall_addr = 0x0;
 static uint32_t test_1_address = 0x0;
@@ -18,6 +22,10 @@ static uint32_t test_3_fib_addr = 0x0;
 static Script* luascript = nullptr;
 extern const char* TEST_BINARY;
 static const std::string str("This is a string");
+static const struct Test {
+	int32_t a = 222;
+	int64_t b = 666;
+} test;
 
 template <int W>
 void syscall_print(Machine<W>& machine)
@@ -91,6 +99,10 @@ void test_setup()
 		.block_size_treshold = 5,
 #endif
 	}};
+	generation++;
+
+	prepper.prepare(*machine, "test_args",
+		"This is a string", test, 333, 444, 555, 666, 777, 888);
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	machine->setup_minimal_syscalls();
@@ -208,27 +220,50 @@ void test_1_lua()
 void test_2_riscv()
 {
 	static CachedAddress<CPUBITS> fa;
-	const struct Test {
-		int32_t a = 222;
-		int64_t b = 666;
-	} test;
-#ifdef RISCV_DEBUG
-	try {
-		int ret =
-		machine->vmcall(fa.get(*machine, "test_args"), "This is a string", test,
-									333, 444, 555, 666, 777, 888);
-		if (ret != 666) abort();
-	} catch (riscv::MachineException& me) {
-		printf(">>> test_2 Machine exception %d: %s (data: %d)\n",
-				me.type(), me.what(), me.data());
-		machine->print_and_pause();
-	}
-#else
 	int ret =
-	machine->vmcall(fa.get(*machine, "test_args"), "This is a string", test,
-								333, 444, 555, 666, 777, 888);
+	machine->vmcall(fa.get(*machine, "test_args"),
+		"This is a string", test,
+		333, 444, 555, 666, 777, 888);
 	if (ret != 666) abort();
-#endif
+}
+void test_2_1_riscv()
+{
+	static riscv::PreparedCall<CPUBITS> prepper;
+	static uint32_t pgen = ~0;
+	if (generation != pgen) {
+		pgen = generation;
+		prepper.prepare(*machine, "test_args",
+			"This is a string", test,
+			333, 444, 555, 666, 777, 888);
+	}
+	int ret = prepper.vmcall();
+	if (ret != 666) abort();
+}
+void test_2_2_riscv()
+{
+	static riscv::PreparedCall<CPUBITS> prepper;
+	static uint32_t pgen = ~0;
+	if (generation != pgen) {
+		pgen = generation;
+		prepper.prepare(*machine, "test_args",
+			"This is a string", test,
+			333, 444, 555, 666, 777, 888);
+	}
+	int ret = prepper.vmcall();
+	if (ret != 666) abort();
+}
+void test_2_3_riscv()
+{
+	static riscv::PreparedCall<CPUBITS> prepper;
+	static uint32_t pgen = ~0;
+	if (generation != pgen) {
+		pgen = generation;
+		prepper.prepare(*machine, "test_args",
+			"This is a string", test,
+			333, 444, 555, 666, 777, 888);
+	}
+	int ret = prepper.vmcall();
+	if (ret != 666) abort();
 }
 void test_2_lua()
 {

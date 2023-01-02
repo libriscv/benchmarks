@@ -60,6 +60,9 @@ extern void test_1_native();
 extern void test_1_riscv_direct();
 extern void test_1_lua();
 extern void test_2_riscv();
+extern void test_2_1_riscv();
+extern void test_2_2_riscv();
+extern void test_2_3_riscv();
 extern void test_2_lua();
 extern void test_3_riscv();
 extern void test_3_riscv_math2();
@@ -143,6 +146,9 @@ int main()
 	printf("\n");
 	if constexpr (test_libriscv) {
 		run_test("libriscv: many arguments", ROH, S, test_setup, test_2_riscv);
+		run_test("libriscv: prepared arguments", ROH, S, test_setup, test_2_1_riscv);
+		run_test("libriscv: prepared arguments", ROH, S, test_setup, test_2_2_riscv);
+		run_test("libriscv: prepared arguments", ROH, S, test_setup, test_2_3_riscv);
 	}
 	if constexpr (test_lua) {
 		run_test(LUANAME ": many arguments", LOH, S, test_setup, test_2_lua);
