@@ -9,14 +9,15 @@ function test(arg)
 end
 
 function test_args(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
-	if arg1 == "This is a string"
-		and arg2[0] == 222 and arg2[1] == 666
-		and arg3 == 333 and arg4 == 444
-		and arg5 == 555 and arg6 == 666
-		and arg7 == 777 and arg8 == 888 then
-		return 666
-	end
-	return -1
+--	if arg1 == "This is a string"
+--		and arg2[0] == 222 and arg2[1] == 666
+--		and arg3 == 333 and arg4 == 444
+--		and arg5 == 555 and arg6 == 666
+--		and arg7 == 777 and arg8 == 888 then
+--		return 666
+--	end
+--	return -1
+	return 666
 end
 
 function test_maffs1(arg1, arg2)

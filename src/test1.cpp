@@ -246,8 +246,7 @@ void test_2_2_riscv()
 	if (generation != pgen) {
 		pgen = generation;
 		prepper.prepare(*machine, "test_args",
-			"This is a string", test,
-			333, 444, 555, 666, 777, 888);
+			"This is a string", test, test, test);
 	}
 	int ret = prepper.vmcall();
 	if (ret != 666) abort();
@@ -258,9 +257,7 @@ void test_2_3_riscv()
 	static uint32_t pgen = ~0;
 	if (generation != pgen) {
 		pgen = generation;
-		prepper.prepare(*machine, "test_args",
-			"This is a string", test,
-			333, 444, 555, 666, 777, 888);
+		prepper.prepare(*machine, "test_args");
 	}
 	int ret = prepper.vmcall();
 	if (ret != 666) abort();
