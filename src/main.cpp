@@ -57,7 +57,8 @@ extern void test_1_riscv_empty();
 extern void test_1_riscv_lookup();
 extern void test_1_lua_empty();
 extern void test_1_native();
-extern void test_1_riscv_direct();
+extern void test_1_riscv_array();
+extern void test_1_riscv_vector();
 extern void test_1_lua();
 extern void test_2_riscv();
 extern void test_2_1_riscv();
@@ -138,7 +139,8 @@ int main()
 	printf("\n");
 	run_test("native: array append", 0, S, test_setup, test_1_native);
 	if constexpr (test_libriscv) {
-		run_test("libriscv: array append", ROH, S, test_setup, test_1_riscv_direct);
+		run_test("libriscv: array append", ROH, S, test_setup, test_1_riscv_array);
+		run_test("libriscv: vector append", ROH, S, test_setup, test_1_riscv_vector);
 	}
 	if constexpr (test_lua) {
 		run_test(LUANAME ": table append", LOH, S, test_setup, test_1_lua);

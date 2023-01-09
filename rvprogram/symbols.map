@@ -5,7 +5,8 @@ selftest
 
 measure_mips
 empty_function
-test
+test_array_append
+test_vector_append
 test_args
 test_maffs1
 test_maffs2

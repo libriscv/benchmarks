@@ -48,7 +48,8 @@ int test_main(int argc, char**)
 	if (argc > 0)
 	{
 		static const char test_string[] = "1234";
-		int cmp = sys_strcmp(test_string, sizeof(test_string)-1, "1234");
+		[[maybe_unused]] int cmp =
+			sys_strcmp(test_string, sizeof(test_string)-1, "1234");
 		assert(cmp == 0);
 	}
 	return 0;
@@ -56,8 +57,8 @@ int test_main(int argc, char**)
 
 PUBLIC_API long selftest(int i, float f, long long number)
 {
-	uint64_t value = 555ull / number;
-	static int bss = 0;
+	[[maybe_unused]] uint64_t value = 555ull / number;
+	[[maybe_unused]] static int bss = 0;
 	assert(i == 1234);
 	assert(f == 5678.0);
 	assert(bss == 0);
@@ -65,8 +66,9 @@ PUBLIC_API long selftest(int i, float f, long long number)
 	assert(bss == 0);
 
 	// test sending a 64-bit integral value
-	static const uint64_t testvalue = 0x5678000012340000;
-	assert(syscall(40, testvalue, testvalue >> 32) == 0);
+	[[maybe_unused]] static const uint64_t testvalue = 0x5678000012340000;
+	auto test64 = syscall(40, testvalue, testvalue >> 32);
+	assert(test64 == 0);
 
 	static int changeme = 444;
 	microthread::oneshot(
@@ -102,14 +104,24 @@ PUBLIC_API void empty_function()
 
 static const char str[] = "This is a string";
 
+// Array-based append
 #include <array>
 static std::array<int, 2048> array;
-static unsigned counter = 0;
+static unsigned acounter = 0;
 
-PUBLIC_API void test(int arg1)
+PUBLIC_API void test_array_append(int arg1)
 {
 	// Bounds-check not strictly necessary, as test is run 2000 times.
-	array.at(counter++) = arg1;
+	array.at(acounter++) = arg1;
+}
+// Vector-based append
+#include <vector>
+static std::vector<int> vec(2048);
+static unsigned vcounter = 0;
+
+PUBLIC_API void test_vector_append(int arg1)
+{
+	vec.at(vcounter++) = arg1;
 }
 
 struct Test {
@@ -359,4 +371,5 @@ PUBLIC_API void add_work()
 PUBLIC_API long fast_exit(long code)
 {
 	halt();
+	__builtin_unreachable();
 }

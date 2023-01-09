@@ -16,7 +16,8 @@ static riscv::PreparedCall<CPUBITS> prepper;
 
 static uint32_t test_1_empty_addr = 0x0;
 static uint32_t test_1_syscall_addr = 0x0;
-static uint32_t test_1_address = 0x0;
+static uint32_t test_1_array_addr = 0x0;
+static uint32_t test_1_vector_addr = 0x0;
 static uint32_t test_3_fib_addr = 0x0;
 
 static Script* luascript = nullptr;
@@ -133,7 +134,8 @@ void test_setup()
 	assert(machine->cpu.reg(10) == 0);
 
 	assert(machine->address_of("empty_function") != 0);
-	assert(machine->address_of("test") != 0);
+	assert(machine->address_of("test_array_append") != 0);
+	assert(machine->address_of("test_vector_append") != 0);
 	assert(machine->address_of("test_args") != 0);
 	assert(machine->address_of("test_maffs1") != 0);
 	assert(machine->address_of("test_maffs2") != 0);
@@ -144,7 +146,8 @@ void test_setup()
 	assert(machine->address_of("test_memcpy") != 0);
 	assert(machine->address_of("test_syscall_memcpy") != 0);
 	test_1_empty_addr = machine->address_of("empty_function");
-	test_1_address = machine->address_of("test");
+	test_1_array_addr = machine->address_of("test_array_append");
+	test_1_vector_addr = machine->address_of("test_vector_append");
 	test_1_syscall_addr = machine->address_of("test_syscall");
 	test_3_fib_addr = machine->address_of("test_fib");
 
@@ -208,9 +211,13 @@ void test_1_lua_empty()
 	luascript->call("empty_function");
 }
 
-void test_1_riscv_direct()
+void test_1_riscv_array()
 {
-	machine->vmcall(test_1_address, 555);
+	machine->vmcall(test_1_array_addr, 555);
+}
+void test_1_riscv_vector()
+{
+	machine->vmcall(test_1_vector_addr, 555);
 }
 void test_1_lua()
 {
