@@ -27,7 +27,7 @@ inline long sys_longcall(const char* data, int b, int c, int d, int e, int f, in
 }
 inline long sys_nada()
 {
-	return syscall(42);
+	return syscall1(42);
 }
 inline float sys_fmod(float a1, float a2)
 {
