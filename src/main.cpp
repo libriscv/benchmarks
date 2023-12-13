@@ -5,7 +5,7 @@ static constexpr bool test_libriscv = true;
 static constexpr bool test_lua = true;
 static constexpr bool test_sieve = true;
 
-template <size_t TIMES = 1000>
+template <size_t TIMES = 1200>
 static long
 run_test(const char* name, long overhead, int samples, test_func setup, test_func execone)
 {
@@ -50,13 +50,14 @@ slow_test(const char* name, int samples, test_func setup, test_func execone)
 /* TESTS */
 extern void run_selftest();
 extern void test_setup();
+extern void test_setup_resume();
 extern uint64_t riscv_measure_mips();
 extern void bench_fork();
 extern void bench_install_syscall();
 extern void test_1_riscv_empty();
 extern void test_1_riscv_lookup();
 extern void test_1_lua_empty();
-extern void test_1_native();
+extern void test_1_riscv_resume();
 extern void test_1_riscv_array();
 extern void test_1_riscv_vector();
 extern void test_1_lua();
@@ -114,14 +115,17 @@ const char* TEST_BINARY = "../rvprogram/build/rvbinary";
 int main()
 {
 	const int S = 200;
-	printf("* All benchmark results are measured in %dx2000 samples\n", S);
+	printf("* All benchmark results are measured in %dx1200 samples\n", S);
 	long riscv_overhead = 0;
 	long lua_overhead = 0;
+	const long BOH =
+		run_test("benchmark overhead", 0, S, [] {}, [] {});
 
 	if constexpr (test_libriscv || test_sieve) {
 		run_selftest();
 		printf("RISC-V self-test OK\n");
 	}
+
 	if constexpr (test_libriscv) {
 		measure_mips("libriscv: mips", test_setup, riscv_measure_mips);
 		run_test("libriscv: install syscall", 0, S, test_setup, bench_install_syscall);
@@ -129,6 +133,7 @@ int main()
 			run_test("libriscv: call overhead", 0, S, test_setup, test_1_riscv_empty);
 		//run_test("libriscv: lookup overhead", 0, S, test_setup, test_1_riscv_lookup);
 		run_test("libriscv: fork", 0, S, test_setup, bench_fork);
+		run_test("libriscv: resume execution", BOH, S, test_setup_resume, test_1_riscv_resume);
 	}
 	if constexpr (test_lua) {
 		lua_overhead =
@@ -137,7 +142,6 @@ int main()
 	const long ROH = riscv_overhead;
 	const long LOH = lua_overhead;
 	printf("\n");
-	run_test("native: array append", 0, S, test_setup, test_1_native);
 	if constexpr (test_libriscv) {
 		run_test("libriscv: array append", ROH, S, test_setup, test_1_riscv_array);
 		run_test("libriscv: vector append", ROH, S, test_setup, test_1_riscv_vector);

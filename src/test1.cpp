@@ -99,6 +99,7 @@ void test_setup()
 #ifdef RISCV_BINARY_TRANSLATION
 		.block_size_treshold = 5,
 #endif
+		.default_exit_function = "fast_exit",
 	}};
 	generation++;
 
@@ -133,6 +134,8 @@ void test_setup()
 	}
 	assert(machine->cpu.reg(10) == 0);
 
+	machine->set_max_instructions(5'000'000ULL);
+
 	assert(machine->address_of("empty_function") != 0);
 	assert(machine->address_of("test_array_append") != 0);
 	assert(machine->address_of("test_vector_append") != 0);
@@ -151,16 +154,16 @@ void test_setup()
 	test_1_syscall_addr = machine->address_of("test_syscall");
 	test_3_fib_addr = machine->address_of("test_fib");
 
-	auto fast_exit = machine->address_of("fast_exit");
-	if (fast_exit != 0x0) {
-		machine->memory.set_exit_address(fast_exit);
-	}
-
 	delete luascript;
 	luascript = new Script("../luaprogram/script.lua");
 
 	extern void reset_native_tests();
 	reset_native_tests();
+}
+void test_setup_resume()
+{
+	test_setup();
+	machine->vmcall<5'000'000ULL, false>("resumable_function");
 }
 
 uint64_t riscv_measure_mips()
@@ -209,6 +212,10 @@ void test_1_riscv_lookup()
 void test_1_lua_empty()
 {
 	luascript->call("empty_function");
+}
+void test_1_riscv_resume()
+{
+	machine->cpu.simulate();
 }
 
 void test_1_riscv_array()

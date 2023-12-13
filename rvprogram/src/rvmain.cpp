@@ -102,6 +102,11 @@ PUBLIC_API void empty_function()
 {
 }
 
+PUBLIC_API void resumable_function()
+{
+	while (true) halt();
+}
+
 static const char str[] = "This is a string";
 
 // Array-based append
