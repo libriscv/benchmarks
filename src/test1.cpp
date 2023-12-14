@@ -96,12 +96,16 @@ void test_setup()
 	delete machine;
 	machine = new machine_t {rvbinary, MachineOptions<CPUBITS>{
 		.memory_max = 32*1024*1024,
+		.default_exit_function = "fast_exit",
 #ifdef RISCV_BINARY_TRANSLATION
 		.block_size_treshold = 5,
 #endif
-		.default_exit_function = "fast_exit",
 	}};
 	generation++;
+
+	if (machine->memory.exit_address() != machine->address_of("fast_exit")) {
+		throw std::runtime_error("'fast_exit' was not found in the RISC-V benchmark program");
+	}
 
 	prepper.prepare(*machine, "test_args",
 		"This is a string", test, 333, 444, 555, 666, 777, 888);
@@ -120,6 +124,7 @@ void test_setup()
 	machine->install_syscall_handler(43, syscall_fmod<CPUBITS>);
 	machine->install_syscall_handler(44, syscall_powf<CPUBITS>);
 	machine->install_syscall_handler(45, syscall_strcmp<CPUBITS>);
+
 	machine->setup_argv({"rvprogram"});
 
 	try {
@@ -179,27 +184,6 @@ void bench_fork()
 
 	}};
 }
-void bench_install_syscall()
-{
-	machine->install_syscall_handlers({
-		{0,	[] (auto&) {
-		}},
-		{1,	[] (auto&) {
-		}},
-		{2,	[] (auto&) {
-		}},
-		{3,	[] (auto&) {
-		}},
-		{4,	[] (auto&) {
-		}},
-		{5,	[] (auto&) {
-		}},
-		{6,	[] (auto&) {
-		}},
-		{7,	[] (auto&) {
-		}}
-	});
-}
 
 void test_1_riscv_empty()
 {
@@ -215,7 +199,7 @@ void test_1_lua_empty()
 }
 void test_1_riscv_resume()
 {
-	machine->cpu.simulate();
+	machine->simulate(5'000ULL);
 }
 
 void test_1_riscv_array()
