@@ -94,11 +94,11 @@ void run_selftest()
 	printf("Calling into event loop...!\n");
 	machine.vmcall("event_loop");
 
-	machine.preempt(machine.address_of("add_work"));
+	machine.preempt(2000, machine.address_of("add_work"));
 
 	printf("Resuming event loop...!\n");
 	machine.simulate<false>(1000);
 	machine.simulate<false>(1000);
-	machine.preempt(machine.address_of("add_work"));
+	machine.preempt(2000, machine.address_of("add_work"));
 	machine.simulate<false>(1000);
 }

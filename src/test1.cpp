@@ -168,7 +168,8 @@ void test_setup()
 void test_setup_resume()
 {
 	test_setup();
-	machine->vmcall<5'000'000ULL, false>("resumable_function");
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall<5'000'000ULL, false>(fa.get(*machine, "resumable_function"));
 }
 
 uint64_t riscv_measure_mips()
