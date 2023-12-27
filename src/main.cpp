@@ -60,10 +60,9 @@ extern void test_1_riscv_resume();
 extern void test_1_riscv_array();
 extern void test_1_riscv_vector();
 extern void test_1_lua();
-extern void test_2_riscv();
-extern void test_2_1_riscv();
-extern void test_2_2_riscv();
-extern void test_2_3_riscv();
+extern void test_2_1_riscv_args();
+extern void test_2_2_riscv_stored();
+extern void test_2_3_riscv_prepared();
 extern void test_2_lua();
 extern void test_3_riscv();
 extern void test_3_riscv_math2();
@@ -149,13 +148,12 @@ int main()
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
-		run_test("libriscv: many arguments", ROH, S, test_setup, test_2_riscv);
-		run_test("libriscv: prepared arguments", ROH, S, test_setup, test_2_1_riscv);
-		run_test("libriscv: prepared arguments", ROH, S, test_setup, test_2_2_riscv);
-		run_test("libriscv: prepared arguments", ROH, S, test_setup, test_2_3_riscv);
+		run_test("libriscv: 8x arguments", ROH, S, test_setup, test_2_1_riscv_args);
+		run_test("libriscv: 8x stored args", ROH, S, test_setup, test_2_2_riscv_stored);
+		run_test("libriscv: 8x prepared args", ROH, S, test_setup, test_2_3_riscv_prepared);
 	}
 	if constexpr (test_lua) {
-		run_test(LUANAME ": many arguments", LOH, S, test_setup, test_2_lua);
+		run_test(LUANAME ": 8x arguments", LOH, S, test_setup, test_2_lua);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {

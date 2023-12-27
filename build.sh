@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-export CXX=clang++-12
 set -e
 
 mkdir -p build_clang

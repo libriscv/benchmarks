@@ -11,8 +11,6 @@ using machine_t = Machine<CPUBITS>;
 
 static std::vector<uint8_t> rvbinary;
 static machine_t* machine = nullptr;
-static uint32_t generation = 0;
-static riscv::PreparedCall<CPUBITS> prepper;
 
 static uint32_t test_1_empty_addr = 0x0;
 static uint32_t test_1_syscall_addr = 0x0;
@@ -27,6 +25,8 @@ static const struct Test {
 	int32_t a = 222;
 	int64_t b = 666;
 } test;
+static riscv::PreparedCall<CPUBITS, int(const char*, Test, int, int, int, int, int, int)> prepper;
+static riscv::StoredCall<CPUBITS> stored;
 
 template <int W>
 void syscall_print(Machine<W>& machine)
@@ -101,14 +101,10 @@ void test_setup()
 		.block_size_treshold = 5,
 #endif
 	}};
-	generation++;
 
-	if (machine->memory.exit_address() != machine->address_of("fast_exit")) {
+	if (machine->memory.exit_address() != machine->address_of("fast_exit") || machine->memory.exit_address() == 0x0) {
 		throw std::runtime_error("'fast_exit' was not found in the RISC-V benchmark program");
 	}
-
-	prepper.prepare(*machine, "test_args",
-		"This is a string", test, 333, 444, 555, 666, 777, 888);
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	machine->setup_minimal_syscalls();
@@ -139,8 +135,6 @@ void test_setup()
 	}
 	assert(machine->cpu.reg(10) == 0);
 
-	machine->set_max_instructions(5'000'000ULL);
-
 	assert(machine->address_of("empty_function") != 0);
 	assert(machine->address_of("test_array_append") != 0);
 	assert(machine->address_of("test_vector_append") != 0);
@@ -158,6 +152,13 @@ void test_setup()
 	test_1_vector_addr = machine->address_of("test_vector_append");
 	test_1_syscall_addr = machine->address_of("test_syscall");
 	test_3_fib_addr = machine->address_of("test_fib");
+
+	prepper.prepare(*machine, "test_args");
+	stored.store(*machine, "test_args",
+		"This is a string", test,
+		333, 444, 555, 666, 777, 888);
+
+	machine->set_max_instructions(5'000'000ULL);
 
 	delete luascript;
 	luascript = new Script("../luaprogram/script.lua");
@@ -216,49 +217,22 @@ void test_1_lua()
 	luascript->call("test", 555);
 }
 
-void test_2_riscv()
+void test_2_1_riscv_args()
 {
 	static CachedAddress<CPUBITS> fa;
-	int ret =
-	machine->vmcall(fa.get(*machine, "test_args"),
-		"This is a string", test,
-		333, 444, 555, 666, 777, 888);
+	int ret = machine->vmcall(fa.get(*machine, "test_args"),
+		"This is a string", test, 333, 444, 555, 666, 777, 888);
 	if (ret != 666) abort();
 }
-void test_2_1_riscv()
+void test_2_2_riscv_stored()
 {
-	static riscv::PreparedCall<CPUBITS> prepper;
-	static uint32_t pgen = ~0;
-	if (generation != pgen) {
-		pgen = generation;
-		prepper.prepare(*machine, "test_args",
-			"This is a string", test,
-			333, 444, 555, 666, 777, 888);
-	}
-	int ret = prepper.vmcall();
+	int ret = stored.vmcall();
 	if (ret != 666) abort();
 }
-void test_2_2_riscv()
+void test_2_3_riscv_prepared()
 {
-	static riscv::PreparedCall<CPUBITS> prepper;
-	static uint32_t pgen = ~0;
-	if (generation != pgen) {
-		pgen = generation;
-		prepper.prepare(*machine, "test_args",
-			"This is a string", test, test, test);
-	}
-	int ret = prepper.vmcall();
-	if (ret != 666) abort();
-}
-void test_2_3_riscv()
-{
-	static riscv::PreparedCall<CPUBITS> prepper;
-	static uint32_t pgen = ~0;
-	if (generation != pgen) {
-		pgen = generation;
-		prepper.prepare(*machine, "test_args");
-	}
-	int ret = prepper.vmcall();
+	int ret = prepper.vmcall(
+		"This is a string", test, 333, 444, 555, 666, 777, 888);
 	if (ret != 666) abort();
 }
 void test_2_lua()
