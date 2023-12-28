@@ -10,3 +10,5 @@ pushd build
 cmake .. -DGCC_TRIPLE=$GCC_TRIPLE -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake
 make -j4
 popd
+
+cp build/rvbinary ..

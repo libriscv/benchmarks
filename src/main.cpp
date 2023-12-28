@@ -100,8 +100,7 @@ extern void test_9_memset_lua();
 #ifdef RUST_BINARY
 const char* TEST_BINARY = "../rvprogram/rustbin/target/riscv32imac-unknown-none-elf/release/rustbin";
 #else
-//const char* TEST_BINARY = "../rvprogram/build_clang/rvbinary";
-const char* TEST_BINARY = "../rvprogram/build/rvbinary";
+const char* TEST_BINARY = "../rvbinary";
 #endif
 
 #ifdef LUAJIT
