@@ -10,9 +10,9 @@ option(PROFILING   "Profiling mode" OFF)
 option(RUST_BINARY "Benchmark with Rust binary" OFF)
 option(USE_LUAJIT  "Benchmark using LuaJIT" ON)
 
-set(OPTIMIZE  "-O2 -gdwarf-4")
+set(OPTIMIZE  "-O3 -gdwarf-4")
 set(COMMON    "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS "${COMMON} ${OPTIMIZE} -std=c++17")
+set(CMAKE_CXX_FLAGS "${COMMON} ${OPTIMIZE} -std=gnu++20")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
