@@ -187,9 +187,14 @@ void bench_fork()
 	}};
 }
 
-void test_1_riscv_empty()
+void test_1_riscv_vmcall_empty()
 {
 	machine->vmcall(test_1_empty_addr);
+}
+void test_1_riscv_preempt_empty()
+{
+	machine->reset_instruction_counter();
+	machine->preempt(UINT64_MAX, test_1_empty_addr);
 }
 void test_1_riscv_lookup()
 {
