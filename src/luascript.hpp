@@ -12,7 +12,7 @@ extern "C" {
 #include <lua5.3/lualib.h>
 #endif
 }
-#include <LuaBridge.h>
+#include <LuaBridge/LuaBridge.h>
 
 class Script {
 public:

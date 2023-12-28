@@ -241,7 +241,7 @@ void test_2_lua()
 	tab[0] = 222;
 	tab[1] = 666;
 	auto ret =
-	luascript->retcall("test_args", "This is a string",
+	luascript->retcall("test_args", std::string("This is a string"),
 			tab, 333, 444, 555, 666, 777, 888);
 	if ((int) ret != 666) abort();
 }

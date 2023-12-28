@@ -55,5 +55,9 @@ inline void setup_minimal_syscalls(Machine<W>& machine)
 }
 
 /* le sigh */
+#ifdef RISCV_32I
 template void setup_minimal_syscalls<4>(Machine<4>&);
+#endif
+#ifdef RISCV_64I
 template void setup_minimal_syscalls<8>(Machine<8>&);
+#endif
