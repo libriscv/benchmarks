@@ -51,6 +51,8 @@ endif()
 option(RISCV_BINARY_TRANSLATION "" OFF)
 option(RISCV_EXPERIMENTAL "" ON)
 option(RISCV_EXT_C "" OFF)
+option(RISCV_32I "" ON)
+option(RISCV_64I "" OFF)
 add_subdirectory(ext/libriscv/lib libriscv)
 
 set(SOURCES

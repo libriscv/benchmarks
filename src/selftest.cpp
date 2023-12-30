@@ -5,7 +5,7 @@ static constexpr int CPUBITS = riscv::RISCV32;
 using machine_t = Machine<CPUBITS>;
 
 //static const char* TEST_BINARY = "../rvprogram/rustbin/target/CPUBITSimac-unknown-none-elf/debug/rustbin";
-static const char* TEST_BINARY = "../rvprogram/build/rvbinary";
+static const char* TEST_BINARY = "../rvbinary";
 
 static void setup_selftest_machine(machine_t& machine)
 {
