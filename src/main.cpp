@@ -174,11 +174,11 @@ int main()
 	printf("\n");
 	if constexpr (test_libriscv) {
 		run_test("libriscv: syscall overhead", ROH, S, test_setup, test_4_riscv_syscall);
-		run_test("libriscv: syscall print", ROH, S, test_setup, test_4_riscv);
+		run_test("libriscv: syscall string", ROH, S, test_setup, test_4_riscv);
 	}
 	if constexpr (test_lua) {
 		run_test(LUANAME ": syscall overhead", LOH, S, test_setup, test_4_lua_syscall);
-		run_test(LUANAME ": syscall print", LOH, S, test_setup, test_4_lua);
+		run_test(LUANAME ": syscall string", LOH, S, test_setup, test_4_lua);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {

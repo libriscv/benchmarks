@@ -31,23 +31,19 @@ static riscv::StoredCall<CPUBITS> stored;
 template <int W>
 void syscall_print(Machine<W>& machine)
 {
-	// get string directly from memory, with max-length
-	const auto rvs = machine.template sysarg<riscv::Buffer>(0);
-	// for the sequential case just use compare against string_view
-	if (rvs.is_sequential()) {
-		if (str != rvs.strview())
-			abort();
-	}
-	else if (str != rvs.to_string()) {
+	// get string_view directly from memory, with max-length
+	const auto view = machine.template sysarg<std::string_view>(0);
+	if (str != view)
 		abort();
-	}
 }
 template <int W>
 void syscall_longcall(Machine<W>& machine)
 {
 	const auto address = machine.template sysarg<address_type<W>>(0);
+	// it's a zero-terminated string
+	const auto view = machine.memory.rvview(address, str.size()+1);
 	// compare using memcmp because we have a known length
-	if (UNLIKELY(machine.memory.memcmp(str.data(), address, str.size()))) {
+	if (std::memcmp(str.data(), view.begin(), str.size()+1)) {
 		abort();
 	}
 }
@@ -109,7 +105,9 @@ void test_setup()
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	machine->setup_minimal_syscalls();
 
-	machine->setup_native_heap(1, 0x40000000, 32*1024*1024);
+	static const uint32_t HEAP_SIZE = 16ull*1024*1024;
+	const auto heap_base = machine->memory.mmap_allocate(HEAP_SIZE);
+	machine->setup_native_heap(1, heap_base, HEAP_SIZE);
 	machine->setup_native_memory(6);
 	machine->setup_native_threads(21);
 
@@ -183,7 +181,7 @@ uint64_t riscv_measure_mips()
 void bench_fork()
 {
 	riscv::Machine<CPUBITS> other {*machine, {
-
+		.use_memory_arena = false
 	}};
 }
 
