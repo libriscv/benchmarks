@@ -9,6 +9,7 @@ option(PGO         "Generate PGO binary" OFF)
 option(PROFILING   "Profiling mode" OFF)
 option(RUST_BINARY "Benchmark with Rust binary" OFF)
 option(USE_LUAJIT  "Benchmark using LuaJIT" ON)
+option(USE_LUAU    "Benchmark using LuaU from Roblox" OFF)
 
 set(OPTIMIZE  "-O3 -gdwarf-4")
 set(COMMON    "-Wall -Wextra")
@@ -55,6 +56,8 @@ option(RISCV_32I "" ON)
 option(RISCV_64I "" OFF)
 add_subdirectory(ext/libriscv/lib libriscv)
 
+add_subdirectory(ext/LuaBridge3/Source LuaBridge3)
+
 set(SOURCES
 	src/main.cpp
 	src/native.cpp
@@ -66,13 +69,19 @@ set(SOURCES
 
 
 add_executable(bench ${SOURCES})
-target_include_directories(bench PRIVATE ext/LuaBridge/Source)
-target_include_directories(bench PRIVATE ext/libriscv/emulator/syscalls)
-target_link_libraries(bench riscv)
+#target_include_directories(bench PRIVATE ext/libriscv/emulator/syscalls)
+target_link_libraries(bench riscv LuaBridge)
 # for some reason this causes -std=gnu++1z
 #set_target_properties(bench PROPERTIES CXX_STANDARD 17)
 
-if (USE_LUAJIT)
+
+if (USE_LUAU)
+	option(LUAU_BUILD_CLI "" OFF)
+	option(LUAU_BUILD_TESTS "" OFF)
+	add_subdirectory(ext/luau luau)
+	target_link_libraries(bench Luau.VM Luau.Compiler)
+	target_compile_definitions(bench PRIVATE LUAU=1)
+elseif (USE_LUAJIT)
 	find_library(LUAJIT luajit-5.1 REQUIRED)
 	target_link_libraries(bench ${LUAJIT})
 	target_include_directories(bench PRIVATE ${LUAJIT_INCLUDE_DIRS})

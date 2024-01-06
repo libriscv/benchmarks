@@ -27,7 +27,7 @@ perform_test(test_func func)
 	return nanodiff(t0, t1);
 }
 
-template <int ROUNDS = 2000> inline float
+template <int ROUNDS = 5000> inline float
 measure_mips(const char* name, test_func setup, mips_func func)
 {
 	setup();

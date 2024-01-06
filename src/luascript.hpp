@@ -2,7 +2,10 @@
 #include <stdexcept>
 #include <string>
 extern "C" {
-#ifdef LUAJIT
+#if defined(LUAU)
+#include "lua.h"
+#include "lualib.h"
+#elif defined(LUAJIT)
 #include <luajit-2.1/lauxlib.h>
 #include <luajit-2.1/lua.h>
 #include <luajit-2.1/lualib.h>
@@ -19,7 +22,7 @@ public:
     // call any script function, with any parameters
     // returns lua reference
     template <typename... Args>
-    inline luabridge::LuaRef retcall(const std::string& name, Args&&...);
+    inline luabridge::LuaResult retcall(const std::string& name, Args&&...);
     // returns nada
     template <typename... Args>
     inline void call(const std::string& name, Args&&...);
@@ -38,7 +41,7 @@ private:
 };
 
 template <typename... Args>
-inline luabridge::LuaRef Script::retcall(const std::string& name, Args&&... args)
+inline luabridge::LuaResult Script::retcall(const std::string& name, Args&&... args)
 {
     auto lref = luabridge::getGlobal(this->state, name.c_str());
     if (lref.isNil()) throw std::runtime_error(std::string("LUA: '") + name + "' did not exist");

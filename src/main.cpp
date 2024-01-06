@@ -104,7 +104,9 @@ const char* TEST_BINARY = "../rvprogram/rustbin/target/riscv32imac-unknown-none-
 const char* TEST_BINARY = "../rvbinary";
 #endif
 
-#ifdef LUAJIT
+#ifdef LUAU
+#define LUANAME "luau"
+#elif defined(LUAJIT)
 #define LUANAME "luajit"
 #else
 #define LUANAME "lua5.3"

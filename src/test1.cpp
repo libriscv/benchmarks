@@ -246,7 +246,7 @@ void test_2_lua()
 	auto ret =
 	luascript->retcall("test_args", std::string("This is a string"),
 			tab, 333, 444, 555, 666, 777, 888);
-	if ((int) ret != 666) abort();
+	if (int(ret[0]) != 666) abort();
 }
 
 void test_3_riscv()

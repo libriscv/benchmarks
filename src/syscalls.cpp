@@ -12,20 +12,13 @@ void syscall_exit(Machine<W>& machine)
 template <int W>
 void syscall_write(Machine<W>& machine)
 {
-	auto [fd, address, len] = machine.template sysargs<int, address_type<W>, address_type<W>> ();
-	SYSPRINT("SYSCALL write: addr = 0x%X, len = %zu\n", address, len);
+	auto [fd, view] = machine.template sysargs<int, std::string_view> ();
 	// we only accept standard pipes, for now :)
 	if (fd >= 0 && fd < 3) {
-		const size_t len_g = std::min((size_t) 1024u, (size_t) len);
-		machine.memory.memview(address, len_g,
-			[] (auto& mem, auto* data, size_t len) {
-				mem.machine().print((const char*) data, len);
-				//state->output.append((char*) data, len);
 #ifdef RISCV_DEBUG
-				(void) write(0, data, len);
+		(void) write(0, view.begin(), view.size());
 #endif
-			});
-		machine.set_result(len_g);
+		machine.set_result(view.size());
 		return;
 	}
 	machine.set_result(-EBADF);

@@ -1,5 +1,9 @@
 #include "luascript.hpp"
+#include "testhelp.hpp"
 #include <cstdio>
+#ifdef LUAU
+#include "Luau/Compiler.h"
+#endif
 
 using namespace luabridge;
 
@@ -26,11 +30,15 @@ Script::Script(const std::string& file)
 {
 	this->state = luaL_newstate();
 	luaL_openlibs(this->state);
+#ifdef LUAU
+	//luaL_sandboxthread(this->state);
+#else
 	lua_sethook(this->state,
 	[] (lua_State* state, lua_Debug*) {
 		fprintf(stderr, "Lua timeout\n");
 		exit(1);
 	}, LUA_MASKCOUNT, INT32_MAX);
+#endif
 	// add engine common script
 	if (add_file(file) == false)
 	{
@@ -50,11 +58,24 @@ Script::~Script()
 
 bool Script::add_file(std::string file)
 {
+#ifdef LUAU
+	auto vec = load_file(file);
+	const std::string source { (const char *)vec.data(), vec.size() };
+	const auto bytecode = Luau::compile(source, {
+		.optimizationLevel = 2
+	});
+	if (luau_load(this->state, file.c_str(), bytecode.c_str(), bytecode.size(), 0) || lua_pcall(this->state, 0, LUA_MULTRET, 0))
+	{
+		fprintf(stderr, "\nWARNING:\n  %s\n\n", lua_tostring(this->state, -1));
+		return false;
+	}
+#else
 	// add script file
 	if (luaL_loadfile(this->state, file.c_str()) || lua_pcall(this->state, 0, LUA_MULTRET, 0))
 	{
 		fprintf(stderr, "\nWARNING:\n  %s\n\n", lua_tostring(this->state, -1));
 		return false;
 	}
+#endif
 	return true;
 }
