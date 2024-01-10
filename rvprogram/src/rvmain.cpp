@@ -178,9 +178,9 @@ PUBLIC_API double test_taylor(int n)
 	}
 	return 4.0 * sum;
 }
+static bool prime[10'000'000];
 PUBLIC_API long test_sieve(const long N)
 {
-	bool prime[10'000'000];
 	memset(prime, true, sizeof(prime));
 	long nprimes = 0;
 	for (long n = 2; n < N; n++)
