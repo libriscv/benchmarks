@@ -23,13 +23,19 @@ public:
     // returns lua reference
     template <typename... Args>
     inline luabridge::LuaResult retcall(const std::string& name, Args&&...);
+
     // returns nada
     template <typename... Args>
     inline void call(const std::string& name, Args&&...);
+    template <typename... Args>
+    inline void call(luabridge::LuaRef& callable, Args&&...);
 
     // create Lua object
     auto ref() const { return luabridge::LuaRef(this->state); }
     auto new_table() const { return luabridge::newTable(this->state); }
+
+	// get global by name
+	auto getGlobal(const std::string& name) const { return luabridge::getGlobal(this->state, name.c_str()); }
 
     bool add_file(std::string file);
 
@@ -55,4 +61,10 @@ inline void Script::call(const std::string& name, Args&&... args)
     auto lref = luabridge::getGlobal(this->state, name.c_str());
     if (lref.isNil()) throw std::runtime_error(std::string("LUA: '") + name + "' did not exist");
     lref(std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+inline void Script::call(luabridge::LuaRef& callable, Args&&... args)
+{
+    callable(std::forward<Args>(args)...);
 }

@@ -1,3 +1,5 @@
+jit.off(true, true)
+
 array = {}
 
 function empty_function()

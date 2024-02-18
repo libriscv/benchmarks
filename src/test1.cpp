@@ -19,6 +19,7 @@ static uint32_t test_1_vector_addr = 0x0;
 static uint32_t test_3_fib_addr = 0x0;
 
 static Script* luascript = nullptr;
+static luabridge::LuaRef* lua_callable = nullptr;
 extern const char* TEST_BINARY;
 static const std::string str("This is a string");
 static const struct Test {
@@ -158,8 +159,10 @@ void test_setup()
 
 	machine->set_max_instructions(5'000'000ULL);
 
+	delete lua_callable;
 	delete luascript;
 	luascript = new Script("../luaprogram/script.lua");
+	lua_callable = new luabridge::LuaRef(luascript->getGlobal("empty_function"));
 
 	extern void reset_native_tests();
 	reset_native_tests();
@@ -200,6 +203,7 @@ void test_1_riscv_lookup()
 }
 void test_1_lua_empty()
 {
+	//luascript->call(*lua_callable);
 	luascript->call("empty_function");
 }
 void test_1_riscv_resume()
