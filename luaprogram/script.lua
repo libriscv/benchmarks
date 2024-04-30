@@ -1,4 +1,4 @@
-jit.off(true, true)
+-- jit.off(true, true)
 
 array = {}
 

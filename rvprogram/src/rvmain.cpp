@@ -346,13 +346,13 @@ PUBLIC_API long measure_mips(int n)
 }
 
 #include <include/event_loop.hpp>
-static std::array<Events, 2> events;
+static std::array<Events<16>, 2> events;
 
 PUBLIC_API void event_loop()
 {
 	while (true) {
 		PRINT("event_loop: Checking for work\n");
-		for (auto& ev : events) ev.handle();
+		for (auto& ev : events) ev.consume_work();
 		PRINT("event_loop: Going to sleep!\n");
 		halt();
 	}
@@ -360,14 +360,14 @@ PUBLIC_API void event_loop()
 
 PUBLIC_API void add_work()
 {
-	Events::Work work {
+	Events<16>::Work work {
 		[] {
 			PRINT("work: Doing some work!\n");
 		}
 	};
 	PRINT("add_work: Adding work\n");
 	for (auto& ev : events)
-		if (ev.delegate(work)) stop_with_value<bool> (true);
+		if (ev.add(work)) stop_with_value<bool> (true);
 	PRINT("add_work: Not adding work this time\n");
 	stop_with_value<bool> (false);
 }
