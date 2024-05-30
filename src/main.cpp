@@ -139,9 +139,14 @@ int main()
 		lua_overhead =
 			run_test(LUANAME ": call overhead", 0, S, test_setup, test_1_lua_empty);
 	}
+
+	printf("\n"
+		"After this point, call overhead is subtracted from every benchmark result for both libriscv and Lua\n"
+		"\n");
+
 	const long ROH = riscv_overhead;
 	const long LOH = lua_overhead;
-	printf("\n");
+
 	if constexpr (test_libriscv) {
 		run_test("libriscv: array append", ROH, S, test_setup, test_1_riscv_array);
 		run_test("libriscv: vector append", ROH, S, test_setup, test_1_riscv_vector);
