@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <vector>
 static constexpr bool test_libriscv = true;
-static constexpr bool test_lua = true;
+static constexpr bool test_lua = false;
 static constexpr bool test_sieve = true;
 
 template <size_t TIMES = 1200>
@@ -226,10 +226,10 @@ int main()
 		run_test(LUANAME ": memset", LOH, S, test_setup, test_9_memset_lua);
 	}
 	printf("\n");
-	if constexpr (test_sieve) {
+	if constexpr (test_sieve && test_libriscv) {
 		slow_test<10>("libriscv: sieve(10M)", 1, test_setup, test_3_riscv_sieve);
 	}
-	if constexpr (test_sieve) {
+	if constexpr (test_sieve && test_lua) {
 		slow_test<10>(LUANAME ": sieve(10M)", 1, test_setup, test_3_lua_sieve);
 	}
 	printf("\n");

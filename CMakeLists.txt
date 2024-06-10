@@ -10,6 +10,8 @@ option(PROFILING   "Profiling mode" OFF)
 option(RUST_BINARY "Benchmark with Rust binary" OFF)
 option(USE_LUAJIT  "Benchmark using LuaJIT" ON)
 option(USE_LUAU    "Benchmark using LuaU from Roblox" OFF)
+option(USE_LUA     "Benchmark using regular Lua" OFF)
+option(CROSS_COMPILE_WIN32 "Cross compile for Windows" OFF)
 
 set(OPTIMIZE  "-O3 -gdwarf-4")
 set(COMMON    "-Wall -Wextra")
@@ -49,6 +51,10 @@ if (PGO)
 	endif()
 endif()
 
+if (CROSS_COMPILE_WIN32)
+	set(MINGW_TOOLCHAIN ON)
+endif()
+
 option(RISCV_BINARY_TRANSLATION "" OFF)
 option(RISCV_EXPERIMENTAL "" ON)
 option(RISCV_EXT_C "" OFF)
@@ -61,19 +67,25 @@ add_subdirectory(ext/LuaBridge3/Source LuaBridge3)
 set(SOURCES
 	src/main.cpp
 	src/native.cpp
-	src/luascript.cpp
 	src/selftest.cpp
 	src/syscalls.cpp
 	src/test1.cpp
 )
-
+if (NOT CROSS_COMPILE_WIN32)
+	list(APPEND SOURCES
+		src/luascript.cpp
+	)
+endif()
 
 add_executable(bench ${SOURCES})
 #target_include_directories(bench PRIVATE ext/libriscv/emulator/syscalls)
 target_link_libraries(bench riscv LuaBridge)
 # for some reason this causes -std=gnu++1z
 #set_target_properties(bench PROPERTIES CXX_STANDARD 17)
-
+if (CROSS_COMPILE_WIN32)
+	target_compile_definitions(bench PRIVATE WIN32=1 LUA_DISABLED=1)
+	target_link_libraries(bench -static)
+endif()
 
 if (USE_LUAU)
 	option(LUAU_BUILD_CLI "" OFF)
@@ -86,12 +98,12 @@ elseif (USE_LUAJIT)
 	target_link_libraries(bench ${LUAJIT})
 	target_include_directories(bench PRIVATE ${LUAJIT_INCLUDE_DIRS})
 	target_compile_definitions(bench PRIVATE LUAJIT=1)
-else()
+elseif (USE_LUA)
 	find_library(LUA lua5.3 REQUIRED)
 	target_link_libraries(bench ${LUA})
 	target_include_directories(bench PRIVATE ${LUA_INCLUDE_DIRS})
-endif()
 
+endif()
 
 if (LTO)
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

@@ -1,10 +1,12 @@
-#include "luascript.hpp"
 #include "testhelp.hpp"
 #include "include/crc32.hpp"
 #include <libriscv/machine.hpp>
 #include <libriscv/cached_address.hpp>
 #include <libriscv/prepared_call.hpp>
 #include <cmath>
+#ifndef LUA_DISABLED
+#include "luascript.hpp"
+#endif
 using namespace riscv;
 static constexpr int CPUBITS = riscv::RISCV32;
 using machine_t = Machine<CPUBITS>;
@@ -18,8 +20,10 @@ static uint32_t test_1_array_addr = 0x0;
 static uint32_t test_1_vector_addr = 0x0;
 static uint32_t test_3_fib_addr = 0x0;
 
+#ifndef LUA_DISABLED
 static Script* luascript = nullptr;
 static luabridge::LuaRef* lua_callable = nullptr;
+#endif
 extern const char* TEST_BINARY;
 static const std::string str("This is a string");
 static const struct Test {
@@ -94,9 +98,6 @@ void test_setup()
 	machine = new machine_t {rvbinary, MachineOptions<CPUBITS>{
 		.memory_max = 32*1024*1024,
 		.default_exit_function = "fast_exit",
-#ifdef RISCV_BINARY_TRANSLATION
-		.block_size_treshold = 5,
-#endif
 	}};
 
 	if (machine->memory.exit_address() != machine->address_of("fast_exit") || machine->memory.exit_address() == 0x0) {
@@ -159,10 +160,12 @@ void test_setup()
 
 	machine->set_max_instructions(5'000'000ULL);
 
+#ifndef LUA_DISABLED
 	delete lua_callable;
 	delete luascript;
 	luascript = new Script("../luaprogram/script.lua");
 	lua_callable = new luabridge::LuaRef(luascript->getGlobal("empty_function"));
+#endif
 
 	extern void reset_native_tests();
 	reset_native_tests();
@@ -201,11 +204,6 @@ void test_1_riscv_lookup()
 {
 	machine->vmcall("empty_function");
 }
-void test_1_lua_empty()
-{
-	//luascript->call(*lua_callable);
-	luascript->call("empty_function");
-}
 void test_1_riscv_resume()
 {
 	machine->simulate(5'000ULL);
@@ -218,10 +216,6 @@ void test_1_riscv_array()
 void test_1_riscv_vector()
 {
 	machine->vmcall(test_1_vector_addr, 555);
-}
-void test_1_lua()
-{
-	luascript->call("test", 555);
 }
 
 void test_2_1_riscv_args()
@@ -241,16 +235,6 @@ void test_2_3_riscv_prepared()
 	int ret = prepper.vmcall(
 		"This is a string", test, 333, 444, 555, 666, 777, 888);
 	if (ret != 666) abort();
-}
-void test_2_lua()
-{
-	auto tab = luascript->new_table();
-	tab[0] = 222;
-	tab[1] = 666;
-	auto ret =
-	luascript->retcall("test_args", std::string("This is a string"),
-			tab, 333, 444, 555, 666, 777, 888);
-	if (int(ret[0]) != 666) abort();
 }
 
 void test_3_riscv()
@@ -293,6 +277,81 @@ void test_3_riscv_taylor()
 	machine->vmcall(fa.get(*machine, "test_taylor"), 1000);
 }
 
+void test_4_riscv_syscall()
+{
+	machine->vmcall(test_1_syscall_addr);
+}
+void test_4_riscv()
+{
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_print"));
+}
+
+void test_5_riscv()
+{
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_longcall"));
+}
+
+void test_6_riscv()
+{
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_threads"));
+}
+
+void test_7_riscv_1()
+{
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_threads_args1"));
+}
+void test_7_riscv_2()
+{
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_threads_args2"));
+}
+
+void test_8_memcpy_riscv()
+{
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_memcpy"));
+}
+void test_8_memcpy_native_riscv()
+{
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_syscall_memcpy"));
+}
+
+void test_9_memset_riscv()
+{
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_memset"));
+}
+void test_9_memset_native_riscv()
+{
+	static CachedAddress<CPUBITS> fa;
+	machine->vmcall(fa.get(*machine, "test_syscall_memset"));
+}
+
+#ifndef LUA_DISABLED
+void test_1_lua_empty()
+{
+	//luascript->call(*lua_callable);
+	luascript->call("empty_function");
+}
+void test_1_lua()
+{
+	luascript->call("test", 555);
+}
+void test_2_lua()
+{
+	auto tab = luascript->new_table();
+	tab[0] = 222;
+	tab[1] = 666;
+	auto ret =
+	luascript->retcall("test_args", std::string("This is a string"),
+			tab, 333, 444, 555, 666, 777, 888);
+	if (int(ret[0]) != 666) abort();
+}
 void test_3_lua_math1()
 {
 	luascript->call("test_maffs1", 111, 222);
@@ -317,16 +376,6 @@ void test_3_lua_sieve()
 {
 	luascript->call("test_sieve", 10000000);
 }
-
-void test_4_riscv_syscall()
-{
-	machine->vmcall(test_1_syscall_addr);
-}
-void test_4_riscv()
-{
-	static CachedAddress<CPUBITS> fa;
-	machine->vmcall(fa.get(*machine, "test_print"));
-}
 void test_4_lua()
 {
 	luascript->call("test_print");
@@ -335,36 +384,13 @@ void test_4_lua_syscall()
 {
 	luascript->call("test_syscall");
 }
-
-void test_5_riscv()
-{
-	static CachedAddress<CPUBITS> fa;
-	machine->vmcall(fa.get(*machine, "test_longcall"));
-}
 void test_5_lua()
 {
 	luascript->call("test_longcall");
 }
-
-void test_6_riscv()
-{
-	static CachedAddress<CPUBITS> fa;
-	machine->vmcall(fa.get(*machine, "test_threads"));
-}
 void test_6_lua()
 {
 	luascript->call("test_threads");
-}
-
-void test_7_riscv_1()
-{
-	static CachedAddress<CPUBITS> fa;
-	machine->vmcall(fa.get(*machine, "test_threads_args1"));
-}
-void test_7_riscv_2()
-{
-	static CachedAddress<CPUBITS> fa;
-	machine->vmcall(fa.get(*machine, "test_threads_args2"));
 }
 void test_7_lua_1()
 {
@@ -374,33 +400,12 @@ void test_7_lua_2()
 {
 	luascript->call("test_threads_args2");
 }
-
-void test_8_memcpy_riscv()
-{
-	static CachedAddress<CPUBITS> fa;
-	machine->vmcall(fa.get(*machine, "test_memcpy"));
-}
-void test_8_memcpy_native_riscv()
-{
-	static CachedAddress<CPUBITS> fa;
-	machine->vmcall(fa.get(*machine, "test_syscall_memcpy"));
-}
 void test_8_memcpy_lua()
 {
 	luascript->call("test_memcpy");
-}
-
-void test_9_memset_riscv()
-{
-	static CachedAddress<CPUBITS> fa;
-	machine->vmcall(fa.get(*machine, "test_memset"));
-}
-void test_9_memset_native_riscv()
-{
-	static CachedAddress<CPUBITS> fa;
-	machine->vmcall(fa.get(*machine, "test_syscall_memset"));
 }
 void test_9_memset_lua()
 {
 	luascript->call("test_memset");
 }
+#endif

@@ -1,15 +1,34 @@
+#pragma once
+#include <chrono>
 #include <stdexcept>
 #include <string>
 #include <time.h>
 #include <unistd.h>
 #include <vector>
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 using test_func = void(*)();
 using mips_func = uint64_t(*)();
-using test_result = long;
+using test_result = int64_t;
+using time_point = std::chrono::time_point<std::chrono::high_resolution_clock>;
 
-inline timespec time_now();
-inline long nanodiff(timespec start_time, timespec end_time);
+inline auto time_now()
+{
+#ifdef WIN32
+	auto hperfclock = []() -> int64_t {
+		LARGE_INTEGER t, f;
+		QueryPerformanceCounter(&t);
+		QueryPerformanceFrequency(&f);
+		return t.QuadPart * 1000000000 / f.QuadPart;
+	};
+	return time_point(std::chrono::nanoseconds(hperfclock()));
+#else
+	return std::chrono::high_resolution_clock::now();
+#endif
+}
+inline int64_t nanodiff(time_point start_time, time_point end_time);
 
 template <int ROUNDS = 2000> inline test_result
 perform_test(test_func func)
@@ -71,13 +90,7 @@ inline std::vector<uint8_t> load_file(const std::string& filename)
     return result;
 }
 
-timespec time_now()
+int64_t nanodiff(time_point start_time, time_point end_time)
 {
-	timespec t;
-	clock_gettime(CLOCK_THREAD_CPUTIME_ID, &t);
-	return t;
-}
-long nanodiff(timespec start_time, timespec end_time)
-{
-	return (end_time.tv_sec - start_time.tv_sec) * (long)1e9 + (end_time.tv_nsec - start_time.tv_nsec);
+	return std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count();
 }
