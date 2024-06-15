@@ -170,11 +170,11 @@ PUBLIC_API int32_t test_fib(int32_t n, int32_t acc = 0, int32_t prev = 1)
 PUBLIC_API double test_taylor(int n)
 {
 	double sum = 1.0;
-	for (int i = 1; i < n;) {
-		sum += -1.0 / (2.0 * (i++) + 1.0);
-		sum +=  1.0 / (2.0 * (i++) + 1.0);
-		sum += -1.0 / (2.0 * (i++) + 1.0);
-		sum +=  1.0 / (2.0 * (i++) + 1.0);
+	for (int i = 1; i < n; i += 4) {
+		sum += -1.0 / (2 * (i + 0) + 1);
+		sum +=  1.0 / (2 * (i + 1) + 1);
+		sum += -1.0 / (2 * (i + 2) + 1);
+		sum +=  1.0 / (2 * (i + 3) + 1);
 	}
 	return 4.0 * sum;
 }

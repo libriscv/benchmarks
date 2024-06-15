@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <vector>
 static constexpr bool test_libriscv = true;
-static constexpr bool test_lua = false;
+static constexpr bool test_lua = true;
 static constexpr bool test_sieve = true;
 
 template <size_t TIMES = 1200>
