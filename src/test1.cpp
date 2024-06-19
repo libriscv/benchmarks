@@ -13,6 +13,7 @@ using machine_t = Machine<CPUBITS>;
 
 static std::vector<uint8_t> rvbinary;
 static machine_t* machine = nullptr;
+static machine_t* machine_that_holds_execute_segment = nullptr;
 
 static uint32_t test_1_empty_addr = 0x0;
 static uint32_t test_1_syscall_addr = 0x0;
@@ -93,6 +94,11 @@ void test_setup()
 {
 	if (rvbinary.empty()) {
 		rvbinary = load_file(TEST_BINARY);
+		// Keep one machine always alive to keep the main execute segment referenced
+		machine_that_holds_execute_segment = new machine_t {rvbinary, MachineOptions<CPUBITS>{
+			.memory_max = 32*1024*1024,
+			.default_exit_function = "fast_exit",
+		}};
 	}
 	delete machine;
 	machine = new machine_t {rvbinary, MachineOptions<CPUBITS>{
