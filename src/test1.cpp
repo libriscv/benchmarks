@@ -31,7 +31,6 @@ static const struct Test {
 	int32_t a = 222;
 	int64_t b = 666;
 } test;
-static riscv::PreparedCall<CPUBITS, int(const char*, Test, int, int, int, int, int, int)> prepper;
 static riscv::StoredCall<CPUBITS> stored;
 
 template <int W>
@@ -90,6 +89,8 @@ void syscall_strcmp(Machine<W>& machine)
 	}
 }
 
+static std::unique_ptr<PreparedCall<CPUBITS, int(const char*, Test, int, int, int, int, int, int)>> caller_test_2_3 = nullptr;
+static std::unique_ptr<PreparedCall<CPUBITS, void()>> caller_test_1_empty;
 void test_setup()
 {
 	if (rvbinary.empty()) {
@@ -159,10 +160,12 @@ void test_setup()
 	test_1_syscall_addr = machine->address_of("test_syscall");
 	test_3_fib_addr = machine->address_of("test_fib");
 
-	prepper.prepare(*machine, "test_args");
 	stored.store(*machine, "test_args",
 		"This is a string", test,
 		333, 444, 555, 666, 777, 888);
+
+	caller_test_1_empty = std::make_unique<PreparedCall<CPUBITS, void()>>(*machine, "empty_function");
+	caller_test_2_3 = std::make_unique<PreparedCall<CPUBITS, int(const char*, Test, int, int, int, int, int, int)>>(*machine, "test_args");
 
 	machine->set_max_instructions(5'000'000ULL);
 
@@ -199,7 +202,13 @@ void bench_fork()
 
 void test_1_riscv_vmcall_empty()
 {
-	machine->vmcall(test_1_empty_addr);
+	caller_test_1_empty->call_with(*machine);
+	//machine->vmcall(test_1_empty_addr);
+}
+void test_1_riscv_timed_vmcall_empty()
+{
+	static_assert(riscv::timed_vm_calls, "Timed VM calls are not enabled");
+	machine->timed_vmcall(4.0f, test_1_empty_addr);
 }
 void test_1_riscv_preempt_empty()
 {
@@ -238,7 +247,7 @@ void test_2_2_riscv_stored()
 }
 void test_2_3_riscv_prepared()
 {
-	int ret = prepper.vmcall(
+	int ret = caller_test_2_3->call_with(*machine,
 		"This is a string", test, 333, 444, 555, 666, 777, 888);
 	if (ret != 666) abort();
 }
@@ -260,17 +269,18 @@ void test_3_riscv()
 }
 void test_3_riscv_math2()
 {
-	static CachedAddress<CPUBITS> fa;
-	machine->vmcall(fa.get(*machine, "test_maffs2"), 3.0, 3.0, 3.0);
+	static PreparedCall<CPUBITS, float(float, float, float)> caller(*machine, "test_maffs2");
+	caller.call_with(*machine, 3.0f, 3.0f, 3.0f);
 }
 void test_3_riscv_math3()
 {
-	static CachedAddress<CPUBITS> fa;
-	machine->vmcall(fa.get(*machine, "test_maffs3"), 3.0, 3.0, 3.0);
+	static PreparedCall<CPUBITS, float(float, float, float)> caller(*machine, "test_maffs3");
+	caller.call_with(*machine, 3.0f, 3.0f, 3.0f);
 }
 void test_3_riscv_fib()
 {
-	machine->vmcall(test_3_fib_addr, 40, 0, 1);
+	static PreparedCall<CPUBITS, int(int, int, int)> caller(*machine, "test_fib");
+	(void)caller.call_with(*machine, 40, 0, 1);
 }
 void test_3_riscv_sieve()
 {
@@ -285,7 +295,12 @@ void test_3_riscv_taylor()
 
 void test_4_riscv_syscall()
 {
-	machine->vmcall(test_1_syscall_addr);
+	static PreparedCall<CPUBITS, void()> caller(*machine, "test_syscall");
+	if (&caller.machine() != machine) {
+		caller.prepare(*machine, test_1_syscall_addr);
+	}
+	//machine->vmcall(test_1_syscall_addr);
+	caller();
 }
 void test_4_riscv()
 {

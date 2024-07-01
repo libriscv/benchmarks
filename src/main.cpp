@@ -54,6 +54,7 @@ extern void test_setup_resume();
 extern uint64_t riscv_measure_mips();
 extern void bench_fork();
 extern void test_1_riscv_vmcall_empty();
+extern void test_1_riscv_timed_vmcall_empty();
 extern void test_1_riscv_preempt_empty();
 extern void test_1_riscv_lookup();
 extern void test_1_lua_empty();
@@ -130,6 +131,7 @@ int main()
 		measure_mips("libriscv: mips", test_setup, riscv_measure_mips);
 		riscv_overhead =
 			run_test("libriscv: call overhead", 0, S, test_setup, test_1_riscv_vmcall_empty);
+		run_test("libriscv: timed call overhead", 0, S, test_setup, test_1_riscv_timed_vmcall_empty);
 		run_test("libriscv: preempt overhead", 0, S, test_setup, test_1_riscv_preempt_empty);
 		//run_test("libriscv: lookup overhead", 0, S, test_setup, test_1_riscv_lookup);
 		run_test("libriscv: fork", 0, S, test_setup, bench_fork);
