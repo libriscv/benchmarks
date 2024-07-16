@@ -98,6 +98,7 @@ void test_setup()
 		// Keep one machine always alive to keep the main execute segment referenced
 		machine_that_holds_execute_segment = new machine_t {rvbinary, MachineOptions<CPUBITS>{
 			.memory_max = 32*1024*1024,
+			.verbose_loader = true,
 			.default_exit_function = "fast_exit",
 		}};
 	}

@@ -73,6 +73,11 @@ set(SOURCES
 	src/syscalls.cpp
 	src/test1.cpp
 )
+if (RISCV_BINARY_TRANSLATION)
+	file(GLOB TRANSLATION_FILES ${CMAKE_BINARY_DIR}/*.cpp)
+	list(APPEND SOURCES ${TRANSLATION_FILES})
+endif()
+
 if (NOT CROSS_COMPILE_WIN32)
 	list(APPEND SOURCES
 		src/luascript.cpp

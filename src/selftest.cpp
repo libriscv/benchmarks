@@ -22,7 +22,17 @@ void run_selftest()
 {
 	auto rvbinary = load_file(TEST_BINARY);
 
-	machine_t machine {rvbinary, { .memory_max = 16*1024*1024 }};
+#ifdef RISCV_BINARY_TRANSLATION
+	std::vector<riscv::MachineTranslationOptions> cc;
+	cc.push_back(riscv::MachineTranslationEmbeddableCodeOptions {});
+#endif
+
+	machine_t machine {rvbinary, {
+		.memory_max = 16*1024*1024,
+#ifdef RISCV_BINARY_TRANSLATION
+		.cross_compile = cc,
+#endif
+	}};
 	setup_selftest_machine(machine);
 
 #ifdef RISCV_DEBUG
