@@ -323,13 +323,17 @@ void test_6_riscv()
 
 void test_7_riscv_1()
 {
+#ifndef RISCV_LIBTCC
 	static CachedAddress<CPUBITS> fa;
 	machine->vmcall(fa.get(*machine, "test_threads_args1"));
+#endif
 }
 void test_7_riscv_2()
 {
+#ifndef RISCV_LIBTCC
 	static CachedAddress<CPUBITS> fa;
 	machine->vmcall(fa.get(*machine, "test_threads_args2"));
+#endif
 }
 
 void test_8_memcpy_riscv()
