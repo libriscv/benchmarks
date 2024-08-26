@@ -161,6 +161,32 @@ void test_setup()
 	test_1_syscall_addr = machine->address_of("test_syscall");
 	test_3_fib_addr = machine->address_of("test_fib");
 
+	#define LIVEPATCH_FAST_PATH(func) \
+		if (!machine->cpu.create_fast_path_function(machine->address_of(func))) { \
+			throw std::runtime_error("Failed to create fast path for " func); \
+		}
+
+	LIVEPATCH_FAST_PATH("measure_mips");
+	LIVEPATCH_FAST_PATH("empty_function");
+	LIVEPATCH_FAST_PATH("test_array_append");
+	LIVEPATCH_FAST_PATH("test_vector_append");
+	LIVEPATCH_FAST_PATH("test_args");
+	LIVEPATCH_FAST_PATH("test_maffs1");
+	LIVEPATCH_FAST_PATH("test_maffs2");
+	LIVEPATCH_FAST_PATH("test_maffs3");
+	LIVEPATCH_FAST_PATH("test_fib");
+	LIVEPATCH_FAST_PATH("test_print");
+	LIVEPATCH_FAST_PATH("test_longcall");
+	LIVEPATCH_FAST_PATH("test_threads");
+	LIVEPATCH_FAST_PATH("test_threads_args1");
+	LIVEPATCH_FAST_PATH("test_threads_args2");
+	LIVEPATCH_FAST_PATH("test_memcpy");
+	LIVEPATCH_FAST_PATH("test_syscall_memcpy");
+	LIVEPATCH_FAST_PATH("test_memset");
+	LIVEPATCH_FAST_PATH("test_syscall_memset");
+	LIVEPATCH_FAST_PATH("test_sieve");
+	LIVEPATCH_FAST_PATH("test_taylor");
+
 	stored.store(*machine, "test_args",
 		"This is a string", test,
 		333, 444, 555, 666, 777, 888);
