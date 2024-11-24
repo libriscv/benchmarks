@@ -46,7 +46,14 @@ Script::Script(const std::string& file)
 	}
 	auto gns = getGlobalNamespace(this->state);
 	gns.beginNamespace("script")
-	.addFunction("nada",     nada)
+	.addFunction("args0",    []() -> void { })
+	.addFunction("args1",    [](int) -> void { })
+	.addFunction("args2",    [](int, int) -> void { })
+	.addFunction("args3",    [](int, int, int) -> void { })
+	.addFunction("args4",    [](int, int, int, int) -> void { })
+	.addFunction("args5",    [](int, int, int, int, int) -> void { })
+	.addFunction("args6",    [](int, int, int, int, int, int) -> void { })
+	.addFunction("args7",    [](int, int, int, int, int, int, int) -> void { })
 	.addFunction("print",    print)
 	.addFunction("longcall", longcall)
 	.endNamespace();

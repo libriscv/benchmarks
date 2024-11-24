@@ -5,6 +5,9 @@ array = {}
 function empty_function()
 	-- do nothing
 end
+function test_overhead_args(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+	return
+end
 
 function test(arg)
 	table.insert(array, arg)
@@ -68,8 +71,29 @@ function test_sieve(n)
 	return primes
 end
 
-function test_syscall()
-	script.nada()
+function test_syscall0()
+	script.args0()
+end
+function test_syscall1()
+	script.args1(1)
+end
+function test_syscall2()
+	script.args2(1, 2)
+end
+function test_syscall3()
+	script.args3(1, 2, 3)
+end
+function test_syscall4()
+	script.args4(1, 2, 3, 4)
+end
+function test_syscall5()
+	script.args5(1, 2, 3, 4, 5)
+end
+function test_syscall6()
+	script.args6(1, 2, 3, 4, 5, 6)
+end
+function test_syscall7()
+	script.args7(1, 2, 3, 4, 5, 6, 7)
 end
 function test_print()
 	script.print("This is a string")

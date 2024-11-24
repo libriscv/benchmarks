@@ -101,6 +101,7 @@ int main(int, char**, char**) {}
 PUBLIC_API void empty_function()
 {
 }
+PUBLIC_API void test_overhead_args() {}
 
 PUBLIC_API void resumable_function()
 {
@@ -206,9 +207,75 @@ PUBLIC_API long test_sieve(const long N)
 	return nprimes;
 }
 
-PUBLIC_API void test_syscall()
+static const long SYSCALL_NUMBER = 42;
+PUBLIC_API void test_syscall0()
 {
-	sys_nada();
+	//register long a0 asm("a0") = 0;
+	register long syscall_id asm("a7") = SYSCALL_NUMBER;
+	asm volatile ("ecall" :: "r"(syscall_id) : "memory");
+}
+PUBLIC_API void test_syscall1(int arg0)
+{
+	register long a0 asm("a0") = arg0;
+	register long syscall_id asm("a7") = SYSCALL_NUMBER;
+	asm volatile ("ecall" :: "r"(syscall_id), "r"(a0) : "memory");
+}
+PUBLIC_API void test_syscall2(int arg0, int arg1)
+{
+	register long a0 asm("a0") = arg0;
+	register long a1 asm("a1") = arg1;
+	register long syscall_id asm("a7") = SYSCALL_NUMBER;
+	asm volatile ("ecall" :: "r"(syscall_id), "r"(a0), "r"(a1) : "memory");
+}
+PUBLIC_API void test_syscall3(int arg0, int arg1, int arg2)
+{
+	register long a0 asm("a0") = arg0;
+	register long a1 asm("a1") = arg1;
+	register long a2 asm("a2") = arg2;
+	register long syscall_id asm("a7") = SYSCALL_NUMBER;
+	asm volatile ("ecall" :: "r"(syscall_id), "r"(a0), "r"(a1), "r"(a2) : "memory");
+}
+PUBLIC_API void test_syscall4(int arg0, int arg1, int arg2, int arg3)
+{
+	register long a0 asm("a0") = arg0;
+	register long a1 asm("a1") = arg1;
+	register long a2 asm("a2") = arg2;
+	register long a3 asm("a3") = arg3;
+	register long syscall_id asm("a7") = SYSCALL_NUMBER;
+	asm volatile ("ecall" :: "r"(syscall_id), "r"(a0), "r"(a1), "r"(a2), "r"(a3) : "memory");
+}
+PUBLIC_API void test_syscall5(int arg0, int arg1, int arg2, int arg3, int arg4)
+{
+	register long a0 asm("a0") = arg0;
+	register long a1 asm("a1") = arg1;
+	register long a2 asm("a2") = arg2;
+	register long a3 asm("a3") = arg3;
+	register long a4 asm("a4") = arg4;
+	register long syscall_id asm("a7") = SYSCALL_NUMBER;
+	asm volatile ("ecall" :: "r"(syscall_id), "r"(a0), "r"(a1), "r"(a2), "r"(a3), "r"(a4) : "memory");
+}
+PUBLIC_API void test_syscall6(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5)
+{
+	register long a0 asm("a0") = arg0;
+	register long a1 asm("a1") = arg1;
+	register long a2 asm("a2") = arg2;
+	register long a3 asm("a3") = arg3;
+	register long a4 asm("a4") = arg4;
+	register long a5 asm("a5") = arg5;
+	register long syscall_id asm("a7") = SYSCALL_NUMBER;
+	asm volatile ("ecall" :: "r"(syscall_id), "r"(a0), "r"(a1), "r"(a2), "r"(a3), "r"(a4), "r"(a5) : "memory");
+}
+PUBLIC_API void test_syscall7(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6)
+{
+	register long a0 asm("a0") = arg0;
+	register long a1 asm("a1") = arg1;
+	register long a2 asm("a2") = arg2;
+	register long a3 asm("a3") = arg3;
+	register long a4 asm("a4") = arg4;
+	register long a5 asm("a5") = arg5;
+	register long a6 asm("a6") = arg6;
+	register long syscall_id asm("a7") = SYSCALL_NUMBER;
+	asm volatile ("ecall" :: "r"(syscall_id), "r"(a0), "r"(a1), "r"(a2), "r"(a3), "r"(a4), "r"(a5), "r"(a6) : "memory");
 }
 PUBLIC_API void test_print()
 {

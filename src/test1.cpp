@@ -16,7 +16,8 @@ static machine_t* machine = nullptr;
 static machine_t* machine_that_holds_execute_segment = nullptr;
 
 static uint32_t test_1_empty_addr = 0x0;
-static uint32_t test_1_syscall_addr = 0x0;
+static uint32_t test_1_overhead_args_addr = 0x0;
+static uint32_t test_1_syscall_addr[8] = {0x0};
 static uint32_t test_1_array_addr = 0x0;
 static uint32_t test_1_vector_addr = 0x0;
 static uint32_t test_3_fib_addr = 0x0;
@@ -144,6 +145,7 @@ void test_setup()
 	assert(machine->cpu.reg(10) == 0);
 
 	assert(machine->address_of("empty_function") != 0);
+	assert(machine->address_of("test_overhead_args") != 0);
 	assert(machine->address_of("test_array_append") != 0);
 	assert(machine->address_of("test_vector_append") != 0);
 	assert(machine->address_of("test_args") != 0);
@@ -156,9 +158,17 @@ void test_setup()
 	assert(machine->address_of("test_memcpy") != 0);
 	assert(machine->address_of("test_syscall_memcpy") != 0);
 	test_1_empty_addr = machine->address_of("empty_function");
+	test_1_overhead_args_addr = machine->address_of("test_overhead_args");
 	test_1_array_addr = machine->address_of("test_array_append");
 	test_1_vector_addr = machine->address_of("test_vector_append");
-	test_1_syscall_addr = machine->address_of("test_syscall");
+	test_1_syscall_addr[0] = machine->address_of("test_syscall0");
+	test_1_syscall_addr[1] = machine->address_of("test_syscall1");
+	test_1_syscall_addr[2] = machine->address_of("test_syscall2");
+	test_1_syscall_addr[3] = machine->address_of("test_syscall3");
+	test_1_syscall_addr[4] = machine->address_of("test_syscall4");
+	test_1_syscall_addr[5] = machine->address_of("test_syscall5");
+	test_1_syscall_addr[6] = machine->address_of("test_syscall6");
+	test_1_syscall_addr[7] = machine->address_of("test_syscall7");
 	test_3_fib_addr = machine->address_of("test_fib");
 
 	#define LIVEPATCH_FAST_PATH(func) \
@@ -168,12 +178,21 @@ void test_setup()
 
 	LIVEPATCH_FAST_PATH("measure_mips");
 	LIVEPATCH_FAST_PATH("empty_function");
+	LIVEPATCH_FAST_PATH("test_overhead_args");
 	LIVEPATCH_FAST_PATH("test_array_append");
 	LIVEPATCH_FAST_PATH("test_vector_append");
 	LIVEPATCH_FAST_PATH("test_args");
 	LIVEPATCH_FAST_PATH("test_maffs1");
 	LIVEPATCH_FAST_PATH("test_maffs2");
 	LIVEPATCH_FAST_PATH("test_maffs3");
+	LIVEPATCH_FAST_PATH("test_syscall0");
+	LIVEPATCH_FAST_PATH("test_syscall1");
+	LIVEPATCH_FAST_PATH("test_syscall2");
+	LIVEPATCH_FAST_PATH("test_syscall3");
+	LIVEPATCH_FAST_PATH("test_syscall4");
+	LIVEPATCH_FAST_PATH("test_syscall5");
+	LIVEPATCH_FAST_PATH("test_syscall6");
+	LIVEPATCH_FAST_PATH("test_syscall7");
 	LIVEPATCH_FAST_PATH("test_fib");
 	LIVEPATCH_FAST_PATH("test_print");
 	LIVEPATCH_FAST_PATH("test_longcall");
@@ -232,6 +251,34 @@ void test_1_riscv_vmcall_empty()
 	caller_test_1_empty->call_with(*machine);
 	//machine->vmcall(test_1_empty_addr);
 }
+template <int N>
+void test_1_riscv_args();
+
+template<> void test_1_riscv_args<1>() {
+	machine->vmcall(test_1_overhead_args_addr, 1);
+}
+template<> void test_1_riscv_args<2>() {
+	machine->vmcall(test_1_overhead_args_addr, 1, 2);
+}
+template<> void test_1_riscv_args<3>() {
+	machine->vmcall(test_1_overhead_args_addr, 1, 2, 3);
+}
+template<> void test_1_riscv_args<4>() {
+	machine->vmcall(test_1_overhead_args_addr, 1, 2, 3, 4);
+}
+template<> void test_1_riscv_args<5>() {
+	machine->vmcall(test_1_overhead_args_addr, 1, 2, 3, 4, 5);
+}
+template<> void test_1_riscv_args<6>() {
+	machine->vmcall(test_1_overhead_args_addr, 1, 2, 3, 4, 5, 6);
+}
+template<> void test_1_riscv_args<7>() {
+	machine->vmcall(test_1_overhead_args_addr, 1, 2, 3, 4, 5, 6, 7);
+}
+template<> void test_1_riscv_args<8>() {
+	machine->vmcall(test_1_overhead_args_addr, 1, 2, 3, 4, 5, 6, 7, 8);
+}
+
 void test_1_riscv_timed_vmcall_empty()
 {
 	static_assert(riscv::timed_vm_calls, "Timed VM calls are not enabled");
@@ -320,15 +367,34 @@ void test_3_riscv_taylor()
 	machine->vmcall(fa.get(*machine, "test_taylor"), 1000);
 }
 
-void test_4_riscv_syscall()
-{
-	static PreparedCall<CPUBITS, void()> caller(*machine, "test_syscall");
-	if (&caller.machine() != machine) {
-		caller.prepare(*machine, test_1_syscall_addr);
-	}
-	//machine->vmcall(test_1_syscall_addr);
-	caller();
+template <int N>
+void test_4_riscv_syscall();
+
+template<> void test_4_riscv_syscall<0>() {
+	machine->vmcall(test_1_syscall_addr[0]);
 }
+template<> void test_4_riscv_syscall<1>() {
+	machine->vmcall(test_1_syscall_addr[1], 1);
+}
+template<> void test_4_riscv_syscall<2>() {
+	machine->vmcall(test_1_syscall_addr[2], 1, 2);
+}
+template<> void test_4_riscv_syscall<3>() {
+	machine->vmcall(test_1_syscall_addr[3], 1, 2, 3);
+}
+template<> void test_4_riscv_syscall<4>() {
+	machine->vmcall(test_1_syscall_addr[4], 1, 2, 3, 4);
+}
+template<> void test_4_riscv_syscall<5>() {
+	machine->vmcall(test_1_syscall_addr[5], 1, 2, 3, 4, 5);
+}
+template<> void test_4_riscv_syscall<6>() {
+	machine->vmcall(test_1_syscall_addr[6], 1, 2, 3, 4, 5, 6);
+}
+template<> void test_4_riscv_syscall<7>() {
+	machine->vmcall(test_1_syscall_addr[7], 1, 2, 3, 4, 5, 6, 7);
+}
+
 void test_4_riscv()
 {
 	static CachedAddress<CPUBITS> fa;
@@ -385,10 +451,37 @@ void test_9_memset_native_riscv()
 }
 
 #ifndef LUA_DISABLED
+template <int N>
+void test_1_lua_args();
+
 void test_1_lua_empty()
 {
 	//luascript->call(*lua_callable);
 	luascript->call("empty_function");
+}
+template<> void test_1_lua_args<1>() {
+	luascript->call("test_overhead_args", 1);
+}
+template<> void test_1_lua_args<2>() {
+	luascript->call("test_overhead_args", 1, 2);
+}
+template<> void test_1_lua_args<3>() {
+	luascript->call("test_overhead_args", 1, 2, 3);
+}
+template<> void test_1_lua_args<4>() {
+	luascript->call("test_overhead_args", 1, 2, 3, 4);
+}
+template<> void test_1_lua_args<5>() {
+	luascript->call("test_overhead_args", 1, 2, 3, 4, 5);
+}
+template<> void test_1_lua_args<6>() {
+	luascript->call("test_overhead_args", 1, 2, 3, 4, 5, 6);
+}
+template<> void test_1_lua_args<7>() {
+	luascript->call("test_overhead_args", 1, 2, 3, 4, 5, 6, 7);
+}
+template<> void test_1_lua_args<8>() {
+	luascript->call("test_overhead_args", 1, 2, 3, 4, 5, 6, 7, 8);
 }
 void test_1_lua()
 {
@@ -432,10 +525,35 @@ void test_4_lua()
 {
 	luascript->call("test_print");
 }
-void test_4_lua_syscall()
-{
-	luascript->call("test_syscall");
+
+template <int N>
+void test_4_lua_syscall();
+
+template<> void test_4_lua_syscall<0>() {
+	luascript->call("test_syscall0");
 }
+template<> void test_4_lua_syscall<1>() {
+	luascript->call("test_syscall1", 1);
+}
+template<> void test_4_lua_syscall<2>() {
+	luascript->call("test_syscall2", 1, 2);
+}
+template<> void test_4_lua_syscall<3>() {
+	luascript->call("test_syscall3", 1, 2, 3);
+}
+template<> void test_4_lua_syscall<4>() {
+	luascript->call("test_syscall4", 1, 2, 3, 4);
+}
+template<> void test_4_lua_syscall<5>() {
+	luascript->call("test_syscall5", 1, 2, 3, 4, 5);
+}
+template<> void test_4_lua_syscall<6>() {
+	luascript->call("test_syscall6", 1, 2, 3, 4, 5, 6);
+}
+template<> void test_4_lua_syscall<7>() {
+	luascript->call("test_syscall7", 1, 2, 3, 4, 5, 6, 7);
+}
+
 void test_5_lua()
 {
 	luascript->call("test_longcall");

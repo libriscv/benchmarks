@@ -54,10 +54,12 @@ extern void test_setup_resume();
 extern uint64_t riscv_measure_mips();
 extern void bench_fork();
 extern void test_1_riscv_vmcall_empty();
+template <int N> extern void test_1_riscv_args();
 extern void test_1_riscv_timed_vmcall_empty();
 extern void test_1_riscv_preempt_empty();
 extern void test_1_riscv_lookup();
 extern void test_1_lua_empty();
+template <int N> extern void test_1_lua_args();
 extern void test_1_riscv_resume();
 extern void test_1_riscv_array();
 extern void test_1_riscv_vector();
@@ -80,8 +82,10 @@ extern void test_3_lua_fib();
 extern void test_3_lua_fib40();
 extern void test_3_lua_sieve();
 extern void test_3_lua_taylor();
+template <int N>
 extern void test_4_riscv_syscall();
 extern void test_4_riscv();
+template <int N>
 extern void test_4_lua_syscall();
 extern void test_4_lua();
 extern void test_5_riscv();
@@ -131,6 +135,15 @@ int main()
 		measure_mips("libriscv: mips", test_setup, riscv_measure_mips);
 		riscv_overhead =
 			run_test("libriscv: call overhead", 0, S, test_setup, test_1_riscv_vmcall_empty);
+		run_test("libriscv: call args=1", 0, S, test_setup, test_1_riscv_args<1>);
+		run_test("libriscv: call args=2", 0, S, test_setup, test_1_riscv_args<2>);
+		run_test("libriscv: call args=3", 0, S, test_setup, test_1_riscv_args<3>);
+		run_test("libriscv: call args=4", 0, S, test_setup, test_1_riscv_args<4>);
+		run_test("libriscv: call args=5", 0, S, test_setup, test_1_riscv_args<5>);
+		run_test("libriscv: call args=6", 0, S, test_setup, test_1_riscv_args<6>);
+		run_test("libriscv: call args=7", 0, S, test_setup, test_1_riscv_args<7>);
+		run_test("libriscv: call args=8", 0, S, test_setup, test_1_riscv_args<8>);
+
 		run_test("libriscv: timed call overhead", 0, S, test_setup, test_1_riscv_timed_vmcall_empty);
 		run_test("libriscv: preempt overhead", 0, S, test_setup, test_1_riscv_preempt_empty);
 		//run_test("libriscv: lookup overhead", 0, S, test_setup, test_1_riscv_lookup);
@@ -140,6 +153,37 @@ int main()
 	if constexpr (test_lua) {
 		lua_overhead =
 			run_test(LUANAME ": call overhead", 0, S, test_setup, test_1_lua_empty);
+		run_test(LUANAME ": call args=1", 0, S, test_setup, test_1_lua_args<1>);
+		run_test(LUANAME ": call args=2", 0, S, test_setup, test_1_lua_args<2>);
+		run_test(LUANAME ": call args=3", 0, S, test_setup, test_1_lua_args<3>);
+		run_test(LUANAME ": call args=4", 0, S, test_setup, test_1_lua_args<4>);
+		run_test(LUANAME ": call args=5", 0, S, test_setup, test_1_lua_args<5>);
+		run_test(LUANAME ": call args=6", 0, S, test_setup, test_1_lua_args<6>);
+		run_test(LUANAME ": call args=7", 0, S, test_setup, test_1_lua_args<7>);
+		run_test(LUANAME ": call args=8", 0, S, test_setup, test_1_lua_args<8>);
+	}
+	printf("\n");
+	if constexpr (test_libriscv) {
+		run_test("libriscv: syscall args=0", 0, S, test_setup, test_4_riscv_syscall<0>);
+		run_test("libriscv: syscall args=1", 0, S, test_setup, test_4_riscv_syscall<1>);
+		run_test("libriscv: syscall args=2", 0, S, test_setup, test_4_riscv_syscall<2>);
+		run_test("libriscv: syscall args=3", 0, S, test_setup, test_4_riscv_syscall<3>);
+		run_test("libriscv: syscall args=4", 0, S, test_setup, test_4_riscv_syscall<4>);
+		run_test("libriscv: syscall args=5", 0, S, test_setup, test_4_riscv_syscall<5>);
+		run_test("libriscv: syscall args=6", 0, S, test_setup, test_4_riscv_syscall<6>);
+		run_test("libriscv: syscall args=7", 0, S, test_setup, test_4_riscv_syscall<7>);
+		run_test("libriscv: syscall string", 0, S, test_setup, test_4_riscv);
+	}
+	if constexpr (test_lua) {
+		run_test(LUANAME ": syscall args=0", 0, S, test_setup, test_4_lua_syscall<0>);
+		run_test(LUANAME ": syscall args=1", 0, S, test_setup, test_4_lua_syscall<1>);
+		run_test(LUANAME ": syscall args=2", 0, S, test_setup, test_4_lua_syscall<2>);
+		run_test(LUANAME ": syscall args=3", 0, S, test_setup, test_4_lua_syscall<3>);
+		run_test(LUANAME ": syscall args=4", 0, S, test_setup, test_4_lua_syscall<4>);
+		run_test(LUANAME ": syscall args=5", 0, S, test_setup, test_4_lua_syscall<5>);
+		run_test(LUANAME ": syscall args=6", 0, S, test_setup, test_4_lua_syscall<6>);
+		run_test(LUANAME ": syscall args=7", 0, S, test_setup, test_4_lua_syscall<7>);
+		run_test(LUANAME ": syscall string", 0, S, test_setup, test_4_lua);
 	}
 
 	printf("\n"
@@ -179,15 +223,6 @@ int main()
 		run_test(LUANAME ": exp math", LOH, S, test_setup, test_3_lua_math3);
 		run_test(LUANAME ": fib(40)", LOH, S, test_setup, test_3_lua_fib);
 		run_test(LUANAME ": taylor(1K)", LOH, S, test_setup, test_3_lua_taylor);
-	}
-	printf("\n");
-	if constexpr (test_libriscv) {
-		run_test("libriscv: syscall overhead", ROH, S, test_setup, test_4_riscv_syscall);
-		run_test("libriscv: syscall string", ROH, S, test_setup, test_4_riscv);
-	}
-	if constexpr (test_lua) {
-		run_test(LUANAME ": syscall overhead", LOH, S, test_setup, test_4_lua_syscall);
-		run_test(LUANAME ": syscall string", LOH, S, test_setup, test_4_lua);
 	}
 	printf("\n");
 	if constexpr (test_libriscv) {
