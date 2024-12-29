@@ -107,6 +107,10 @@ void test_setup()
 	machine = new machine_t {rvbinary, MachineOptions<CPUBITS>{
 		.memory_max = 32*1024*1024,
 		.default_exit_function = "fast_exit",
+#ifdef RISCV_BINARY_TRANSLATION
+		.translate_ignore_instruction_limit = true,
+		.translate_automatic_nbit_address_space = true,
+#endif
 	}};
 
 	if (machine->memory.exit_address() != machine->address_of("fast_exit") || machine->memory.exit_address() == 0x0) {
@@ -279,11 +283,6 @@ template<> void test_1_riscv_args<8>() {
 	machine->vmcall(test_1_overhead_args_addr, 1, 2, 3, 4, 5, 6, 7, 8);
 }
 
-void test_1_riscv_timed_vmcall_empty()
-{
-	static_assert(riscv::timed_vm_calls, "Timed VM calls are not enabled");
-	machine->timed_vmcall(4.0f, test_1_empty_addr);
-}
 void test_1_riscv_preempt_empty()
 {
 	machine->reset_instruction_counter();
@@ -415,17 +414,13 @@ void test_6_riscv()
 
 void test_7_riscv_1()
 {
-#ifndef RISCV_LIBTCC
 	static CachedAddress<CPUBITS> fa;
 	machine->vmcall(fa.get(*machine, "test_threads_args1"));
-#endif
 }
 void test_7_riscv_2()
 {
-#ifndef RISCV_LIBTCC
 	static CachedAddress<CPUBITS> fa;
 	machine->vmcall(fa.get(*machine, "test_threads_args2"));
-#endif
 }
 
 void test_8_memcpy_riscv()

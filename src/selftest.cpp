@@ -28,8 +28,10 @@ void run_selftest()
 #endif
 
 	machine_t machine {rvbinary, {
-		.memory_max = 16*1024*1024,
+		.memory_max = 32*1024*1024,
 #ifdef RISCV_BINARY_TRANSLATION
+		.translate_ignore_instruction_limit = true,
+		.translate_automatic_nbit_address_space = true,
 		.cross_compile = cc,
 #endif
 	}};

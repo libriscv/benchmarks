@@ -11,20 +11,20 @@ set(WARNINGS  "-Wall -Wextra")
 set(COMMON    "-ggdb3 -O3")
 
 if (GCC_TRIPLE STREQUAL "riscv32-unknown-elf")
-	set(RISCV_ABI "-march=rv32imfd_zba_zbb_zbc_zbs -mabi=ilp32d")
+	set(RISCV_ABI "-march=rv32g_zba_zbb_zbc_zbs -mabi=ilp32d")
 else()
 	set(RISCV_ABI "-march=rv64imfd_zba_zbb_zbc_zbs -mabi=lp64d")
 endif()
-set(COMMON    "${COMMON} -flto=4")
+#set(COMMON    "${COMMON} -flto")
 if (NOT LIBC_USE_STDLIB)
-	set(COMMON    "${COMMON} -nostdlib -fno-builtin")
+	set(COMMON    "${COMMON} -fno-builtin")
 endif()
 
 # we need this libgcc for 64-bit divisions
 set(LIBGCC ${LIBRARY_DIR}/libgcc.a)
 
 set(CMAKE_C_FLAGS "${WARNINGS} ${COMMON} -std=c11 ${RISCV_ABI}")
-set(CMAKE_CXX_FLAGS "${WARNINGS} ${COMMON} -std=c++17 ${RISCV_ABI} -fno-exceptions -fno-rtti -fno-threadsafe-statics")
+set(CMAKE_CXX_FLAGS "${WARNINGS} ${COMMON} -std=c++17 ${RISCV_ABI} -fexceptions -frtti -fno-threadsafe-statics")
 
 if (DEBUGGING)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
@@ -48,6 +48,7 @@ set(SOURCES
 unset(CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES)
 unset(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES)
 # this fixes a bug where CMake adds -rdynamic to literally everything
+set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
 add_subdirectory(ext)
