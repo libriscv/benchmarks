@@ -86,7 +86,7 @@ endif()
 
 add_executable(bench ${SOURCES})
 #target_include_directories(bench PRIVATE ext/libriscv/emulator/syscalls)
-target_link_libraries(bench riscv LuaBridge)
+target_link_libraries(bench riscv LuaBridge jemalloc)
 # for some reason this causes -std=gnu++1z
 #set_target_properties(bench PROPERTIES CXX_STANDARD 17)
 if (CROSS_COMPILE_WIN32)

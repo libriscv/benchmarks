@@ -101,7 +101,78 @@ void test_setup()
 			.memory_max = 32*1024*1024,
 			.verbose_loader = true,
 			.default_exit_function = "fast_exit",
+#ifdef RISCV_BINARY_TRANSLATION
+			.translate_ignore_instruction_limit = true,
+			.translate_automatic_nbit_address_space = true,
+#endif
 		}};
+		machine_t* machine = machine_that_holds_execute_segment;
+		assert(machine->address_of("empty_function") != 0);
+		assert(machine->address_of("test_overhead_args") != 0);
+		assert(machine->address_of("test_array_append") != 0);
+		assert(machine->address_of("test_vector_append") != 0);
+		assert(machine->address_of("test_args") != 0);
+		assert(machine->address_of("test_maffs1") != 0);
+		assert(machine->address_of("test_maffs2") != 0);
+		assert(machine->address_of("test_maffs3") != 0);
+		assert(machine->address_of("test_fib") != 0);
+		assert(machine->address_of("test_print") != 0);
+		assert(machine->address_of("test_longcall") != 0);
+		assert(machine->address_of("test_memcpy") != 0);
+		assert(machine->address_of("test_syscall_memcpy") != 0);
+		test_1_empty_addr = machine->address_of("empty_function");
+		test_1_overhead_args_addr = machine->address_of("test_overhead_args");
+		test_1_array_addr = machine->address_of("test_array_append");
+		test_1_vector_addr = machine->address_of("test_vector_append");
+		test_1_syscall_addr[0] = machine->address_of("test_syscall0");
+		test_1_syscall_addr[1] = machine->address_of("test_syscall1");
+		test_1_syscall_addr[2] = machine->address_of("test_syscall2");
+		test_1_syscall_addr[3] = machine->address_of("test_syscall3");
+		test_1_syscall_addr[4] = machine->address_of("test_syscall4");
+		test_1_syscall_addr[5] = machine->address_of("test_syscall5");
+		test_1_syscall_addr[6] = machine->address_of("test_syscall6");
+		test_1_syscall_addr[7] = machine->address_of("test_syscall7");
+		test_3_fib_addr = machine->address_of("test_fib");
+
+		if (machine->memory.exit_address() != machine->address_of("fast_exit") || machine->memory.exit_address() == 0x0) {
+			//throw std::runtime_error("'fast_exit' was not found in the RISC-V benchmark program");
+			fprintf(stderr, "'fast_exit' was not found in the RISC-V benchmark program\n");
+		}
+
+		#define LIVEPATCH_FAST_PATH(func) \
+			if (!machine->cpu.create_fast_path_function(machine->address_of(func))) { \
+				throw std::runtime_error("Failed to create fast path for " func); \
+			}
+
+		LIVEPATCH_FAST_PATH("measure_mips");
+		LIVEPATCH_FAST_PATH("empty_function");
+		LIVEPATCH_FAST_PATH("test_overhead_args");
+		LIVEPATCH_FAST_PATH("test_array_append");
+		LIVEPATCH_FAST_PATH("test_vector_append");
+		LIVEPATCH_FAST_PATH("test_args");
+		LIVEPATCH_FAST_PATH("test_maffs1");
+		LIVEPATCH_FAST_PATH("test_maffs2");
+		LIVEPATCH_FAST_PATH("test_maffs3");
+		LIVEPATCH_FAST_PATH("test_syscall0");
+		LIVEPATCH_FAST_PATH("test_syscall1");
+		LIVEPATCH_FAST_PATH("test_syscall2");
+		LIVEPATCH_FAST_PATH("test_syscall3");
+		LIVEPATCH_FAST_PATH("test_syscall4");
+		LIVEPATCH_FAST_PATH("test_syscall5");
+		LIVEPATCH_FAST_PATH("test_syscall6");
+		LIVEPATCH_FAST_PATH("test_syscall7");
+		LIVEPATCH_FAST_PATH("test_fib");
+		LIVEPATCH_FAST_PATH("test_print");
+		LIVEPATCH_FAST_PATH("test_longcall");
+		LIVEPATCH_FAST_PATH("test_threads");
+		LIVEPATCH_FAST_PATH("test_threads_args1");
+		LIVEPATCH_FAST_PATH("test_threads_args2");
+		LIVEPATCH_FAST_PATH("test_memcpy");
+		LIVEPATCH_FAST_PATH("test_syscall_memcpy");
+		LIVEPATCH_FAST_PATH("test_memset");
+		LIVEPATCH_FAST_PATH("test_syscall_memset");
+		LIVEPATCH_FAST_PATH("test_sieve");
+		LIVEPATCH_FAST_PATH("test_taylor");
 	}
 	delete machine;
 	machine = new machine_t {rvbinary, MachineOptions<CPUBITS>{
@@ -112,10 +183,6 @@ void test_setup()
 		.translate_automatic_nbit_address_space = true,
 #endif
 	}};
-
-	if (machine->memory.exit_address() != machine->address_of("fast_exit") || machine->memory.exit_address() == 0x0) {
-		throw std::runtime_error("'fast_exit' was not found in the RISC-V benchmark program");
-	}
 
 	// the minimum number of syscalls needed for malloc and C++ exceptions
 	machine->setup_minimal_syscalls();
@@ -148,68 +215,6 @@ void test_setup()
 	}
 	assert(machine->cpu.reg(10) == 0);
 
-	assert(machine->address_of("empty_function") != 0);
-	assert(machine->address_of("test_overhead_args") != 0);
-	assert(machine->address_of("test_array_append") != 0);
-	assert(machine->address_of("test_vector_append") != 0);
-	assert(machine->address_of("test_args") != 0);
-	assert(machine->address_of("test_maffs1") != 0);
-	assert(machine->address_of("test_maffs2") != 0);
-	assert(machine->address_of("test_maffs3") != 0);
-	assert(machine->address_of("test_fib") != 0);
-	assert(machine->address_of("test_print") != 0);
-	assert(machine->address_of("test_longcall") != 0);
-	assert(machine->address_of("test_memcpy") != 0);
-	assert(machine->address_of("test_syscall_memcpy") != 0);
-	test_1_empty_addr = machine->address_of("empty_function");
-	test_1_overhead_args_addr = machine->address_of("test_overhead_args");
-	test_1_array_addr = machine->address_of("test_array_append");
-	test_1_vector_addr = machine->address_of("test_vector_append");
-	test_1_syscall_addr[0] = machine->address_of("test_syscall0");
-	test_1_syscall_addr[1] = machine->address_of("test_syscall1");
-	test_1_syscall_addr[2] = machine->address_of("test_syscall2");
-	test_1_syscall_addr[3] = machine->address_of("test_syscall3");
-	test_1_syscall_addr[4] = machine->address_of("test_syscall4");
-	test_1_syscall_addr[5] = machine->address_of("test_syscall5");
-	test_1_syscall_addr[6] = machine->address_of("test_syscall6");
-	test_1_syscall_addr[7] = machine->address_of("test_syscall7");
-	test_3_fib_addr = machine->address_of("test_fib");
-
-	#define LIVEPATCH_FAST_PATH(func) \
-		if (!machine->cpu.create_fast_path_function(machine->address_of(func))) { \
-			throw std::runtime_error("Failed to create fast path for " func); \
-		}
-
-	LIVEPATCH_FAST_PATH("measure_mips");
-	LIVEPATCH_FAST_PATH("empty_function");
-	LIVEPATCH_FAST_PATH("test_overhead_args");
-	LIVEPATCH_FAST_PATH("test_array_append");
-	LIVEPATCH_FAST_PATH("test_vector_append");
-	LIVEPATCH_FAST_PATH("test_args");
-	LIVEPATCH_FAST_PATH("test_maffs1");
-	LIVEPATCH_FAST_PATH("test_maffs2");
-	LIVEPATCH_FAST_PATH("test_maffs3");
-	LIVEPATCH_FAST_PATH("test_syscall0");
-	LIVEPATCH_FAST_PATH("test_syscall1");
-	LIVEPATCH_FAST_PATH("test_syscall2");
-	LIVEPATCH_FAST_PATH("test_syscall3");
-	LIVEPATCH_FAST_PATH("test_syscall4");
-	LIVEPATCH_FAST_PATH("test_syscall5");
-	LIVEPATCH_FAST_PATH("test_syscall6");
-	LIVEPATCH_FAST_PATH("test_syscall7");
-	LIVEPATCH_FAST_PATH("test_fib");
-	LIVEPATCH_FAST_PATH("test_print");
-	LIVEPATCH_FAST_PATH("test_longcall");
-	LIVEPATCH_FAST_PATH("test_threads");
-	LIVEPATCH_FAST_PATH("test_threads_args1");
-	LIVEPATCH_FAST_PATH("test_threads_args2");
-	LIVEPATCH_FAST_PATH("test_memcpy");
-	LIVEPATCH_FAST_PATH("test_syscall_memcpy");
-	LIVEPATCH_FAST_PATH("test_memset");
-	LIVEPATCH_FAST_PATH("test_syscall_memset");
-	LIVEPATCH_FAST_PATH("test_sieve");
-	LIVEPATCH_FAST_PATH("test_taylor");
-
 	stored.store(*machine, "test_args",
 		"This is a string", test,
 		333, 444, 555, 666, 777, 888);
@@ -225,10 +230,8 @@ void test_setup()
 	luascript = new Script("../luaprogram/script.lua");
 	lua_callable = new luabridge::LuaRef(luascript->getGlobal("empty_function"));
 #endif
-
-	extern void reset_native_tests();
-	reset_native_tests();
 }
+
 void test_setup_resume()
 {
 	test_setup();
