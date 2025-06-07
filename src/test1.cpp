@@ -47,7 +47,7 @@ void syscall_longcall(Machine<W>& machine)
 {
 	const auto address = machine.template sysarg<address_type<W>>(0);
 	// it's a zero-terminated string
-	const auto view = machine.memory.rvview(address, str.size()+1);
+	const auto view = machine.memory.memview(address, str.size()+1);
 	// compare using memcmp because we have a known length
 	if (std::memcmp(str.data(), view.begin(), str.size()+1)) {
 		abort();
@@ -168,9 +168,9 @@ void test_setup()
 		LIVEPATCH_FAST_PATH("test_threads_args1");
 		LIVEPATCH_FAST_PATH("test_threads_args2");
 		LIVEPATCH_FAST_PATH("test_memcpy");
-		LIVEPATCH_FAST_PATH("test_syscall_memcpy");
+		//LIVEPATCH_FAST_PATH("test_syscall_memcpy");
 		LIVEPATCH_FAST_PATH("test_memset");
-		LIVEPATCH_FAST_PATH("test_syscall_memset");
+		//LIVEPATCH_FAST_PATH("test_syscall_memset");
 		LIVEPATCH_FAST_PATH("test_sieve");
 		LIVEPATCH_FAST_PATH("test_taylor");
 	}
@@ -243,7 +243,7 @@ uint64_t riscv_measure_mips()
 {
 	machine->reset_instruction_counter();
 	static CachedAddress<CPUBITS> fa;
-	machine->vmcall(fa.get(*machine, "measure_mips"), 64000);
+	machine->vmcall<500'000'000ULL>(fa.get(*machine, "measure_mips"), 64000);
 	return machine->instruction_counter();
 }
 void bench_fork()

@@ -52,7 +52,7 @@ extern void run_selftest();
 extern void test_setup();
 extern void test_setup_resume();
 extern uint64_t riscv_measure_mips();
-extern void bench_fork();
+//extern void bench_fork();
 extern void test_1_riscv_vmcall_empty();
 template <int N> extern void test_1_riscv_args();
 extern void test_1_riscv_preempt_empty();
@@ -145,7 +145,7 @@ int main()
 
 		run_test("libriscv: preempt overhead", 0, S, test_setup, test_1_riscv_preempt_empty);
 		//run_test("libriscv: lookup overhead", 0, S, test_setup, test_1_riscv_lookup);
-		run_test("libriscv: fork", 0, S, test_setup, bench_fork);
+		//run_test("libriscv: fork", 0, S, test_setup, bench_fork);
 		run_test("libriscv: resume execution", BOH, S, test_setup_resume, test_1_riscv_resume);
 	}
 	if constexpr (test_lua) {

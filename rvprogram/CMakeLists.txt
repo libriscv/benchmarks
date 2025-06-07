@@ -15,7 +15,7 @@ if (GCC_TRIPLE STREQUAL "riscv32-unknown-elf")
 else()
 	set(RISCV_ABI "-march=rv64imfd_zba_zbb_zbc_zbs -mabi=lp64d")
 endif()
-#set(COMMON    "${COMMON} -flto")
+set(COMMON    "${COMMON} -fno-builtin-memcpy -fno-builtin-memset -fno-builtin-memmove -fno-builtin-memcmp")
 if (NOT LIBC_USE_STDLIB)
 	set(COMMON    "${COMMON} -fno-builtin")
 endif()
@@ -61,6 +61,11 @@ target_compile_definitions(libc PUBLIC
 add_executable(rvbinary ${SOURCES})
 target_include_directories(rvbinary PRIVATE ${CMAKE_SOURCE_DIR}/../src/include)
 target_link_libraries(rvbinary -static -Wl,--whole-archive libc tinyprintf -Wl,--no-whole-archive ${LIBGCC})
+target_link_libraries(rvbinary
+	-Wl,--wrap=memcpy,--wrap=memset,--wrap=memmove,--wrap=memcmp
+	-Wl,--wrap=strlen,--wrap=strcmp,--wrap=strncmp
+	-Wl,--wrap=malloc,--wrap=calloc,--wrap=realloc,--wrap=free
+)
 # place ELF into the top binary folder
 set_target_properties(rvbinary
 	PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"

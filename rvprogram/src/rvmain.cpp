@@ -317,8 +317,8 @@ PUBLIC_API long test_threads_args2()
 	return microthread::join(thread);
 }
 
-static uint8_t src_array[600] __attribute__((aligned(16)));
-static uint8_t dst_array[600] __attribute__((aligned(16)));
+static int src_array[300] __attribute__((aligned(16)));
+static int dst_array[300] __attribute__((aligned(16)));
 static_assert(sizeof(src_array) == sizeof(dst_array), "!");
 
 PUBLIC_API void* test_memcpy()
