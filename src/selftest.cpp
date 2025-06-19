@@ -1,11 +1,17 @@
 #include <libriscv/machine.hpp>
 #include "testhelp.hpp"
 using namespace riscv;
+#if RISCV_ARCH == 32
 static constexpr int CPUBITS = riscv::RISCV32;
+#else
+static constexpr int CPUBITS = riscv::RISCV64;
+#endif
 using machine_t = Machine<CPUBITS>;
-
-//static const char* TEST_BINARY = "../rvprogram/rustbin/target/CPUBITSimac-unknown-none-elf/debug/rustbin";
-static const char* TEST_BINARY = "../rvbinary";
+#ifdef RUST_BINARY
+const char* TEST_BINARY = "../rvprogram/rustbin/target/riscv32imac-unknown-none-elf/release/rustbin";
+#else
+const char* TEST_BINARY = (CPUBITS == RISCV32) ? "../rv32-binary" : "../rv64-binary";
+#endif
 
 static void setup_selftest_machine(machine_t& machine)
 {
@@ -42,8 +48,9 @@ void run_selftest()
 	machine.print_and_pause();
 #endif
 
-	printf("Self-test running ELF entry at 0x%lX\n",
-			(long) machine.memory.start_address());
+	printf("Self-test running %s ELF entry at 0x%lX\n",
+			TEST_BINARY,
+			(long)machine.memory.start_address());
 	machine.cpu.reg(10) = 666;
 	try {
 		// run until it stops

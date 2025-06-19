@@ -102,12 +102,6 @@ extern void test_9_memset_riscv();
 extern void test_9_memset_native_riscv();
 extern void test_9_memset_lua();
 
-#ifdef RUST_BINARY
-const char* TEST_BINARY = "../rvprogram/rustbin/target/riscv32imac-unknown-none-elf/release/rustbin";
-#else
-const char* TEST_BINARY = "../rvbinary";
-#endif
-
 #ifdef LUAU
 #define LUANAME "luau"
 #elif defined(LUAJIT)

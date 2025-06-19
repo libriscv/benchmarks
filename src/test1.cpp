@@ -8,7 +8,11 @@
 #include "luascript.hpp"
 #endif
 using namespace riscv;
+#if RISCV_ARCH == 32
 static constexpr int CPUBITS = riscv::RISCV32;
+#else
+static constexpr int CPUBITS = riscv::RISCV64;
+#endif
 using machine_t = Machine<CPUBITS>;
 
 static std::vector<uint8_t> rvbinary;
