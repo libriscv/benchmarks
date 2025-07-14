@@ -118,7 +118,9 @@ static unsigned acounter = 0;
 PUBLIC_API void test_array_append(int arg1)
 {
 	// Bounds-check not strictly necessary, as test is run 2000 times.
-	array.at(acounter++) = arg1;
+	//array.at(acounter++) = arg1;
+	array[acounter & 2047] = arg1;
+	acounter ++;
 }
 // Vector-based append
 #include <vector>
@@ -127,7 +129,9 @@ static unsigned vcounter = 0;
 
 PUBLIC_API void test_vector_append(int arg1)
 {
-	vec.at(vcounter++) = arg1;
+	//vec.at(vcounter++) = arg1;
+	vec[vcounter & 2047] = arg1;
+	vcounter ++;
 }
 
 struct Test {

@@ -110,41 +110,41 @@ void test_setup()
 			.translate_automatic_nbit_address_space = true,
 #endif
 		}};
-		machine_t* machine = machine_that_holds_execute_segment;
-		assert(machine->address_of("empty_function") != 0);
-		assert(machine->address_of("test_overhead_args") != 0);
-		assert(machine->address_of("test_array_append") != 0);
-		assert(machine->address_of("test_vector_append") != 0);
-		assert(machine->address_of("test_args") != 0);
-		assert(machine->address_of("test_maffs1") != 0);
-		assert(machine->address_of("test_maffs2") != 0);
-		assert(machine->address_of("test_maffs3") != 0);
-		assert(machine->address_of("test_fib") != 0);
-		assert(machine->address_of("test_print") != 0);
-		assert(machine->address_of("test_longcall") != 0);
-		assert(machine->address_of("test_memcpy") != 0);
-		assert(machine->address_of("test_syscall_memcpy") != 0);
-		test_1_empty_addr = machine->address_of("empty_function");
-		test_1_overhead_args_addr = machine->address_of("test_overhead_args");
-		test_1_array_addr = machine->address_of("test_array_append");
-		test_1_vector_addr = machine->address_of("test_vector_append");
-		test_1_syscall_addr[0] = machine->address_of("test_syscall0");
-		test_1_syscall_addr[1] = machine->address_of("test_syscall1");
-		test_1_syscall_addr[2] = machine->address_of("test_syscall2");
-		test_1_syscall_addr[3] = machine->address_of("test_syscall3");
-		test_1_syscall_addr[4] = machine->address_of("test_syscall4");
-		test_1_syscall_addr[5] = machine->address_of("test_syscall5");
-		test_1_syscall_addr[6] = machine->address_of("test_syscall6");
-		test_1_syscall_addr[7] = machine->address_of("test_syscall7");
-		test_3_fib_addr = machine->address_of("test_fib");
+		machine_t* m = machine_that_holds_execute_segment;
+		assert(m->address_of("empty_function") != 0);
+		assert(m->address_of("test_overhead_args") != 0);
+		assert(m->address_of("test_array_append") != 0);
+		assert(m->address_of("test_vector_append") != 0);
+		assert(m->address_of("test_args") != 0);
+		assert(m->address_of("test_maffs1") != 0);
+		assert(m->address_of("test_maffs2") != 0);
+		assert(m->address_of("test_maffs3") != 0);
+		assert(m->address_of("test_fib") != 0);
+		assert(m->address_of("test_print") != 0);
+		assert(m->address_of("test_longcall") != 0);
+		assert(m->address_of("test_memcpy") != 0);
+		assert(m->address_of("test_syscall_memcpy") != 0);
+		test_1_empty_addr = m->address_of("empty_function");
+		test_1_overhead_args_addr = m->address_of("test_overhead_args");
+		test_1_array_addr = m->address_of("test_array_append");
+		test_1_vector_addr = m->address_of("test_vector_append");
+		test_1_syscall_addr[0] = m->address_of("test_syscall0");
+		test_1_syscall_addr[1] = m->address_of("test_syscall1");
+		test_1_syscall_addr[2] = m->address_of("test_syscall2");
+		test_1_syscall_addr[3] = m->address_of("test_syscall3");
+		test_1_syscall_addr[4] = m->address_of("test_syscall4");
+		test_1_syscall_addr[5] = m->address_of("test_syscall5");
+		test_1_syscall_addr[6] = m->address_of("test_syscall6");
+		test_1_syscall_addr[7] = m->address_of("test_syscall7");
+		test_3_fib_addr = m->address_of("test_fib");
 
-		if (machine->memory.exit_address() != machine->address_of("fast_exit") || machine->memory.exit_address() == 0x0) {
+		if (m->memory.exit_address() != m->address_of("fast_exit") || m->memory.exit_address() == 0x0) {
 			//throw std::runtime_error("'fast_exit' was not found in the RISC-V benchmark program");
 			fprintf(stderr, "'fast_exit' was not found in the RISC-V benchmark program\n");
 		}
 
 		#define LIVEPATCH_FAST_PATH(func) \
-			if (!machine->cpu.create_fast_path_function(machine->address_of(func))) { \
+			if (!m->cpu.create_fast_path_function(m->address_of(func))) { \
 				throw std::runtime_error("Failed to create fast path for " func); \
 			}
 
@@ -177,56 +177,57 @@ void test_setup()
 		//LIVEPATCH_FAST_PATH("test_syscall_memset");
 		LIVEPATCH_FAST_PATH("test_sieve");
 		LIVEPATCH_FAST_PATH("test_taylor");
-	}
-	delete machine;
-	machine = new machine_t {rvbinary, MachineOptions<CPUBITS>{
-		.memory_max = 32*1024*1024,
-		.default_exit_function = "fast_exit",
+
+		delete machine;
+		machine = new machine_t {rvbinary, MachineOptions<CPUBITS>{
+			.memory_max = 32*1024*1024,
+			.default_exit_function = "fast_exit",
 #ifdef RISCV_BINARY_TRANSLATION
-		.translate_ignore_instruction_limit = true,
-		.translate_automatic_nbit_address_space = true,
+			.translate_ignore_instruction_limit = true,
+			.translate_automatic_nbit_address_space = true,
 #endif
-	}};
+		}};
 
-	// the minimum number of syscalls needed for malloc and C++ exceptions
-	machine->setup_minimal_syscalls();
+		// the minimum number of syscalls needed for malloc and C++ exceptions
+		machine->setup_minimal_syscalls();
 
-	static const uint32_t HEAP_SIZE = 16ull*1024*1024;
-	const auto heap_base = machine->memory.mmap_allocate(HEAP_SIZE);
-	machine->setup_native_heap(1, heap_base, HEAP_SIZE);
-	machine->setup_native_memory(6);
-	machine->setup_native_threads(21);
+		static const uint32_t HEAP_SIZE = 16ull*1024*1024;
+		const auto heap_base = machine->memory.mmap_allocate(HEAP_SIZE);
+		machine->setup_native_heap(1, heap_base, HEAP_SIZE);
+		machine->setup_native_memory(6);
+		machine->setup_native_threads(21);
 
-	machine->install_syscall_handler(40, syscall_print<CPUBITS>);
-	machine->install_syscall_handler(41, syscall_longcall<CPUBITS>);
-	machine->install_syscall_handler(42, syscall_nothing<CPUBITS>);
+		machine->install_syscall_handler(40, syscall_print<CPUBITS>);
+		machine->install_syscall_handler(41, syscall_longcall<CPUBITS>);
+		machine->install_syscall_handler(42, syscall_nothing<CPUBITS>);
 
-	machine->install_syscall_handler(43, syscall_fmod<CPUBITS>);
-	machine->install_syscall_handler(44, syscall_powf<CPUBITS>);
-	machine->install_syscall_handler(45, syscall_strcmp<CPUBITS>);
+		machine->install_syscall_handler(43, syscall_fmod<CPUBITS>);
+		machine->install_syscall_handler(44, syscall_powf<CPUBITS>);
+		machine->install_syscall_handler(45, syscall_strcmp<CPUBITS>);
 
-	machine->setup_argv({"rvprogram"});
+		machine->setup_argv({"rvprogram"});
 
-	try {
-		// run until it stops
-		machine->simulate();
-	} catch (riscv::MachineException& me) {
-		printf(">>> Machine exception %d: %s (data: 0x%lX)\n",
-				me.type(), me.what(), me.data());
+		try {
+			// run until it stops
+			machine->simulate();
+		} catch (riscv::MachineException& me) {
+			printf(">>> Machine exception %d: %s (data: 0x%lX)\n",
+					me.type(), me.what(), me.data());
 #ifdef RISCV_DEBUG
-		machine->print_and_pause();
+			machine->print_and_pause();
 #endif
+		}
+		assert(machine->cpu.reg(10) == 0);
+
+		stored.store(*machine, "test_args",
+			"This is a string", test,
+			333, 444, 555, 666, 777, 888);
+
+		caller_test_1_empty = std::make_unique<PreparedCall<CPUBITS, void()>>(*machine, "empty_function");
+		caller_test_2_3 = std::make_unique<PreparedCall<CPUBITS, int(const char*, Test, int, int, int, int, int, int)>>(*machine, "test_args");
+
+		machine->set_max_instructions(5'000'000ULL);
 	}
-	assert(machine->cpu.reg(10) == 0);
-
-	stored.store(*machine, "test_args",
-		"This is a string", test,
-		333, 444, 555, 666, 777, 888);
-
-	caller_test_1_empty = std::make_unique<PreparedCall<CPUBITS, void()>>(*machine, "empty_function");
-	caller_test_2_3 = std::make_unique<PreparedCall<CPUBITS, int(const char*, Test, int, int, int, int, int, int)>>(*machine, "test_args");
-
-	machine->set_max_instructions(5'000'000ULL);
 
 #ifndef LUA_DISABLED
 	delete lua_callable;
