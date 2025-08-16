@@ -4,6 +4,7 @@
 #include <libriscv/cached_address.hpp>
 #include <libriscv/prepared_call.hpp>
 #include <cmath>
+#include <thread>
 #ifndef LUA_DISABLED
 #include "luascript.hpp"
 #endif
@@ -107,6 +108,8 @@ void test_setup()
 			.default_exit_function = "fast_exit",
 #ifdef RISCV_BINARY_TRANSLATION
 			.translate_ignore_instruction_limit = true,
+			.translate_use_register_caching = riscv::libtcc_enabled,
+			.translate_use_syscall_clobbering_optimization = true,
 			.translate_automatic_nbit_address_space = true,
 #endif
 		}};

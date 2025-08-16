@@ -30,13 +30,17 @@ void run_selftest()
 
 #ifdef RISCV_BINARY_TRANSLATION
 	std::vector<riscv::MachineTranslationOptions> cc;
-	cc.push_back(riscv::MachineTranslationEmbeddableCodeOptions {});
+	// We don't want to use embeddable code when benchmarking JIT
+	if constexpr (!riscv::libtcc_enabled) {
+		cc.push_back(riscv::MachineTranslationEmbeddableCodeOptions {});
+	}
 #endif
 
 	machine_t machine {rvbinary, {
 		.memory_max = 32*1024*1024,
 #ifdef RISCV_BINARY_TRANSLATION
 		.translate_ignore_instruction_limit = true,
+		.translate_use_syscall_clobbering_optimization = true,
 		.translate_automatic_nbit_address_space = true,
 		.cross_compile = cc,
 #endif
